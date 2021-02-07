@@ -5,7 +5,7 @@ int main()//int main(int argc, char *argv[])
     printf("Assembling..\n");
     setlocale(LC_ALL, "russian");
 
-    text_t text_s    = {}; //структура текста
+    text_t text_s    = {}; // структура текста
 
     FILE* text = fopen("user_code[for user].txt", "r");
 
