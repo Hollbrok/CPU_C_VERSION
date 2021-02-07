@@ -133,22 +133,16 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     assert(code_s);
     assert(ass_s);
 
-    ass_s->data     = (double*) calloc(code_s->terms + 2, sizeof(double));
+    ass_s->data      = (double*) calloc(code_s->terms + 2, sizeof(double));
     assert(ass_s->data);
 
-    ass_s->rix_data = (double*) calloc(code_s->terms + 2, sizeof(double));
-    assert(ass_s->rix_data);
+    double* rix_call = (double*) calloc(code_s->terms + 2, sizeof(double));
+    assert(rix_call);
 
-    ass_s->rix_call   = (int*) calloc(code_s->terms + 2, sizeof(int));
-    assert(ass_s->rix_call);
-
-    ass_s->cur_rix = 0;
+    int rix_cur_size = 0;
 
     int assembler_size = 0;
 
-    /*Возможно костыль*/
-    ass_s->rix_call[0] = -1;
-    /*Возможно костыль*/
 
     #ifdef DEBUG
         printf("TERMS = %d\n", code_s->terms);
@@ -156,6 +150,8 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     #endif
 
     int cur_code_size  = 0;
+
+
 
     for(int i = 0; i < code_s->terms; i++)
     {
@@ -170,7 +166,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
         int j = 0;
 
-        for(j = 0; j < MAX_SIZE_COMMAND; j++)
+        for(j; j < MAX_SIZE_COMMAND; j++)
         {
             if(code_s->data[j + cur_code_size] != ' ')
             {
@@ -201,8 +197,9 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
         if(!strcmp(temp, "push"))
         {
-            ass_s->data[i]       = 1;
-            IS_LAST_COMMAND_PUSH = 1;
+            ass_s->data[i]           = 1;
+            //rix_call[rix_cur_size++] = 1;
+            IS_LAST_COMMAND_PUSH     = 1;
         }
         else if(!strcmp(temp, "add"))
             ass_s->data[i] = 2;
@@ -236,16 +233,14 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             ass_s->data[i] = 16;
         else if(!strcmp(temp, "rax"))
         {
-            ass_s->data[i]                      = 17;
-            ass_s->rix_data[ass_s->cur_rix]     = 17;
-            ass_s->rix_call[ass_s->cur_rix++]   = i;
+            ass_s->data[i]           = 17;
+            rix_call[rix_cur_size++] = 2;
         }
         else if(!strcmp(temp, "rbx"))
         {
             //printf("ass_s->cur_rix = %d", ass_s->cur_rix);
-            ass_s->data[i]                      = 18;
-            ass_s->rix_data[ass_s->cur_rix]     = 18;
-            ass_s->rix_call[ass_s->cur_rix++]     = i;
+            ass_s->data[i]           = 18;
+            rix_call[rix_cur_size++] = 2;
             //printf("i = %d\n", i);
             //printf("ass_s->cur_rix = %d\n", ass_s->cur_rix);
             //printf("ass_s->rix_call[cur_rix = %d] = %d\n\n\n", ass_s->cur_rix, ass_s->rix_call[ass_s->cur_rix]);
@@ -254,15 +249,13 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         }
         else if(!strcmp(temp, "rcx"))
         {
-            ass_s->data[i]                      = 19;
-            ass_s->rix_data[ass_s->cur_rix]     = 19;
-            ass_s->rix_call[ass_s->cur_rix++]   = i;
+            ass_s->data[i]           = 19;
+            rix_call[rix_cur_size++] = 2;
         }
         else if(!strcmp(temp, "rdx"))
         {
-            ass_s->data[i]                      = 20;
-            ass_s->rix_data[ass_s->cur_rix]     = 20;
-            ass_s->rix_call[ass_s->cur_rix++]   = i;
+            ass_s->data[i]           = 20;
+            rix_call[rix_cur_size++] = 2;
         }
         else if(!strcmp(temp, "pop"))
             ass_s->data[i] = 21;
@@ -284,6 +277,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             if(IS_LAST_COMMAND_PUSH)
             {
                 ass_s->data[i]    = (double) std::atof(temp);
+                rix_call[rix_cur_size++] = 1;
                 IS_LAST_COMMAND_PUSH = 0;
             }
             else
@@ -321,15 +315,28 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
 
-    int cur_rix = 0;
+    //int cur_rix = 0;
+    //for(int i = 0; i < rix_cur_size; i++)
+       // printf("[%lg]", rix_call[i]);
+    //printf("\n");
+
+    rix_cur_size = 0;
+
 
     for(int i = 0; i < ass_s->ass_size; i++)
     {
-        if(ass_s->rix_call[cur_rix] == i)
-            fprintf(assembler_txt, "[[%.2lf]] ", ass_s->rix_data[cur_rix++]);
+        if((ass_s->data[i] == 1) || (ass_s->data[i] == 21))
+        {
+            fprintf(assembler_txt, "%lg ", ass_s->data[i]);
+            fprintf(assembler_txt, "[%lg] ", rix_call[rix_cur_size++]);
+            i++;
+            fprintf(assembler_txt, "(%lg) ", ass_s->data[i]);
+        }
         else
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
     }
+
+    free(rix_call);
 
     fclose(assembler_txt);
 
@@ -457,10 +464,6 @@ void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пр�
     free(ass_s->data);
     ass_s->data = nullptr;
 
-    free(ass_s->rix_data);
-    free(ass_s->rix_call);
-
-    ass_s->cur_rix  = 0;
     ass_s->ass_size = 0;
 }
 
