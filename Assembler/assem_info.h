@@ -25,9 +25,6 @@ struct code_t
 struct ass_code
 {
     double* data            = nullptr;
-    double* rix_data        = nullptr;
-    int*    rix_call        = nullptr;
-    int     cur_rix         = 0;
     int     ass_size        = 0;
 };
 
