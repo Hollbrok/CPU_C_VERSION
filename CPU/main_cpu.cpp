@@ -22,7 +22,7 @@ int main()
 
     CPU(&ass_s, &Stack);     //(&ass_s, &Stack, &reg_s); //with registers
 
-    print_for_user(&Stack);  // information for user
+    //print_for_user(&Stack);  // information for user
     stack_dump(&Stack);      // information for me
     printf("DONE!!\n");
     //getch();
