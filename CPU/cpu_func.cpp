@@ -26,12 +26,12 @@ void make_ass_s(FILE* text, ass_code* ass_s)
         if(buffer_char[index] == ' ')
             space_counter++;
 
-    int size_buffer = space_counter;
+    ass_s->max_ass_size = space_counter;//int size_buffer = space_counter;
     //printf("Размер buffer_double = %d\n", size_buffer);
 
-    ass_s->data     = (double*) calloc(size_buffer, sizeof(double));
+    ass_s->data     = (double*) calloc(ass_s->max_ass_size, sizeof(double));
     assert(ass_s->data);
-    ass_s->ass_size = 0;
+    int ass_cur_size = 0;
 
     while(*buffer_char)//for(int index = 0; index < size_buffer; index++)
     {
@@ -39,9 +39,12 @@ void make_ass_s(FILE* text, ass_code* ass_s)
         double temp_val = get_number(&buffer_char);
         //printf("temp_val = %lg\n", temp_val);
 
-        ass_s->data[ass_s->ass_size++] = temp_val;
+        ass_s->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
+
+    //printf("max = %d, size = %d\n", ass_s->max_ass_size, ass_s->ass_size);
+    ass_s->max_ass_size = ass_cur_size;
     //printf("7777777\n7777777777\n777777777\n");
     //printf("ass_size = [%d]\n", ass_s->ass_size);
     /*for(int index = 0; index < ass_s->ass_size; index++)
@@ -81,11 +84,14 @@ void CPU(ass_code* ass_s, stack_t* Stack)
     if(NEW_COMMAND_ERROR)
         return;
 
-    int skip = -1;
+    struct rix rix_s = {};
+
+    int skip_first  = -1;
+    int skip_second = -1;
 
     //ass_s->cur_rix = 0;
 
-    for(int i = 0; i < ass_s->ass_size; i++)
+    for(int i = 0; i < ass_s->max_ass_size; i++)
     {
         if(EXIT_CONDITION == 1)
             break;
@@ -96,7 +102,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
         #endif
 
 
-        if(skip == i)
+        if((skip_first == i) || (skip_second == i))
         {
             #ifdef DEBUG
                 printf("\n i == skip = %d\n\n", skip);
@@ -110,20 +116,49 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 printf("Pushing this number %lf\n",ass_s->data[i]);
                 printf("(double)push_num = %lf\n", ass_s->data[i]);
             #endif
+            if (ass_s->data[i + 1] == 1)
+                push_stack(Stack, ass_s->data[i + 2]);
+            else if (ass_s->data[i + 1] == 2)
+            {
+                if (ass_s->data[i + 2] == 17)
+                    push_stack(Stack, rix_s.rax);
+                else if (ass_s->data[i + 2] == 18)
+                    push_stack(Stack, rix_s.rbx);
+                else if (ass_s->data[i + 2] == 19)
+                    push_stack(Stack, rix_s.rcx);
+                else if (ass_s->data[i + 2] == 20)
+                    push_stack(Stack, rix_s.rdx);
+            }
 
-            push_stack(Stack, ass_s->data[i + 1]);
-            skip = i + 1;
+            skip_first  = i + 1;
+            skip_second = i + 2;
 
         }
+
         else if(ass_s->data[i] == 21)//POP rix
         {
+            if (ass_s->data[i + 1] == 1)
+                pop_stack(Stack);
+            else if (ass_s->data[i + 1] == 2)
+            {
+                if (ass_s->data[i + 2] == 17)
+                    rix_s.rax = pop_stack(Stack);
+                else if (ass_s->data[i + 2] == 18)
+                    rix_s.rbx = pop_stack(Stack);
+                else if (ass_s->data[i + 2] == 19)
+                    rix_s.rcx = pop_stack(Stack);
+                else if (ass_s->data[i + 2] == 20)
+                    rix_s.rdx = pop_stack(Stack);
+            }
 
-            FILE* error = fopen("[!]ERRORS.txt", "ab");
+            skip_first  = i + 1;
+            skip_second = i + 2;
+
+            /*FILE* error = fopen("[!]ERRORS.txt", "ab");
             fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
             fprintf(error, "ERROR in recognizing registers\n");
             fprintf(error, "assembler_code[%d] = %d", i, (int)ass_s->data[i]);
-            fclose(error);
-
+            fclose(error);*/
         }
         else
         {
@@ -239,7 +274,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     PRINT_STATE = 1;
 
                     fprintf(result, "At your request we show the number at the top of\n"
-                                    "the stack at the time of the call : [%lf]\n\n", x1);
+                                    "the stack at the time of the call : [%lg]\n\n", x1);
                     push_stack(Stack, x1);
                     fclose(result);
                     break;
@@ -427,7 +462,7 @@ void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пр�
     free(ass_s->data);
     ass_s->data = nullptr;
 
-    ass_s->ass_size = 0;
+    ass_s->max_ass_size = 0;
 }
 
 
