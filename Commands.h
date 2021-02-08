@@ -2,6 +2,7 @@
 #define COMMANDS_H_INCLUDED
 
 const int MAX_SIZE_COMMAND  = 20;
+const int MAX_SIZE_LABLE    = 4;
 const int DEBUG_STATE       = 0;
 
 
@@ -29,6 +30,8 @@ enum commands
     RCX         = 19,
     RDX         = 20,
     POP         = 21,
+    LABEL       = 22,
+    JMP         = 23,
 
 };
 
