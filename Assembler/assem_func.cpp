@@ -328,9 +328,9 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         if((ass_s->data[i] == 1) || (ass_s->data[i] == 21))
         {
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
-            fprintf(assembler_txt, "[%lg] ", rix_call[rix_cur_size++]);
+            fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
             i++;
-            fprintf(assembler_txt, "(%lg) ", ass_s->data[i]);
+            fprintf(assembler_txt, "%lg ", ass_s->data[i]);
         }
         else
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
