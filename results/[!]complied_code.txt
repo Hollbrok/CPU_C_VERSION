@@ -1,1 +1,1 @@
-push 15 push 5 add push 12 push 2 sub div push 100 mul push 2 mul sqr push 80 add push 100 div out hlt 
+push 15 pop rbx push rbx push rbx add out hlt 
