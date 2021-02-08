@@ -7,6 +7,7 @@ int PRINT_STATE             = 0;   // Отвечает за то, дополня
 
 int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то gg
 int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
+int IS_LAST_COMMAND_JMP     = 0;
 
 
 void text_construct(text_t* text_s, FILE* text)
@@ -171,7 +172,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             if(code_s->data[j + cur_code_size] != ' ')
             {
                 temp[j] = code_s->data[j + cur_code_size];
-                //printf("_%c[%d]_", temp[j], j);
+                //printf("%c", temp[j], j);
                 #ifdef DEBUG
                     printf("_%c[%d]_", temp[j], j);
                 #endif
@@ -235,27 +236,26 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         {
             ass_s->data[i]           = 17;
             rix_call[rix_cur_size++] = 2;
+            IS_LAST_COMMAND_PUSH = 0;
         }
         else if(!strcmp(temp, "rbx"))
         {
-            //printf("ass_s->cur_rix = %d", ass_s->cur_rix);
             ass_s->data[i]           = 18;
             rix_call[rix_cur_size++] = 2;
-            //printf("i = %d\n", i);
-            //printf("ass_s->cur_rix = %d\n", ass_s->cur_rix);
-            //printf("ass_s->rix_call[cur_rix = %d] = %d\n\n\n", ass_s->cur_rix, ass_s->rix_call[ass_s->cur_rix]);
-            //ass_s->cur_rix++;
+            IS_LAST_COMMAND_PUSH = 0;
 
         }
         else if(!strcmp(temp, "rcx"))
         {
             ass_s->data[i]           = 19;
             rix_call[rix_cur_size++] = 2;
+            IS_LAST_COMMAND_PUSH = 0;
         }
         else if(!strcmp(temp, "rdx"))
         {
             ass_s->data[i]           = 20;
             rix_call[rix_cur_size++] = 2;
+            IS_LAST_COMMAND_PUSH = 0;
         }
         else if(!strcmp(temp, "pop"))
             ass_s->data[i] = 21;
@@ -268,32 +268,88 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             END_STATE = 1;
         }
 
-        else
+        else if (IS_LAST_COMMAND_PUSH)
         {
             #ifdef DEBUG
                 printf("i = %d. _%s_\n", i, temp);
             #endif
-
-            if(IS_LAST_COMMAND_PUSH)
-            {
-                ass_s->data[i]    = (double) std::atof(temp);
-                rix_call[rix_cur_size++] = 1;
-                IS_LAST_COMMAND_PUSH = 0;
-            }
-            else
-            {
-                FILE* error = fopen("[!]ERRORS.txt", "ab");
-                fprintf(error, "\n\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
-                fprintf(error, "Unknown command..\n");
-                fprintf(error, "assembler_code[%d] = %s\n", i, temp);
-                fclose(error);
-                NEW_COMMAND_ERROR = 1;
-                break;//хз, мб убрать break?? по сути ни на что не влияет, так как дальше стоит
-                      //проверка на NEW_COMMAND_ERROR, но убирает дальнейшую обработку команда.
-                      //можно оставить число для проверки как работает после новой команды.
-            }
+            //printf("Ouch..\n");
+            ass_s->data[i]           = (double) std::atof(temp);
+            rix_call[rix_cur_size++] = 1;
+            IS_LAST_COMMAND_PUSH = 0;
+        }
+        else if (strchr(temp, ':'))
+        {
+            //printf("GOOD\n");
+            ass_s->data[i] = 22;
+            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
+            assert(int_data);
 
 
+            //for (int index   = 0; temp[index]; index++)
+            //    printf("old_temp[i] = %c,\n", temp[index]);
+
+            //int index = 0;
+            for (int index = 1; temp[index]; index++)
+                int_data[index - 1]  = ((int)temp[index]) % 10;
+            //temp[index] = '\n';
+            //printf("\t\ttemp[%d] = %c\n", index, temp[index]);
+
+
+            for (int i = 1; temp[i]; i++)
+                printf("new_temp[i] = %c,\n", int_data[i - 1]);
+
+            int temp_int = 0;
+
+            for(int i = 1; temp[i]; i++)
+                temp_int += i * int_data[i - 1];
+
+            printf("int_temp = %d\n", temp_int);
+            rix_call[rix_cur_size++] = temp_int;
+            printf("GOOD\n");
+            free(int_data);
+
+        }
+        else if (!strcmp(temp, "jmp"))
+        {
+            ass_s->data[i]      = 23;
+            IS_LAST_COMMAND_JMP = 1;
+
+        }
+        else if (IS_LAST_COMMAND_JMP)
+        {
+            printf("HAHA\n");
+            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
+            assert(int_data);
+
+            for (int index = 0; temp[index]; index++)
+                int_data[index]  = ((int)temp[index]) % 10;
+
+            for (int i = 0; temp[i]; i++)
+                printf("int_data[i] = %c,\n", int_data[i]);
+
+            int temp_int = 0;
+
+            for(int i = 0; temp[i]; i++)
+                temp_int += (i + 1) * int_data[i];
+
+            printf("\ttemp_int = %d\n", temp_int);
+            ass_s->data[i]      = temp_int;
+            IS_LAST_COMMAND_JMP = 0;
+            free(int_data);
+        }
+        else
+        {
+            FILE* error = fopen("[!]ERRORS.txt", "ab");
+            fprintf(error, "\n\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
+            fprintf(error, "Unknown command..\n");
+            fprintf(error, "assembler_code[%d] = %s\n", i, temp);
+            fclose(error);
+            NEW_COMMAND_ERROR = 1;
+            free(temp);//!!!!!!!!!!!!!!!!!!!!!!
+            break;//хз, мб убрать break?? по сути ни на что не влияет, так как дальше стоит
+                    //проверка на NEW_COMMAND_ERROR, но убирает дальнейшую обработку команда.
+                    //можно оставить число для проверки как работает после новой команды.
 
             #ifdef DEBUG
                 printf("assembler_code = %lf\n\n\n", ass_s->data[i]);
@@ -307,18 +363,11 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
 
     if(NEW_COMMAND_ERROR)
-    {
-        //free(ass_s->data);
-        //ass_s->data = nullptr;
         return;
-    }
+
 
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
 
-    //int cur_rix = 0;
-    //for(int i = 0; i < rix_cur_size; i++)
-       // printf("[%lg]", rix_call[i]);
-    //printf("\n");
 
     rix_cur_size = 0;
 
@@ -331,6 +380,11 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
             i++;
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
+        }
+        else if (ass_s->data[i] == 22)
+        {
+           fprintf(assembler_txt, "%lg ", ass_s->data[i]);
+           fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
         }
         else
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
