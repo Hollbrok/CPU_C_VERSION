@@ -1,56 +1,23 @@
-Number of lines      = 18
-Length of the file   = 102
+Number of lines      = 7
+Length of the file   = 46
 lines[1]. $push 15$
 	length = 7
 
-lines[2]. $push 5$
-	length = 6
-
-lines[3]. $add$
-	length = 3
-
-lines[4]. $push 12$
+lines[2]. $pop rbx$
 	length = 7
 
-lines[5]. $push 2$
-	length = 6
-
-lines[6]. $sub$
-	length = 3
-
-lines[7]. $div$
-	length = 3
-
-lines[8]. $push 100$
+lines[3]. $push rbx$
 	length = 8
 
-lines[9]. $mul$
-	length = 3
-
-lines[10]. $push 2$
-	length = 6
-
-lines[11]. $mul$
-	length = 3
-
-lines[12]. $sqr$
-	length = 3
-
-lines[13]. $push 80$
-	length = 7
-
-lines[14]. $add$
-	length = 3
-
-lines[15]. $push 100$
+lines[4]. $push rbx$
 	length = 8
 
-lines[16]. $div$
+lines[5]. $add$
 	length = 3
 
-lines[17]. $out$
+lines[6]. $out$
 	length = 3
 
-lines[18]. $hlt$
+lines[7]. $hlt$
 	length = 3
 
