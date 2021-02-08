@@ -26,7 +26,7 @@ void make_ass_s(FILE* text, ass_code* ass_s)
         if(buffer_char[index] == ' ')
             space_counter++;
 
-    ass_s->max_ass_size = space_counter;//int size_buffer = space_counter;
+    ass_s->max_ass_size = space_counter; //int size_buffer = space_counter;
     //printf("Размер buffer_double = %d\n", size_buffer);
 
     ass_s->data     = (double*) calloc(ass_s->max_ass_size, sizeof(double));
