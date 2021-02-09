@@ -1,23 +1,32 @@
-Number of lines      = 7
-Length of the file   = 46
-lines[1]. $push 15$
+Number of lines      = 10
+Length of the file   = 63
+lines[1]. $push 5$
+	length = 6
+
+lines[2]. $push 15,4$
+	length = 9
+
+lines[3]. $push 2$
+	length = 6
+
+lines[4]. $ja :L33$
 	length = 7
 
-lines[2]. $pop rbx$
-	length = 7
+lines[5]. $push 1$
+	length = 6
 
-lines[3]. $push rbx$
-	length = 8
+lines[6]. $L33:$
+	length = 4
 
-lines[4]. $push rbx$
-	length = 8
+lines[7]. $push 5$
+	length = 6
 
-lines[5]. $add$
+lines[8]. $add$
 	length = 3
 
-lines[6]. $out$
+lines[9]. $out$
 	length = 3
 
-lines[7]. $hlt$
+lines[10]. $hlt$
 	length = 3
 
