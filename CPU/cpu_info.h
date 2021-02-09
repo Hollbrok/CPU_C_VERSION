@@ -7,7 +7,6 @@ struct ass_code
 {
     double* data            = nullptr;
     int     max_ass_size    = 0;
-    //int     ass_size        = 0;
 };
 
 struct rix
