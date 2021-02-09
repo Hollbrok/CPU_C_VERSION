@@ -1,0 +1,152 @@
+<html>
+<head>
+<title>StackLib build log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>
+<body>
+<tt>
+Build started on: <u>20-12-2020 at 01:48.02</u><br />
+Build ended on: <u>20-12-2020 at 01:48.04</u><p />
+<b>-------------- Build: Debug in StackLib (compiler: GNU GCC Compiler - Strict)---------------</b><br />
+g++.exe  -c C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp -o obj\Debug\stack_func.o  -Wall -g  -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wmissing-field-initializers -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -D_DEBUG -D_EJUDGE_CLIENT_SIDE -D_EJC<br />
+In file included from C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack.h:14,<br />
+                 from C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:2:<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_config.h:7:39: warning: overflow in conversion from 'float' to 'int' changes value from '+QNaNf' to '0' [-Woverflow]</font><br />
+    7 | const int POISON_SIZES              = NAN;<br />
+      |                                       ^~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'void stack_dump(stack_t*)':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:187:71: warning: format '%s' expects argument of type 'char*', but argument 6 has type 'int' [-Wformat=]</font><br />
+  187 |         fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, Stack-&gt;hash_stack, sec_lvl);<br />
+      |                                                                      ~^                                        ~~~~~~~~~~~~~~~~~<br />
+      |                                                                       |                                               |<br />
+      |                                                                       char*                                           int<br />
+      |                                                                      %d<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:187:22: warning: too many arguments for format [-Wformat-extra-args]</font><br />
+  187 |         fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, Stack-&gt;hash_stack, sec_lvl);<br />
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:187:71: warning: format '%s' expects argument of type 'char*', but argument 6 has type 'int' [-Wformat=]</font><br />
+  187 |         fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, Stack-&gt;hash_stack, sec_lvl);<br />
+      |                                                                      ~^                                        ~~~~~~~~~~~~~~~~~<br />
+      |                                                                       |                                               |<br />
+      |                                                                       char*                                           int<br />
+      |                                                                      %d<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:187:22: warning: too many arguments for format [-Wformat-extra-args]</font><br />
+  187 |         fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, Stack-&gt;hash_stack, sec_lvl);<br />
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:188:26: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  188 |         char* addres_n = "notepad ";<br />
+      |                          ^~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:200:29: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  200 |         char* type_string = "";<br />
+      |                             ^~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:201:22: warning: comparison with string literal results in unspecified behavior [-Waddress]</font><br />
+  201 |         if(FORMAT == "lg")<br />
+      |                      ^~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:203:27: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  203 |             type_string = "double";<br />
+      |                           ^~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:205:27: warning: comparison with string literal results in unspecified behavior [-Waddress]</font><br />
+  205 |         else if(FORMAT == "d")<br />
+      |                           ^~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:207:27: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  207 |             type_string = "int";<br />
+      |                           ^~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:209:27: warning: comparison with string literal results in unspecified behavior [-Waddress]</font><br />
+  209 |         else if(FORMAT == "c")<br />
+      |                           ^~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:211:27: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  211 |             type_string = "char";<br />
+      |                           ^~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:213:27: warning: comparison with string literal results in unspecified behavior [-Waddress]</font><br />
+  213 |         else if(FORMAT == "s")<br />
+      |                           ^~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:215:27: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  215 |             type_string = "string";<br />
+      |                           ^~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:219:27: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  219 |             type_string = "ERROR";<br />
+      |                           ^~~~~~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'int stack_verify(stack_t*)':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:310:33: warning: comparing floating point with == or != is unsafe [-Wfloat-equal]</font><br />
+  310 |     else if((Stack-&gt;data[-1] != CANARY_LEFT_DATA) &amp;&amp; ((!low_sec) &amp;&amp; (!med_sec)))<br />
+      |                                 ^~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:316:58: warning: comparing floating point with == or != is unsafe [-Wfloat-equal]</font><br />
+  316 |     else if((Stack-&gt;data[Stack-&gt;capacity] != (type_data) CANARY_RIGHT_DATA) &amp;&amp; ((!low_sec) &amp;&amp; (!med_sec)))<br />
+      |                                                          ^~~~~~~~~~~~~~~~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'char* error_print()':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:346:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  346 |             return "NULL STACK PTR";<br />
+      |                    ^~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:348:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  348 |             return "NULL DATA PTR";<br />
+      |                    ^~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:350:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  350 |             return "CUR BIGGER THAN CAPACITY";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:352:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  352 |             return "CUR LESS THAN ZERO";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:354:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  354 |             return "CAPACITY LESS THAN ZERO";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:356:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  356 |             return "CAPACITY IS NOT A NORMAL NUMBER";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:358:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  358 |             return "CUR_SIZE IS NOT A NORMAL NUMBER";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:360:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  360 |             return "DOUBLE CONSTRUCT";<br />
+      |                    ^~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:362:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  362 |             return "ERROR_DATA_LEFT";<br />
+      |                    ^~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:364:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  364 |             return "ERROR_DATA_RIGHT";<br />
+      |                    ^~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:366:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  366 |             return "ERROR_STACK_LEFT";<br />
+      |                    ^~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:368:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  368 |             return "ERROR_STACK_RIGHT";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:370:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  370 |             return "Somebody is trying to hack a stack";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:372:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  372 |             return " MAX_CAPACITY_ERROR";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:374:20: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  374 |             return "ERROR IN error_print();\n";<br />
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'int hash_stack(stack_t*)':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:460:225: warning: suggest parentheses around '-' in operand of '&amp;' [-Wparentheses]</font><br />
+  460 |             Hash += (int) (N * ((double)(A * ((int) (Stack-&gt;data[i]) | (int) (Stack-&gt;data[i - 1]))) - (int) (A * ((int) (Stack-&gt;data[i]) | (int) (Stack-&gt;data[i - 1]))))) + (int) (Stack-&gt;data[i]) ^ (int) (Stack-&gt;data[i - 1]) - (int) (Stack-&gt;data[i]) &amp; (int) (Stack-&gt;data[i - 1]);<br />
+      |                                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:460:171: warning: suggest parentheses around arithmetic in operand of '^' [-Wparentheses]</font><br />
+  460 |             Hash += (int) (N * ((double)(A * ((int) (Stack-&gt;data[i]) | (int) (Stack-&gt;data[i - 1]))) - (int) (A * ((int) (Stack-&gt;data[i]) | (int) (Stack-&gt;data[i - 1]))))) + (int) (Stack-&gt;data[i]) ^ (int) (Stack-&gt;data[i - 1]) - (int) (Stack-&gt;data[i]) &amp; (int) (Stack-&gt;data[i - 1]);<br />
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'char* define_lvl()':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:482:16: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  482 |         return "LOW";<br />
+      |                ^~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:484:16: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  484 |         return "MEDIUM";<br />
+      |                ^~~~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:486:16: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  486 |         return "HIGH";<br />
+      |                ^~~~~~<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:487:12: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]</font><br />
+  487 |     return "ERROR, CHACK YOUR CODE";<br />
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~<br />
+C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp: In function 'int stack_verify(stack_t*)':<br />
+<font color="#0000ff">C:\Users\Danik\Documents\Задачи_СИ\Projects\Libraries\StackLib\stack_func.cpp:339:1: warning: control reaches end of non-void function [-Wreturn-type]</font><br />
+  339 | }<br />
+      | ^<br />
+ar.exe -r -s libStackLib.a obj\Debug\stack_func.o<br />
+ar.exe: creating libStackLib.a<br />
+Output size is 33.37 KB<br />
+<font color="#0000ff">Process terminated with status 0 (0 minutes, 1 seconds)</font><br />
+<font color="#0000ff">0 errors, 40 warnings (0 minutes, 1 seconds)</font><br />
+</tt>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1608310897 source:c:\users\danik\documents\Задачи_СИ\projects\libraries\stacklib\stack_func.cpp
+	"for_user.h"
+
+1607108165 c:\users\danik\documents\Задачи_СИ\projects\libraries\stacklib\for_user.h
+	"stack.h"
+
+1608310518 c:\users\danik\documents\Задачи_СИ\projects\libraries\stacklib\stack.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<locale.h>
+	<math.h>
+	<assert.h>
+	<string.h>
+	<limits.h>
+	<typeinfo>
+	<ctype.h>
+	"stack_config.h"
+
+1607109416 c:\users\danik\documents\Задачи_СИ\projects\libraries\stacklib\stack_config.h
+
