@@ -2,7 +2,7 @@
 
 int main()
 {
-    printf("CPU..\n");
+    printf("CPU in progress..\n");
 
     setlocale(LC_ALL, "russian");
 
