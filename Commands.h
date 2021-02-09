@@ -19,11 +19,11 @@ enum commands
     POW         = 8,
     SQRT        = 9,
     IN          = 10,
-    PRINT       = 11,
+    PRINT       = 11, // лишняя
     DEL         = 12,
     LN          = 13,
     LOG10       = 14,
-    QUADRATIC   = 15,
+    QUADRATIC   = 15, // лишняя
     LOG2        = 16,
     RAX         = 17,
     RBX         = 18,
@@ -32,7 +32,12 @@ enum commands
     POP         = 21,
     LABEL       = 22,
     JMP         = 23,
-
+    JE          = 24,
+    JAB         = 25,
+    JAE         = 26,
+    JBE         = 27,
+    JA          = 28,
+    JB          = 29,
 };
 
 #endif // COMMANDS_H_INCLUDED
