@@ -7,7 +7,8 @@ int PRINT_STATE             = 0;   // Отвечает за то, дополня
 
 int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то gg
 int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
-int IS_LAST_COMMAND_JMP     = 0;
+int IS_LAST_COMMAND_JMP     = 0;   // Для jmp             |---<|___ одно и тоже, заменить на одну константу
+int IS_LAST_COMMAND_TRANSITION = 0;// Для jmp, je, jbe .. |---<|    и в обработке слов тоже
 
 
 void text_construct(text_t* text_s, FILE* text)
@@ -199,7 +200,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         if(!strcmp(temp, "push"))
         {
             ass_s->data[i]           = 1;
-            //rix_call[rix_cur_size++] = 1;
             IS_LAST_COMMAND_PUSH     = 1;
         }
         else if(!strcmp(temp, "add"))
@@ -236,7 +236,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         {
             ass_s->data[i]           = 17;
             rix_call[rix_cur_size++] = 2;
-            IS_LAST_COMMAND_PUSH = 0;
+            IS_LAST_COMMAND_PUSH     = 0;
         }
         else if(!strcmp(temp, "rbx"))
         {
@@ -249,16 +249,46 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         {
             ass_s->data[i]           = 19;
             rix_call[rix_cur_size++] = 2;
-            IS_LAST_COMMAND_PUSH = 0;
+            IS_LAST_COMMAND_PUSH     = 0;
         }
         else if(!strcmp(temp, "rdx"))
         {
             ass_s->data[i]           = 20;
             rix_call[rix_cur_size++] = 2;
-            IS_LAST_COMMAND_PUSH = 0;
+            IS_LAST_COMMAND_PUSH     = 0;
         }
         else if(!strcmp(temp, "pop"))
             ass_s->data[i] = 21;
+        else if(!strcmp(temp, "je"))
+        {
+            ass_s->data[i] = 24;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
+        else if(!strcmp(temp, "jab"))
+        {
+            ass_s->data[i] = 25;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
+        else if(!strcmp(temp, "jae"))
+        {
+            ass_s->data[i] = 26;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
+        else if(!strcmp(temp, "jbe"))
+        {
+            ass_s->data[i] = 27;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
+        else if(!strcmp(temp, "ja"))
+        {
+            ass_s->data[i] = 28;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
+        else if(!strcmp(temp, "jb"))
+        {
+            ass_s->data[i] = 29;
+            IS_LAST_COMMAND_TRANSITION = 1;
+        }
         else if(!strcmp(temp, "hlt"))
         {
             ass_s->data[i] = 0;
@@ -278,33 +308,43 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             rix_call[rix_cur_size++] = 1;
             IS_LAST_COMMAND_PUSH = 0;
         }
-        else if (strchr(temp, ':'))
+        else if(IS_LAST_COMMAND_TRANSITION)
+        {
+            //rix_call[rix_cur_size++] = 22;
+            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
+            assert(int_data);
+
+            for (int index = 1; temp[index - 1]; index++)
+                int_data[index - 1]  = ((int)temp[index]) % 10;
+
+            int temp_int = 0;
+
+            for(int index = 1; temp[index - 1]; index++)
+                temp_int += (index) * int_data[index - 1];
+
+            ass_s->data[i]   = temp_int;
+            IS_LAST_COMMAND_TRANSITION = 0;
+            free(int_data);
+        }
+        else if (temp[strlen(temp) - 1] == ':')//(strchr(temp, ':'))
         {
             //printf("GOOD\n");
             ass_s->data[i] = 22;
             int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
             assert(int_data);
 
+            for (int index = 0; temp[index + 1]; index++)
+                int_data[index]  = ((int)temp[index]) % 10;
 
-            //for (int index   = 0; temp[index]; index++)
-            //    printf("old_temp[i] = %c,\n", temp[index]);
-
-            //int index = 0;
-            for (int index = 1; temp[index]; index++)
-                int_data[index - 1]  = ((int)temp[index]) % 10;
-            //temp[index] = '\n';
-            //printf("\t\ttemp[%d] = %c\n", index, temp[index]);
-
-
-            for (int i = 1; temp[i]; i++)
-                printf("new_temp[i] = %c,\n", int_data[i - 1]);
+            for (int index = 0; temp[index + 1]; index++)
+                printf("new_temp[index] = %c,\n", int_data[index - 1]);
 
             int temp_int = 0;
 
-            for(int i = 1; temp[i]; i++)
-                temp_int += i * int_data[i - 1];
+            for(int i = 0; temp[i + 1]; i++)
+                temp_int += (i + 1) * int_data[i];
 
-            printf("int_temp = %d\n", temp_int);
+            printf("temp_int = %d\n", temp_int);
             rix_call[rix_cur_size++] = temp_int;
             printf("GOOD\n");
             free(int_data);
@@ -318,24 +358,20 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         }
         else if (IS_LAST_COMMAND_JMP)
         {
-            printf("HAHA\n");
+            //ass_s->data[i] = 22;
             int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
             assert(int_data);
 
-            for (int index = 0; temp[index]; index++)
-                int_data[index]  = ((int)temp[index]) % 10;
-
-            for (int i = 0; temp[i]; i++)
-                printf("int_data[i] = %c,\n", int_data[i]);
+            for (int index = 1; temp[index - 1]; index++)
+                int_data[index - 1]  = ((int)temp[index]) % 10;
 
             int temp_int = 0;
 
-            for(int i = 0; temp[i]; i++)
-                temp_int += (i + 1) * int_data[i];
+            for(int index = 1; temp[index - 1]; index++)
+                temp_int += (index) * int_data[index - 1];
 
-            printf("\ttemp_int = %d\n", temp_int);
-            ass_s->data[i]      = temp_int;
-            IS_LAST_COMMAND_JMP = 0;
+            ass_s->data[i]   = temp_int;
+            IS_LAST_COMMAND_TRANSITION = 0;
             free(int_data);
         }
         else
@@ -381,7 +417,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             i++;
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
         }
-        else if (ass_s->data[i] == 22)
+        else if ((ass_s->data[i] == 22))
         {
            fprintf(assembler_txt, "%lg ", ass_s->data[i]);
            fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
