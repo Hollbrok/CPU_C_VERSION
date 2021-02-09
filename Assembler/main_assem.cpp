@@ -2,7 +2,7 @@
 
 int main()//int main(int argc, char *argv[])
 {
-    printf("Assembling..\n");
+    printf("Assembling in progress..\n");
     setlocale(LC_ALL, "russian");
 
     text_t text_s    = {}; //структура текста
