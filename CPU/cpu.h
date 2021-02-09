@@ -28,3 +28,4 @@ char* set_time(struct tm *u);
 char* define_date(void);
 
 #endif // CPU_H_INCLUDED
+ 
