@@ -361,3 +361,113 @@ capacity    = 10
 *[9] data   = 1,#QNAN (POISON)
 ******************************************************************
 
+	Дата log_stack'a : 09.02.2021 22:37:07, вторник (чч/мм/гг)
+
+
+******************************************************************
+Stack(OK) [0000000000A1FDE0]. "Stack"
+Security lvl is HIGH
+Type of data is double
+Hash        = 54
+size        = 1
+capacity    = 10
+*[0] data   = 10
+*[1] data   = 1,#QNAN (POISON)
+*[2] data   = 1,#QNAN (POISON)
+*[3] data   = 1,#QNAN (POISON)
+*[4] data   = 1,#QNAN (POISON)
+*[5] data   = 1,#QNAN (POISON)
+*[6] data   = 1,#QNAN (POISON)
+*[7] data   = 1,#QNAN (POISON)
+*[8] data   = 1,#QNAN (POISON)
+*[9] data   = 1,#QNAN (POISON)
+******************************************************************
+
+	Дата log_stack'a : 09.02.2021 22:37:34, вторник (чч/мм/гг)
+
+
+******************************************************************
+Stack(OK) [0000000000A1FDE0]. "Stack"
+Security lvl is HIGH
+Type of data is double
+Hash        = 88
+size        = 2
+capacity    = 10
+*[0] data   = 5
+*[1] data   = 6
+*[2] data   = 1,#QNAN (POISON)
+*[3] data   = 1,#QNAN (POISON)
+*[4] data   = 1,#QNAN (POISON)
+*[5] data   = 1,#QNAN (POISON)
+*[6] data   = 1,#QNAN (POISON)
+*[7] data   = 1,#QNAN (POISON)
+*[8] data   = 1,#QNAN (POISON)
+*[9] data   = 1,#QNAN (POISON)
+******************************************************************
+
+	Дата log_stack'a : 09.02.2021 22:38:36, вторник (чч/мм/гг)
+
+
+******************************************************************
+Stack(OK) [0000000000A1FDE0]. "Stack"
+Security lvl is HIGH
+Type of data is double
+Hash        = 54
+size        = 1
+capacity    = 10
+*[0] data   = 10
+*[1] data   = 1,#QNAN (POISON)
+*[2] data   = 1,#QNAN (POISON)
+*[3] data   = 1,#QNAN (POISON)
+*[4] data   = 1,#QNAN (POISON)
+*[5] data   = 1,#QNAN (POISON)
+*[6] data   = 1,#QNAN (POISON)
+*[7] data   = 1,#QNAN (POISON)
+*[8] data   = 1,#QNAN (POISON)
+*[9] data   = 1,#QNAN (POISON)
+******************************************************************
+
+	Дата log_stack'a : 09.02.2021 22:39:27, вторник (чч/мм/гг)
+
+
+******************************************************************
+Stack(OK) [0000000000A1FDE0]. "Stack"
+Security lvl is HIGH
+Type of data is double
+Hash        = 54
+size        = 1
+capacity    = 10
+*[0] data   = 10
+*[1] data   = 1,#QNAN (POISON)
+*[2] data   = 1,#QNAN (POISON)
+*[3] data   = 1,#QNAN (POISON)
+*[4] data   = 1,#QNAN (POISON)
+*[5] data   = 1,#QNAN (POISON)
+*[6] data   = 1,#QNAN (POISON)
+*[7] data   = 1,#QNAN (POISON)
+*[8] data   = 1,#QNAN (POISON)
+*[9] data   = 1,#QNAN (POISON)
+******************************************************************
+
+	Дата log_stack'a : 09.02.2021 22:45:30, вторник (чч/мм/гг)
+
+
+******************************************************************
+Stack(OK) [0000000000A1FDE0]. "Stack"
+Security lvl is HIGH
+Type of data is double
+Hash        = 54
+size        = 1
+capacity    = 10
+*[0] data   = 10
+*[1] data   = 1,#QNAN (POISON)
+*[2] data   = 1,#QNAN (POISON)
+*[3] data   = 1,#QNAN (POISON)
+*[4] data   = 1,#QNAN (POISON)
+*[5] data   = 1,#QNAN (POISON)
+*[6] data   = 1,#QNAN (POISON)
+*[7] data   = 1,#QNAN (POISON)
+*[8] data   = 1,#QNAN (POISON)
+*[9] data   = 1,#QNAN (POISON)
+******************************************************************
+

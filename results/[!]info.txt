@@ -1,5 +1,5 @@
 Number of lines      = 10
-Length of the file   = 63
+Length of the file   = 65
 lines[1]. $push 5$
 	length = 6
 
@@ -9,14 +9,14 @@ lines[2]. $push 15,4$
 lines[3]. $push 2$
 	length = 6
 
-lines[4]. $ja :L33$
-	length = 7
+lines[4]. $ja :L333$
+	length = 8
 
 lines[5]. $push 1$
 	length = 6
 
-lines[6]. $L33:$
-	length = 4
+lines[6]. $L333:$
+	length = 5
 
 lines[7]. $push 5$
 	length = 6
