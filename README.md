@@ -1,5 +1,7 @@
 # CPU_C_VERSION
 C version of CPU with registers, labels, jumps and conditional jumps.
+______________
+How you can see ~~ded's weakness~~ cats 😺😻😺. 
 ______________    
 ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄.  
 ⠄⠄⠄⠄⠄⠄⢰⣷⡄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄  
