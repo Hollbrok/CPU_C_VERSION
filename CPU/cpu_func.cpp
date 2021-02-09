@@ -17,7 +17,6 @@ void make_ass_s(FILE* text, ass_code* ass_s)
 
     char* buffer_char = (char*) calloc(file_length, sizeof(char));
     assert(buffer_char);
-    //printf("для buffer_char выделено [%d]\n", file_length);
 
     fread(buffer_char, sizeof(char), file_length, text);
 
@@ -26,55 +25,38 @@ void make_ass_s(FILE* text, ass_code* ass_s)
         if(buffer_char[index] == ' ')
             space_counter++;
 
-    ass_s->max_ass_size = space_counter;//int size_buffer = space_counter;
-    //printf("Размер buffer_double = %d\n", size_buffer);
+    ass_s->max_ass_size = space_counter;
 
     ass_s->data     = (double*) calloc(ass_s->max_ass_size, sizeof(double));
     assert(ass_s->data);
     int ass_cur_size = 0;
 
-    while(*buffer_char)//for(int index = 0; index < size_buffer; index++)
+    while(*buffer_char)
     {
-        //printf("IN WHILE buffer_char = [%c]\n", *buffer_char);
-        double temp_val = get_number(&buffer_char);
-        //printf("temp_val = %lg\n", temp_val);
-
+        double temp_val             = get_number(&buffer_char);
         ass_s->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
-
-    //printf("max = %d, size = %d\n", ass_s->max_ass_size, ass_s->ass_size);
     ass_s->max_ass_size = ass_cur_size;
-    //printf("7777777\n7777777777\n777777777\n");
-    //printf("ass_size = [%d]\n", ass_s->ass_size);
-
-    /*for(int index = 0; index < ass_s->max_ass_size; index++)
-    {
-        //printf("$%d$", index);
-        printf("[%lg]\n", ass_s->data[index]);
-    } */
-
+    return;
 }
 
 double get_number(char** buffer)
 {
     ignore_spaces(buffer);
     double number = atof(*buffer);
-    //printf("number = %lg\n", number);
-    //getch();
 
     while (isdigit(**buffer) || (**buffer == ','))
         (*buffer)++;
 
     ignore_spaces(buffer);
-
     return number;
 }
 
 
 void ignore_spaces(char** buffer)
 {
-    while (isspace(**buffer))// || (**buffer == ','))
+    while (isspace(**buffer))
         (*buffer)++;
 }
 
@@ -157,11 +139,6 @@ void CPU(ass_code* ass_s, stack_t* Stack)
             skip_first  = i + 1;
             skip_second = i + 2;
 
-            /*FILE* error = fopen("[!]ERRORS.txt", "ab");
-            fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
-            fprintf(error, "ERROR in recognizing registers\n");
-            fprintf(error, "assembler_code[%d] = %d", i, (int)ass_s->data[i]);
-            fclose(error);*/
         }
         else
         {
@@ -310,10 +287,25 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     for(int index = 0; index < ass_s->max_ass_size; index++)
                         if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
                         {
-                            //printf("HEY\n");
-                            i = index; // в некст цикле i = index + 1. Тем самым мы
-                                       // начинаем работу со следующей команды после метки
-                            break;
+                            if (index < 3)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
                         }
 
                     break;
@@ -323,7 +315,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     skip_first = i + 1;
                     break;
                 }
-                case JE:/*24*/
+                case JE:/*24 ==*/
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
@@ -331,20 +323,35 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     if(x2 == x1) // JE -- TRUE, то нужно выполнить переход на метку
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
                         i++;
                     break;
                 }
-                case JAB:/*25*/
+                case JAB:/*25 !=*/
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
@@ -352,20 +359,35 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     if(x2 != x1) // JAB -- TRUE, то нужно выполнить переход на метку
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
                         i++;
                     break;
                 }
-                case JAE:/*26*/
+                case JAE:/*26 >=*/
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
@@ -373,20 +395,35 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     if(x2 >= x1) // JAE -- TRUE, то нужно выполнить переход на метку
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
                         i++;
                     break;
                 }
-                case JBE:/*27*/
+                case JBE:/*27 <=*/
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
@@ -394,20 +431,35 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     if(x2 <= x1) // JBE -- TRUE, то нужно выполнить переход на метку
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
                         i++;
                     break;
                 }
-                case JA:/*28*/
+                case JA:/*28 >*/
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
@@ -415,13 +467,28 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     if(x2 > x1) // JA -- TRUE, то нужно выполнить переход на метку
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
@@ -433,16 +500,31 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if(x2 < x1) // JB -- TRUE, то нужно выполнить переход на метку
+                    if(x2 < x1)
                     {
                         for(int index = 0; index < ass_s->max_ass_size; index++)
-                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                        {
+                            if (index < 3)
                             {
-                                //printf("IT WORKS\n");
-                                i = index; // в некст цикле i = index + 1. Тем самым мы
-                                           // начинаем работу со следующей команды после метки
-                                break;     // Оно брейкается только с ифа, или с for??
-                            }              // Ответ: из всего.
+                                i = index;
+                                break;
+                            }
+                            else if (ass_s->data[index - 2] != 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else if (index == 3)
+                                continue;
+                            else if (ass_s->data[index - 4] == 1)
+                            {
+                                i = index;
+                                break;
+                            }
+                            else
+                                continue;
+                        }
 
                     }
                     else
