@@ -9,23 +9,23 @@ struct line_t
 
 struct text_t
 {
-    char* data              = nullptr;
-    line_t* lines           = nullptr;
-    int n_struct            = 0;
-    int length_file         = 0;
+    char* data      = nullptr;
+    line_t* lines   = nullptr;
+    int n_struct    = 0;
+    int length_file = 0;
 };
 
 struct code_t
 {
-    char*   data            = nullptr;
-    int     length          = 0;
-    int     terms           = 0;
+    char*   data   = nullptr;
+    int     length = 0;
+    int     terms  = 0;
 };
 
 struct ass_code
 {
-    double* data            = nullptr;
-    int     ass_size        = 0;
+    double* data     = nullptr;
+    int     ass_size = 0;
 };
 
 
