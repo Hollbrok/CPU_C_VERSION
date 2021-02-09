@@ -310,7 +310,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     for(int index = 0; index < ass_s->max_ass_size; index++)
                         if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
                         {
-                            printf("HEY\n");
+                            //printf("HEY\n");
                             i = index; // в некст цикле i = index + 1. Тем самым мы
                                        // начинаем работу со следующей команды после метки
                             break;
@@ -323,11 +323,132 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     skip_first = i + 1;
                     break;
                 }
+                case JE:/*24*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
 
-                //case nn:/*print(чтобы добавить нужно будет переделать перевод в assembler_code)*/
-                //{       /*а именно нужно будет просто создавать второй стек из char* и туда*/
-                //        /*пихать текст, которых юзей будет просить выводить*/
-                //}
+                    if(x2 == x1) // JE -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
+                case JAB:/*25*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
+
+                    if(x2 != x1) // JAB -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
+                case JAE:/*26*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
+
+                    if(x2 >= x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
+                case JBE:/*27*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
+
+                    if(x2 <= x1) // JBE -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
+                case JA:/*28*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
+
+                    if(x2 > x1) // JA -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
+                case JB:/*29*/
+                {
+                    double x1 = pop_stack(Stack);
+                    double x2 = pop_stack(Stack);
+
+                    if(x2 < x1) // JB -- TRUE, то нужно выполнить переход на метку
+                    {
+                        for(int index = 0; index < ass_s->max_ass_size; index++)
+                            if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
+                            {
+                                //printf("IT WORKS\n");
+                                i = index; // в некст цикле i = index + 1. Тем самым мы
+                                           // начинаем работу со следующей команды после метки
+                                break;     // Оно брейкается только с ифа, или с for??
+                            }              // Ответ: из всего.
+
+                    }
+                    else
+                        i++;
+                    break;
+                }
                 default:
                 {
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
