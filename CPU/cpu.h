@@ -13,8 +13,6 @@
 
 void make_ass_s(FILE* text, ass_code* ass_s);
 
-double get_number(char** buffer);
-
 void ignore_spaces(char** buffer);
 
 void CPU(ass_code* ass_s, stack_t* Stack);
@@ -22,6 +20,8 @@ void CPU(ass_code* ass_s, stack_t* Stack);
 void print_for_user(stack_t* Stack);
 
 void ass_code_destruct(ass_code* ass_s);
+
+double get_number(char** buffer);
 
 char* set_time(struct tm *u);
 
