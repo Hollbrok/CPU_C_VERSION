@@ -1,0 +1,10 @@
+push 5
+push 15,4
+push 2
+ja :[something]
+push 1
+[something]:
+push 5
+add
+out
+hlt
