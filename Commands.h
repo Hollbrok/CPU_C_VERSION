@@ -1,9 +1,9 @@
 #ifndef COMMANDS_H_INCLUDED
 #define COMMANDS_H_INCLUDED
 
-const int MAX_SIZE_COMMAND  = 20;
-const int MAX_SIZE_LABLE    = 4;
-const int DEBUG_STATE       = 0;
+constexpr int MAX_SIZE_COMMAND  = 20;
+constexpr int MAX_SIZE_LABLE    = 5;
+constexpr int DEBUG_STATE       = 0;
 
 
 enum commands
