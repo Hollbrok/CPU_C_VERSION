@@ -23,7 +23,7 @@ void ass_code_destruct(ass_code* ass_s);
 
 char* set_time(struct tm *u);
 
-char* define_date(void);
+char* define_date();
 
 double get_number(char** buffer);
 
