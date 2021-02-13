@@ -5,8 +5,8 @@
 #include <time.h>
 #include "assem_info.h"
 
-#define DOUBLE_T        // that's the type of data
 /*#define DEBUG*/       // if you need to find a bug or fix something
+#define DOUBLE_T        // that's the type of data
 #include <stack.h>
 
 #include "Commands.h"
