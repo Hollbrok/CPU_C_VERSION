@@ -78,7 +78,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
 
     for(int i = 0; i < ass_s->max_ass_size; i++)
     {
-        printf("i = %d\n", i);
+        //printf("i = %d\n", i);
         if(EXIT_CONDITION == 1)
             break;
 
@@ -211,7 +211,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case POW:/*pow*/
                 {
-                    printf("in pow\n");
+                    //printf("in pow\n");
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
@@ -274,7 +274,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case DEL:/*del*/
                 {
-                    double trash = pop_stack(Stack);
+                    pop_stack(Stack);
                     break;
                 }
                 case LN:/*ln*/
@@ -515,19 +515,19 @@ void CPU(ass_code* ass_s, stack_t* Stack)
 
                     if (x2 < x1)
                     {
-                        printf("Below\n");
+                        //printf("Below\n");
                         for(int index = 0; index < ass_s->max_ass_size; index++)
                         if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
                         {
                             if (index < 3)
                             {
-                                printf("find i = %d\n", index);
+                                //printf("find i = %d\n", index);
                                 i = index;
                                 break;
                             }
                             else if (ass_s->data[index - 2] != 1)
                             {
-                                printf("find i = %d\n", index);
+                                //printf("find i = %d\n", index);
                                 i = index;
                                 break;
                             }
@@ -535,7 +535,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                                 continue;
                             else if (ass_s->data[index - 4] == 1)
                             {
-                                printf("find i = %d\n", index);
+                                //printf("find i = %d\n", index);
                                 i = index;
                                 break;
                             }
@@ -681,7 +681,7 @@ char* set_time(struct tm *time)
     char *tmp                   = nullptr;
 
 
-    int length = strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
+    strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
 
     tmp = (char*) malloc(sizeof(string_time));
     strcpy(tmp, string_time);
