@@ -2,13 +2,12 @@
 
 int END_STATE               = 0;   // Статус выхода из ассемблирования кода
 int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
-int PRINT_STATE             = 0;   // Отвечает за то, дополнять в print_for_user или записывать сначала в зависимости от того,
-                                   // была ли вызвана дополнительная функция для печати
 
-int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то gg
+
+int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
 int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
-int IS_LAST_COMMAND_JMP     = 0;   // Для jmp             |---<|___ одно и тоже, заменить на одну константу
-int IS_LAST_COMMAND_TRANSITION = 0;// Для jmp, je, jbe .. |---<|    и в обработке слов тоже
+int IS_LAST_COMMAND_JMP     = 0;
+
 
 
 void text_construct(text_t* text_s, FILE* text)
@@ -19,22 +18,19 @@ void text_construct(text_t* text_s, FILE* text)
     text_s->data = (char*) calloc(file_length, sizeof(char));
     assert(text_s->data);
 
-    //text_s->lines = (line_t*) calloc(file_length, sizeof(line_t)); //??
-    //assert(text_s->lines);                                         // |
-                                                                     // |
-    int file_lines = 0;                                              // |
-    file_length    = 0;                                              // |
-                                                                     // |
-    useful_sizes(text, text_s, &file_lines, &file_length);           // |
-                                                                     // |
-    text_s->lines = (line_t*) calloc(file_lines + 1, sizeof(line_t));   //<"
+    int file_lines = 0;
+    file_length    = 0;
+
+    useful_sizes(text, text_s, &file_lines, &file_length);
+
+    text_s->lines = (line_t*) calloc(file_lines + 1, sizeof(line_t));
     assert(text_s->lines);
 
     line_t* lines = (line_t*) calloc(file_lines + 1, sizeof(line_t));
     assert(lines);
 
 
-    long length = 0;
+    long length    = 0;
     long n_structs = 0;
 
     other_sizes(length, n_structs, file_length, text_s, lines);
@@ -66,27 +62,13 @@ void get_code(text_t* text_s, code_t* code_s)
     assert(text_s);
     assert(code_s);
 
-    // Разбить функцию на две, то есть добавить еще assembler_code func
-    // Через структуру ass_code + добавить (constructor and destructor)
-    // Сделать через структуру code_t: добавить конструктор и деструктор в конце функции
-
-
     int size_of_code = text_s->length_file + 3;
     code_s->length = size_of_code;
 
     code_s->data = (char*) calloc(code_s->length, sizeof(char));
     assert(code_s->data);
 
-    #ifdef DEBUG
-        printf("\n\nAlloc size is (%d)\n\n", size_of_code);
-    #endif
-
     int cur_size = 0;
-
-    #ifdef DEBUG
-        printf("\Strings = %d\n\n",text_s->n_struct);
-    #endif
-
 
     for(int x = 0; x < text_s->n_struct; x++)
     {
@@ -98,10 +80,8 @@ void get_code(text_t* text_s, code_t* code_s)
                     code_s->data[cur_size++] = text_s->lines[x].line[temp];
                 break;
             }
-
             else
                 code_s->data[cur_size++] = text_s->lines[x].line[y];
-
         }
 
         if((cur_size < size_of_code + 1))
@@ -112,21 +92,12 @@ void get_code(text_t* text_s, code_t* code_s)
     int terms = 0;
     code_s->terms = terms;
 
-    #ifdef DEBUG
-        printf("size of code is = %d\n", size_of_code);
-        printf("\"%s\"\n", code_s->data);
-    #endif
-
     for(int i = 0; i < size_of_code; i++)
         if(code_s->data[i] == ' ')
             code_s->terms++;
+
     code_s->terms++;
 
-    #ifdef DEBUG
-        printf("terms = %d\n", code_s->terms);
-    #endif
-
-    //free(code_s->data) в деструктор запихнуть.
     return;
 }
 
@@ -141,44 +112,24 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     double* rix_call = (double*) calloc(code_s->terms + 2, sizeof(double));
     assert(rix_call);
 
-    int rix_cur_size = 0;
-
-    int assembler_size = 0;
-
-
-    #ifdef DEBUG
-        printf("TERMS = %d\n", code_s->terms);
-        printf("\n\n\n");
-    #endif
-
+    int rix_cur_size   = 0;
     int cur_code_size  = 0;
 
 
 
-    for(int i = 0; i < code_s->terms; i++)
+    for (int i = 0; i < code_s->terms; i++)
     {
         if(END_STATE)
             break;
 
-        char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char)); //или сделать через calloc + free ???
-
-        #ifdef DEBUG
-            printf("Already in tmp ");
-        #endif
+        char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
         int j = 0;
 
-        for(j; j < MAX_SIZE_COMMAND; j++)
+        for (j = 0; j < MAX_SIZE_COMMAND; j++)
         {
             if(code_s->data[j + cur_code_size] != ' ')
-            {
                 temp[j] = code_s->data[j + cur_code_size];
-                //printf("%c", temp[j], j);
-                #ifdef DEBUG
-                    printf("_%c[%d]_", temp[j], j);
-                #endif
-            }
-
             else
             {
                 temp[j] = '\0';
@@ -188,168 +139,112 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
         cur_code_size += j + 1;
 
-        #ifdef DEBUG
-            printf("\nj = %d\n", j);
-        #endif
-
-        #ifdef DEBUG
-            printf("temp[%d] = (%s)\n", i, temp);
-            printf("\n\n");
-        #endif
-
-        if(!strcmp(temp, "push"))
+        if (!strcmp(temp, "push"))
         {
             ass_s->data[i]           = 1;
             IS_LAST_COMMAND_PUSH     = 1;
         }
-        else if(!strcmp(temp, "add"))
+        else if (!strcmp(temp, "add"))
             ass_s->data[i] = 2;
-        else if(!strcmp(temp, "mul"))
+        else if (!strcmp(temp, "mul"))
             ass_s->data[i] = 3;
-        else if(!strcmp(temp, "div"))
+        else if (!strcmp(temp, "div"))
             ass_s->data[i] = 4;
-        else if(!strcmp(temp, "sub"))
+        else if (!strcmp(temp, "sub"))
             ass_s->data[i] = 5;
-        else if(!strcmp(temp, "sin"))
+        else if (!strcmp(temp, "sin"))
             ass_s->data[i] = 6;
-        else if(!strcmp(temp, "cos"))
+        else if (!strcmp(temp, "cos"))
             ass_s->data[i] = 7;
-        else if(!strcmp(temp, "pow"))
+        else if (!strcmp(temp, "pow"))
             ass_s->data[i] = 8;
-        else if(!strcmp(temp, "sqr"))
+        else if (!strcmp(temp, "sqr"))
             ass_s->data[i] = 9;
-        else if(!strcmp(temp, "in"))
+        else if (!strcmp(temp, "in"))
             ass_s->data[i] = 10;
-        else if(!strcmp(temp, "out"))
+        else if (!strcmp(temp, "out"))
             ass_s->data[i] = 11;
-        else if(!strcmp(temp, "del"))
+        else if (!strcmp(temp, "del"))
             ass_s->data[i] = 12;
-        else if(!strcmp(temp, "ln"))
+        else if (!strcmp(temp, "ln"))
             ass_s->data[i] = 13;
-        else if(!strcmp(temp, "log10"))
+        else if (!strcmp(temp, "log10"))
             ass_s->data[i] = 14;
-        else if(!strcmp(temp, "quadratic"))
+        else if (!strcmp(temp, "quadratic"))
             ass_s->data[i] = 15;
-        else if(!strcmp(temp, "log2"))
+        else if (!strcmp(temp, "log2"))
             ass_s->data[i] = 16;
-        else if(!strcmp(temp, "rax"))
+        else if (!strcmp(temp, "rax"))
         {
             ass_s->data[i]           = 17;
             rix_call[rix_cur_size++] = 2;
             IS_LAST_COMMAND_PUSH     = 0;
         }
-        else if(!strcmp(temp, "rbx"))
+        else if (!strcmp(temp, "rbx"))
         {
             ass_s->data[i]           = 18;
             rix_call[rix_cur_size++] = 2;
             IS_LAST_COMMAND_PUSH = 0;
 
         }
-        else if(!strcmp(temp, "rcx"))
+        else if (!strcmp(temp, "rcx"))
         {
             ass_s->data[i]           = 19;
             rix_call[rix_cur_size++] = 2;
             IS_LAST_COMMAND_PUSH     = 0;
         }
-        else if(!strcmp(temp, "rdx"))
+        else if (!strcmp(temp, "rdx"))
         {
             ass_s->data[i]           = 20;
             rix_call[rix_cur_size++] = 2;
             IS_LAST_COMMAND_PUSH     = 0;
         }
-        else if(!strcmp(temp, "pop"))
+        else if (!strcmp(temp, "pop"))
             ass_s->data[i] = 21;
-        else if(!strcmp(temp, "je"))
+        else if (!strcmp(temp, "je"))
         {
-            ass_s->data[i] = 24;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 24;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "jab"))
+        else if (!strcmp(temp, "jab"))
         {
-            ass_s->data[i] = 25;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 25;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "jae"))
+        else if (!strcmp(temp, "jae"))
         {
-            ass_s->data[i] = 26;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 26;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "jbe"))
+        else if (!strcmp(temp, "jbe"))
         {
-            ass_s->data[i] = 27;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 27;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "ja"))
+        else if (!strcmp(temp, "ja"))
         {
-            ass_s->data[i] = 28;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 28;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "jb"))
+        else if (!strcmp(temp, "jb"))
         {
-            ass_s->data[i] = 29;
-            IS_LAST_COMMAND_TRANSITION = 1;
+            ass_s->data[i]      = 29;
+            IS_LAST_COMMAND_JMP = 1;
         }
-        else if(!strcmp(temp, "hlt"))
+        else if (!strcmp(temp, "hlt"))
         {
             ass_s->data[i] = 0;
-            #ifdef DEBUG
-                printf("Команда номер %d распозналась как выход, то есть = 0\n", i + 1);
-            #endif
             END_STATE = 1;
         }
 
         else if (IS_LAST_COMMAND_PUSH)
         {
-            #ifdef DEBUG
-                printf("i = %d. _%s_\n", i, temp);
-            #endif
-            //printf("Ouch..\n");
             ass_s->data[i]           = (double) std::atof(temp);
             rix_call[rix_cur_size++] = 1;
             IS_LAST_COMMAND_PUSH = 0;
         }
-        else if(IS_LAST_COMMAND_TRANSITION)
-        {
-            //rix_call[rix_cur_size++] = 22;
-            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
-            assert(int_data);
-
-            for (int index = 1; temp[index - 1]; index++)
-                int_data[index - 1]  = ((int)temp[index]) % 10;
-
-            int temp_int = 0;
-
-            for(int index = 1; temp[index - 1]; index++)
-                temp_int += (index) * int_data[index - 1];
-
-            ass_s->data[i]   = temp_int;
-            IS_LAST_COMMAND_TRANSITION = 0;
-            free(int_data);
-        }
-        else if (temp[strlen(temp) - 1] == ':')//(strchr(temp, ':'))
-        {
-            //printf("GOOD\n");
+        else if (temp[strlen(temp) - 1] == ':')
             ass_s->data[i] = 22;
-            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
-            assert(int_data);
-
-            for (int index = 0; temp[index + 1]; index++)
-                int_data[index]  = ((int)temp[index]) % 10;
-
-            //for (int index = 0; temp[index + 1]; index++)
-                //printf("new_temp[index] = %c,\n", int_data[index - 1]);
-
-            int temp_int = 0;
-
-            for(int i = 0; temp[i + 1]; i++)
-                temp_int += (i + 1) * int_data[i];
-
-            //printf("temp_int = %d\n", temp_int);
-            rix_call[rix_cur_size++] = temp_int;
-            //printf("GOOD\n");
-            free(int_data);
-
-        }
         else if (!strcmp(temp, "jmp"))
         {
             ass_s->data[i]      = 23;
@@ -358,21 +253,56 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         }
         else if (IS_LAST_COMMAND_JMP)
         {
-            //ass_s->data[i] = 22;
-            int* int_data = (int*) calloc(MAX_SIZE_LABLE + 1, sizeof(int));
-            assert(int_data);
+            int temp_cur_code_size = 0;
+            int correction         = 0;
 
-            for (int index = 1; temp[index - 1]; index++)
-                int_data[index - 1]  = ((int)temp[index]) % 10;
+            for (int index = 0; index < code_s->terms; index++)
+            {
+                char* temp_str = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
+                assert(temp_str);
 
-            int temp_int = 0;
+                int iter = 0;
 
-            for(int index = 1; temp[index - 1]; index++)
-                temp_int += (index) * int_data[index - 1];
+                for (iter = 0; iter < MAX_SIZE_COMMAND; iter++)
+                {
+                    if(code_s->data[iter + temp_cur_code_size] != ' ')
+                        temp_str[iter] = code_s->data[iter + temp_cur_code_size];
+                    else
+                    {
+                        temp_str[iter] = '\0';
+                        break;
+                    }
+                }
 
-            ass_s->data[i]   = temp_int;
-            IS_LAST_COMMAND_TRANSITION = 0;
-            free(int_data);
+                if (!strcmp(temp_str, "push"))
+                    correction++;
+                else if (!strcmp(temp_str, "pop"))
+                    correction++;
+                else if (temp_str[strlen(temp) - 1] == ':')
+                {
+                    int ERROR_LABEL = 0;
+                    for (int iter_2 = 0; iter_2 < (int)(strlen(temp) - 1); iter_2++)
+                        if (temp_str[iter_2] != temp[iter_2 + 1])
+                        {
+                            printf("ERROR_LABEL\n");
+                            ERROR_LABEL = 1;
+                            break;
+                        }
+
+                    if((!ERROR_LABEL) && (temp_str[strlen(temp) - 1] == temp[0]))
+                    {
+                        //printf("correction is %d, index is %d\n", correction, index);
+                        ass_s->data[i] = index + correction;     // index теперь смотрит на ... 22 ..., В CPU будет после итерации на след. действие -- GOOD.
+                        free(temp_str);
+                        break;
+                    }
+                }
+
+                free(temp_str);
+                temp_cur_code_size += iter + 1;
+            }
+
+            IS_LAST_COMMAND_JMP = 0;
         }
         else
         {
@@ -384,9 +314,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             NEW_COMMAND_ERROR = 1;
             free(temp);
             break;
-            #ifdef DEBUG
-                printf("assembler_code = %lf\n\n\n", ass_s->data[i]);
-            #endif
         }
         ass_s->ass_size++;
         free(temp);
@@ -404,30 +331,19 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
     for(int i = 0; i < ass_s->ass_size; i++)
     {
-        if((ass_s->data[i] == 1) || (ass_s->data[i] == 21))
+        if(((int)ass_s->data[i] == 1) || ((int)ass_s->data[i] == 21))
         {
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
             fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
             i++;
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
         }
-        else if ((ass_s->data[i] == 22))
-        {
-           fprintf(assembler_txt, "%lg ", ass_s->data[i]);
-           fprintf(assembler_txt, "%lg ", rix_call[rix_cur_size++]);
-        }
         else
             fprintf(assembler_txt, "%lg ", ass_s->data[i]);
     }
 
     free(rix_call);
-
     fclose(assembler_txt);
-
-    #ifdef DEBUG
-        printf("\nassembler_size = %d\n\n\n", assembler_size);
-    #endif
-
     return;
 }
 
@@ -438,7 +354,6 @@ void text_destruct(text_t* text_s)
 
     free(text_s->lines);
     text_s->lines = nullptr;
-
 }
 
 long size_of_file(FILE* text)
@@ -451,7 +366,6 @@ long size_of_file(FILE* text)
     file_length++;
 
     return file_length;
-
 }
 
 void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_length)
@@ -461,7 +375,7 @@ void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_length
     assert(file_lines);
     assert(file_length);
 
-    while((text_s->data[*file_length] = fgetc(text)) && !feof(text))
+    while((text_s->data[*file_length] = fgetc(text)) && (!feof(text)))
     {
         if(text_s->data[*file_length] == '\n')
             (*file_lines)++;
@@ -472,7 +386,6 @@ void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_length
 void printf_text_s(text_t* text_s)
 {
     assert(text_s);
-    //assert(lines);
 
     FILE* res = fopen("[!]complied_code.txt", "w");
 
@@ -530,6 +443,7 @@ inline other_sizes(long length, long n_structs, int file_length, text_t* text_s,
 
     text_s->n_struct    = n_structs;
     text_s->length_file = file_length;
+
 }
 
 void code_destruct(code_t* code_s)
@@ -541,7 +455,7 @@ void code_destruct(code_t* code_s)
 
 }
 
-void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пройтись по всем элементам занулить их
+void ass_code_destruct(ass_code* ass_s) //перед free нужно еще пройтись по всем элементам занулить их
 {
     assert(ass_s);
 
@@ -553,13 +467,11 @@ void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пр�
 
 char* set_time(struct tm *time)
 {
-    int size_time               = 40;
-
-    char string_time[size_time] = {0};
+    char string_time[size_time] = {};
     char *tmp                   = nullptr;
 
 
-    int length = strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
+    strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
 
     tmp = (char*) malloc(sizeof(string_time));
     strcpy(tmp, string_time);
