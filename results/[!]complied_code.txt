@@ -1,1 +1,0 @@
-push 5 push 15,4 push 2 ja :L333 push 1 L333: push 5 add out hlt 
