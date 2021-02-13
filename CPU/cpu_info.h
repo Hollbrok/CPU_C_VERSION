@@ -1,7 +1,8 @@
 #ifndef CPU_INFO_H_INCLUDED
 #define CPU_INFO_H_INCLUDED
 
-const int START_SIZE = 10; // Начальный размер стека.
+constexpr int START_SIZE = 10; // Начальный размер стека.
+constexpr int size_time  = 40;
 
 struct ass_code
 {
