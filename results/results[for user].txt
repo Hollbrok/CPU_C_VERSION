@@ -1,3 +1,0 @@
-At your request we show the number at the top of
-the stack at the time of the call : [10]
-
