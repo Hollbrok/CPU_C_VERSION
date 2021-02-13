@@ -20,13 +20,9 @@ int main()
     make_ass_s(text, &ass_s);
 
     CPU(&ass_s, &Stack);
-
-    //print_for_user(&Stack);  // information for user
-    stack_dump(&Stack);        // information for me
-    printf("DONE!!\n");
-
+    stack_dump(&Stack);
     ass_code_destruct(&ass_s);
+    printf("DONE!!\n");
 
     return 0;
 }
- 
