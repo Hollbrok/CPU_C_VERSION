@@ -1,12 +1,6 @@
 #include "cpu.h"
 
-int END_STATE               = 0;   // Статус выхода из ассемблирования кода (ТУТ НЕ НУЖНА ЭТА КОНСТАНТА)
 int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
-int PRINT_STATE             = 0;   // Отвечает за то, дополнять в print_for_user или записывать сначала в зависимости от того,
-                                   // была ли вызвана дополнительная функция для печати
-
-int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то gg
-int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду  (ТУТ ТОЖЕ НЕ НУЖНА ЭТА КОНСТАНТА)
 
 void make_ass_s(FILE* text, ass_code* ass_s)
 {
@@ -31,7 +25,7 @@ void make_ass_s(FILE* text, ass_code* ass_s)
     assert(ass_s->data);
     int ass_cur_size = 0;
 
-    while(*buffer_char)
+    while (*buffer_char)
     {
         double temp_val             = get_number(&buffer_char);
         ass_s->data[ass_cur_size++] = temp_val;
@@ -53,7 +47,6 @@ double get_number(char** buffer)
     return number;
 }
 
-
 void ignore_spaces(char** buffer)
 {
     while (isspace(**buffer))
@@ -64,77 +57,51 @@ void CPU(ass_code* ass_s, stack_t* Stack)
 {
     assert(Stack);
     assert(ass_s);
-    //assert(reg_s);
-
-    if(NEW_COMMAND_ERROR)
-        return;
 
     struct rix rix_s = {};
 
     int skip_first  = -1;
     int skip_second = -1;
 
-    //ass_s->cur_rix = 0;
-
-    for(int i = 0; i < ass_s->max_ass_size; i++)
+    for (int i = 0; i < ass_s->max_ass_size; i++)
     {
-        //printf("i = %d\n", i);
         if(EXIT_CONDITION == 1)
             break;
 
-        #ifdef DEBUG
-            printf("i before skip = %d\n", i);
-            printf("assembler[%d] = %lf\n", i, ass_s->data[i]);
-        #endif
-
-
         if((skip_first == i) || (skip_second == i))
-        {
-            #ifdef DEBUG
-                printf("\n i == skip = %d\n\n", skip);
-            #endif
             continue;
-        }
-        else if(ass_s->data[i] == 1)//PUSH
+        else if((int)ass_s->data[i] == 1)//PUSH
         {
-            #ifdef DEBUG
-                printf("i after skip = %d\n", i);
-                printf("Pushing this number %lf\n",ass_s->data[i]);
-                printf("(double)push_num = %lf\n", ass_s->data[i]);
-            #endif
-
-            if (ass_s->data[i + 1] == 1)
+            if ((int)ass_s->data[i + 1] == 1)
                 push_stack(Stack, ass_s->data[i + 2]);
-            else if (ass_s->data[i + 1] == 2)
+            else if ((int)ass_s->data[i + 1] == 2)
             {
-                if (ass_s->data[i + 2] == 17)
+                if ((int)ass_s->data[i + 2] == 17)
                     push_stack(Stack, rix_s.rax);
-                else if (ass_s->data[i + 2] == 18)
+                else if ((int)ass_s->data[i + 2] == 18)
                     push_stack(Stack, rix_s.rbx);
-                else if (ass_s->data[i + 2] == 19)
+                else if ((int)ass_s->data[i + 2] == 19)
                     push_stack(Stack, rix_s.rcx);
-                else if (ass_s->data[i + 2] == 20)
+                else if ((int)ass_s->data[i + 2] == 20)
                     push_stack(Stack, rix_s.rdx);
             }
 
             skip_first  = i + 1;
             skip_second = i + 2;
-
         }
-
-        else if(ass_s->data[i] == 21)//POP rix
+        else if((int)ass_s->data[i] == 21)//POP / POPrix
         {
-            if (ass_s->data[i + 1] == 1)
+            if ((int)ass_s->data[i + 1] == 1)
                 pop_stack(Stack);
-            else if (ass_s->data[i + 1] == 2)
+            else if ((int)ass_s->data[i + 1] == 2)
             {
-                if (ass_s->data[i + 2] == 17)
+                if ((int)ass_s->data[i + 2] == 17)
                     rix_s.rax = pop_stack(Stack);
-                else if (ass_s->data[i + 2] == 18)
+                else if ((int)ass_s->data[i + 2] == 18)
                     rix_s.rbx = pop_stack(Stack);
-                else if (ass_s->data[i + 2] == 19)
+                else if ((int)ass_s->data[i + 2] == 19)
                     rix_s.rcx = pop_stack(Stack);
-                else if (ass_s->data[i + 2] == 20)
+                else if ((int)ass_s->data[i + 2] == 20)
                     rix_s.rdx = pop_stack(Stack);
             }
 
@@ -149,9 +116,6 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 case HLT:/*hlt*/
                 {
                     EXIT_CONDITION = 1;
-                    #ifdef DEBUG
-                        printf("exit on command number %d, = %lf\n", i + 1, ass_s->data[i]);
-                    #endif
                     break;
                 }
                 case PUSH:/*push(то есть error, так как если push, то сюда не должно дойти)*/
@@ -211,23 +175,16 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case POW:/*pow*/
                 {
-                    //printf("in pow\n");
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if ((x1 < 0) || (x1 == 0 && x2 == 0))
+                    if ((x1 < 0))
                     {
-                        FILE* result = fopen("results[for user].txt", "ab");
-                        if (!PRINT_STATE)
-                        {
-                            fclose(result);
-                            FILE* result = fopen("results[for user].txt", "wb");
-                        }
+                        FILE* result = fopen("results[for user].txt", "wb");
 
                         fprintf(result, "sorry, but you should read more"
                                         "about the rules for exponentiation");
                         fclose(result);
-                        PRINT_STATE = 1;
                     }
 
                     push_stack(Stack, pow(x2, x1));
@@ -256,15 +213,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     }
                     double x1 = pop_stack(Stack);
 
-                    FILE* result = fopen("results[for user].txt", "ab");
-
-                    if (!PRINT_STATE)
-                    {
-                        fclose(result);
-                        FILE* result = fopen("results[for user].txt", "wb");
-                    }
-
-                    PRINT_STATE = 1;
+                    FILE* result = fopen("results[for user].txt", "wb");
 
                     fprintf(result, "At your request we show the number at the top of\n"
                                     "the stack at the time of the call : [%lg]\n\n", x1);
@@ -297,253 +246,75 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JMP:/*23*/
                 {
-                    for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
+                    i = (int)ass_s->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
                     break;
                 }
                 case LABEL:/*22*/
                 {
-                    skip_first = i + 1;
                     break;
                 }
-                case JE:/*24 ==*/
+                case JE:/*24 ==   */
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 == x1) // JE -- TRUE, то нужно выполнить переход на метку
-                    {
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                    if (x2 == x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
                 }
-                case JAB:/*25 !=*/
+                case JAB:/*25 !=  */
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if(x2 != x1) // JAB -- TRUE, то нужно выполнить переход на метку
-                    {
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                    if (x2 != x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
                 }
-                case JAE:/*26 >=*/
+                case JAE:/*26 >=  */
                 {
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
                     if (x2 >= x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                    {
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
                 }
-                case JBE:/*27 <=*/
+                case JBE:/*27 <=  */
                 {
-                    double x1 = pop_stack(Stack);
+                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 <= x1) // JBE -- TRUE, то нужно выполнить переход на метку
-                    {
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                    if (x2 <= x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
                 }
-                case JA:/*28 >*/
+                case JA:/*28 >    */
                 {
-                    double x1 = pop_stack(Stack);
+                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 > x1) // JA -- TRUE, то нужно выполнить переход на метку
-                    {
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                    if (x2 > x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
                 }
-                case JB:/*29*/
+                case JB:/*29 <    */
                 {
-                    double x1 = pop_stack(Stack);
+                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 < x1)
-                    {
-                        //printf("Below\n");
-                        for(int index = 0; index < ass_s->max_ass_size; index++)
-                        if ((ass_s->data[i + 1] == ass_s->data[index]) && (ass_s->data[index - 1] == 22))
-                        {
-                            if (index < 3)
-                            {
-                                //printf("find i = %d\n", index);
-                                i = index;
-                                break;
-                            }
-                            else if (ass_s->data[index - 2] != 1)
-                            {
-                                //printf("find i = %d\n", index);
-                                i = index;
-                                break;
-                            }
-                            else if (index == 3)
-                                continue;
-                            else if (ass_s->data[index - 4] == 1)
-                            {
-                                //printf("find i = %d\n", index);
-                                i = index;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
+                    if (x2 < x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                        i = (int)ass_s->data[i + 1];
                     else
                         i++;
                     break;
@@ -565,13 +336,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
 
 void print_for_user(stack_t* Stack)
 {
-    FILE* result = fopen("results[for user].txt", "a");
-
-    if(!PRINT_STATE)
-    {
-        fclose(result);
-        FILE* result = fopen("results[for user].txt", "w");
-    }
+    FILE* result = fopen("results[for user].txt", "wb");
 
     if(Stack->cur_size > 0)
     {
@@ -597,11 +362,6 @@ void print_for_user(stack_t* Stack)
                 i_copy /= 10;
                 order++;
             }
-
-            #ifdef DEBUG
-                printf("max_order = %d\n", max_order);
-                printf("order = %d\n", order);
-            #endif
 
             switch(order)
             {
@@ -675,11 +435,8 @@ void print_for_user(stack_t* Stack)
 
 char* set_time(struct tm *time)
 {
-    int size_time               = 40;
-
-    char string_time[size_time] = {0};
+    char string_time[size_time] = {};
     char *tmp                   = nullptr;
-
 
     strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
 
@@ -689,7 +446,7 @@ char* set_time(struct tm *time)
     return(tmp);
 }
 
-char* define_date(void)
+char* define_date()
 {
     const time_t timer    = time(nullptr);
     struct tm* local_time = localtime(&timer);
