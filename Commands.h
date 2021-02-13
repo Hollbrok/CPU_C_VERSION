@@ -19,7 +19,7 @@ enum commands
     POW         = 8,
     SQRT        = 9,
     IN          = 10,
-    PRINT       = 11, // лишняя
+    PRINT       = 11,
     DEL         = 12,
     LN          = 13,
     LOG10       = 14,
