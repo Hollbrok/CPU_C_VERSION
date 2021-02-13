@@ -13,19 +13,22 @@ void disassembler(ass_code* ass_s, FILE* result)
     {
         if (EXIT_CONDITION == 1)
             break;
-
         if ((skip_first == i) || (skip_second == i))
             continue;
-        else if (ass_s->data[i] == 1) // PUSH
+        //printf("ass_s->data[%d] = %lg\n", i, ass_s->data[i]);
+        if ((int)ass_s->data[i] == 1) // PUSH
         {
-            if(ass_s->data[i + 1] == 1)
+            //printf("PUSH");
+            if((int)ass_s->data[i + 1] == 1)
             {
+                //printf(" NUMBER\n");
                 fprintf(result, "push %lg\n", ass_s->data[i + 2]);
                 skip_first  = i + 1;
                 skip_second = i + 2;
             }
-            else if (ass_s->data[i + 1] == 2)
+            else if ((int)ass_s->data[i + 1] == 2)
             {
+                //printf(" rix\n");
                 switch((int)ass_s->data[i + 2])
                 {
                     case RAX:
@@ -54,16 +57,35 @@ void disassembler(ass_code* ass_s, FILE* result)
                         break;
                     }
                 }
-
+                //printf("SKIPPPP\n");
                 skip_first  = i + 1;
                 skip_second = i + 2;
             }
             else
                 printf("BIG NT\n");
         }
+        else if ((int)ass_s->data[i] == 21) // PUSH
+        {
+            if ((int)ass_s->data[i + 1] == 1)
+                fprintf(result, "pop\n");
+            else if ((int)ass_s->data[i + 1] == 2)
+            {
+                if ((int)ass_s->data[i + 2] == 17)
+                    fprintf(result, "pop rax\n");
+                else if ((int)ass_s->data[i + 2] == 18)
+                    fprintf(result, "pop rbx\n");
+                else if ((int)ass_s->data[i + 2] == 19)
+                    fprintf(result, "pop rcx\n");
+                else if ((int)ass_s->data[i + 2] == 20)
+                    fprintf(result, "pop rdx\n");
+            }
+
+            skip_first  = i + 1;
+            skip_second = i + 2;
+
+        }
         else
         {
-
             switch((int)ass_s->data[i])
             {
                 case HLT:/*hlt*/
@@ -72,16 +94,17 @@ void disassembler(ass_code* ass_s, FILE* result)
                     fprintf(result, "hlt\n");
                     break;
                 }
-                case PUSH:/*push(то есть error, так как если push, то сюда не должно дойти)*/
+                case PUSH:/*push(С‚Рѕ РµСЃС‚СЊ error, С‚Р°Рє РєР°Рє РµСЃР»Рё push, С‚Рѕ СЃСЋРґР° РЅРµ РґРѕР»Р¶РЅРѕ РґРѕР№С‚Рё)*/
                 {
                     FILE* error = fopen("ERROR_PRINT.txt", "ab");
-                    fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
+                    fprintf(error, "\tР”Р°С‚Р° error'a : %s (С‡С‡/РјРј/РіРі)\n\n", define_date());
                     fprintf(error, "ERROR in LINE %d", __LINE__);
                     fclose(error);
                     break;
                 }
                 case ADD:/*add*/
                 {
+                    //printf("%lg\n",ass_s->data[i]);
                     fprintf(result, "add\n");
                     break;
                 }
@@ -152,55 +175,63 @@ void disassembler(ass_code* ass_s, FILE* result)
                 }
                 case JMP:/*23*/
                 {
-                    fprintf(result, "jmp :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "jmp :LAB%d\n", number_command);
                     break;
                 }
                 case LABEL:/*22*/
                 {
-                    fprintf(result, "[something]:\n");
-                    skip_first = i + 1;
+                    //int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "LAB%d:\n", i);
+                    //skip_first = i + 1;
                     break;
                 }
                 case JE:/*24 ==*/
                 {
-                    fprintf(result, "je :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "je :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 case JAB:/*25 !=*/
                 {
-                    fprintf(result, "jab :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "jab :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 case JAE:/*26 >=*/
                 {
-                    fprintf(result, "jae :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "jae :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 case JBE:/*27 <=*/
                 {
-                    fprintf(result, "jbe :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "jbe :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 case JA:/*28 >*/
                 {
-                    fprintf(result, "ja :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "ja :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 case JB:/*29*/
                 {
-                    fprintf(result, "jb :[something]\n");
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "jb :LAB%d\n", number_command);
                     skip_first = i + 1;
                     break;
                 }
                 default:
                 {
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
-                    fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
+                    fprintf(error, "\tР”Р°С‚Р° error'a : %s (С‡С‡/РјРј/РіРі)\n\n", define_date());
                     fprintf(error, "Unknown command..\n");
                     fprintf(error, "assembler_code[%d] = %d", i, (int)ass_s->data[i]);
                     fclose(error);
@@ -238,6 +269,7 @@ void make_ass_s(FILE* text, ass_code* ass_s)
     while(*buffer_char)
     {
         double temp_val             = get_number(&buffer_char);
+        //printf("get number %lg\n", temp_val);
         ass_s->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
@@ -264,7 +296,7 @@ void ignore_spaces(char** buffer)
         (*buffer)++;
 }
 
-void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пройтись по всем элементам занулить их
+void ass_code_destruct(ass_code* ass_s)//РїРµСЂРµРґ free РЅСѓР¶РЅРѕ РµС‰Рµ РїСЂРѕР№С‚РёСЃСЊ РїРѕ РІСЃРµРј СЌР»РµРјРµРЅС‚Р°Рј Р·Р°РЅСѓР»РёС‚СЊ РёС…
 {
     assert(ass_s);
 
@@ -276,13 +308,11 @@ void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пройтись по всем э
 
 char* set_time(struct tm *time)
 {
-    int size_time               = 40;
-
-    char string_time[size_time] = {0};
+    char string_time[size_time] = {};
     char *tmp                   = nullptr;
 
 
-    int length = strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
+    strftime(string_time, size_time, "%d.%m.%Y %H:%M:%S, %A", time);
 
     tmp = (char*) malloc(sizeof(string_time));
     strcpy(tmp, string_time);
