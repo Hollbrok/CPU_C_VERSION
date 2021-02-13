@@ -336,17 +336,17 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             for (int index = 0; temp[index + 1]; index++)
                 int_data[index]  = ((int)temp[index]) % 10;
 
-            for (int index = 0; temp[index + 1]; index++)
-                printf("new_temp[index] = %c,\n", int_data[index - 1]);
+            //for (int index = 0; temp[index + 1]; index++)
+                //printf("new_temp[index] = %c,\n", int_data[index - 1]);
 
             int temp_int = 0;
 
             for(int i = 0; temp[i + 1]; i++)
                 temp_int += (i + 1) * int_data[i];
 
-            printf("temp_int = %d\n", temp_int);
+            //printf("temp_int = %d\n", temp_int);
             rix_call[rix_cur_size++] = temp_int;
-            printf("GOOD\n");
+            //printf("GOOD\n");
             free(int_data);
 
         }
@@ -382,16 +382,12 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
             fprintf(error, "assembler_code[%d] = %s\n", i, temp);
             fclose(error);
             NEW_COMMAND_ERROR = 1;
-            free(temp);//!!!!!!!!!!!!!!!!!!!!!!
-            break;//хз, мб убрать break?? по сути ни на что не влияет, так как дальше стоит
-                    //проверка на NEW_COMMAND_ERROR, но убирает дальнейшую обработку команда.
-                    //можно оставить число для проверки как работает после новой команды.
-
+            free(temp);
+            break;
             #ifdef DEBUG
                 printf("assembler_code = %lf\n\n\n", ass_s->data[i]);
             #endif
         }
-
         ass_s->ass_size++;
         free(temp);
     }
@@ -403,8 +399,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
 
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
-
-
     rix_cur_size = 0;
 
 
