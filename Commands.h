@@ -2,7 +2,7 @@
 #define COMMANDS_H_INCLUDED
 
 constexpr int MAX_SIZE_COMMAND  = 20;
-constexpr int MAX_SIZE_LABLE    = 5;
+constexpr int MAX_SIZE_LABLE    = 15;
 constexpr int DEBUG_STATE       = 0;
 
 
@@ -38,6 +38,8 @@ enum commands
     JBE         = 27,
     JA          = 28,
     JB          = 29,
+    RET         = 30,
+    CALL        = 31,
 };
 
 #endif // COMMANDS_H_INCLUDED
