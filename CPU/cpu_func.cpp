@@ -54,24 +54,30 @@ void ignore_spaces(char** buffer)
         (*buffer)++;
 }
 
-void CPU(ass_code* ass_s, stack_t* Stack)
+void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
 {
     assert(Stack);
+    assert(Stack_call);
     assert(ass_s);
 
-    struct rix rix_s = {};
+    struct rix rix_s = {}; // сделать просто массив и поменять кодировку регистров
 
     int skip_first  = -1;
     int skip_second = -1;
 
     for (int i = 0; i < ass_s->max_ass_size; i++)
     {
+
         if(EXIT_CONDITION == 1)
             break;
 
         if((skip_first == i) || (skip_second == i))
+        {
+            //printf("skip_f_s = [%d],[%d]\n", skip_first, skip_second);
             continue;
-        else if((int)ass_s->data[i] == 1)//PUSH
+        }
+        //printf("in start i = %d, ass[i] = %.0lf\n", i, ass_s->data[i]);
+        if((int)ass_s->data[i] == 1)//PUSH
         {
             if ((int)ass_s->data[i + 1] == 1)
                 push_stack(Stack, ass_s->data[i + 2]);
@@ -92,6 +98,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
         }
         else if((int)ass_s->data[i] == 21)//POP / POPrix
         {
+            if(Stack->cur_size < 1)
+            {
+                printf("not enough numbers to pop\n");
+                EXIT_CONDITION = 1;
+                break;
+            }
             if ((int)ass_s->data[i + 1] == 1)
                 pop_stack(Stack);
             else if ((int)ass_s->data[i + 1] == 2)
@@ -143,6 +155,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case MUL:/*mul*/
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to mul\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
                     push_stack(Stack, x1 * x2);
@@ -150,6 +168,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case DIV:/*div*/
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to div\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
                     push_stack(Stack, x2 / x1);
@@ -157,6 +181,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case SUB:/*sub*/
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to sub\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
                     push_stack(Stack, x2 - x1);
@@ -176,6 +206,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case POW:/*pow*/
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("no numbers to pow\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
@@ -206,6 +242,7 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case PRINT:/*out*/
                 {
+                    //printf("in out\n");
                     if(Stack->cur_size == 0)
                     {
                         printf("not enough space in Stack to out. Exit..\n");
@@ -255,6 +292,26 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     push_stack(Stack, log2(x1));
                     break;
                 }
+                case CALL:
+                {
+                    //printf("CALL in i = [%d]\n", i);
+                    push_stack(Stack_call, i);
+                    i = (int)ass_s->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
+                    break;
+                }
+                case RET:
+                {
+                    //printf("RET is command number i = [%d]\n", i);
+                    if(Stack_call->cur_size < 1)
+                    {
+                        printf("no number in stack_call to return\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
+                    i = pop_stack(Stack_call) + 1;
+                    //printf("Next command will be i = %d\n", i + 1);
+                    break;
+                }
                 case JMP:/*23*/
                 {
                     i = (int)ass_s->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
@@ -266,17 +323,35 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JE:/*24 ==   */
                 {
+                    //printf("in JE\n");
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JE\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
+                    //printf("x1 = %lg, x2 = %lg\n", x1, x2);
                     if (x2 == x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                    {
+                        //printf("РАВНЫ\n");
                         i = (int)ass_s->data[i + 1];
+                        //printf("Идем на i = %d\n", i);
+                    }
                     else
                         i++;
                     break;
                 }
                 case JAB:/*25 !=  */
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JAB\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
@@ -288,6 +363,12 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JAE:/*26 >=  */
                 {
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JAE\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
@@ -299,7 +380,13 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JBE:/*27 <=  */
                 {
-                     double x1 = pop_stack(Stack);
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JBE\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
+                    double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
                     if (x2 <= x1) // JAE -- TRUE, то нужно выполнить переход на метку
@@ -310,7 +397,13 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JA:/*28 >    */
                 {
-                     double x1 = pop_stack(Stack);
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JA\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
+                    double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
                     if (x2 > x1) // JAE -- TRUE, то нужно выполнить переход на метку
@@ -321,7 +414,13 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                 }
                 case JB:/*29 <    */
                 {
-                     double x1 = pop_stack(Stack);
+                    if(Stack->cur_size < 2)
+                    {
+                        printf("not enough numbers to JB\n");
+                        EXIT_CONDITION = 1;
+                        break;
+                    }
+                    double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
                     if (x2 < x1) // JAE -- TRUE, то нужно выполнить переход на метку
