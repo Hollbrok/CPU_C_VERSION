@@ -1,0 +1,15 @@
+push 1
+pop rbx
+LAB6:
+push rbx
+push 2
+pow
+out
+push rbx
+push 1
+add
+pop rbx
+push rbx
+push 100
+jb :LAB6
+hlt
