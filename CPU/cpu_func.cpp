@@ -1,6 +1,7 @@
 #include "cpu.h"
 
 int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
+int SECOND_PRINT            = 0;
 
 void make_ass_s(FILE* text, ass_code* ass_s)
 {
@@ -213,12 +214,22 @@ void CPU(ass_code* ass_s, stack_t* Stack)
                     }
                     double x1 = pop_stack(Stack);
 
-                    FILE* result = fopen("results[for user].txt", "wb");
+                    if(!SECOND_PRINT)
+                    {
+                        FILE* result = fopen("results[for user].txt", "wb");
+                        SECOND_PRINT = 1;
+                        fprintf(result, "[%lg]\n", x1);
+                        fclose(result);
+                    }
+                    else
+                    {
+                        FILE* result = fopen("results[for user].txt", "a");
+                        fprintf(result, "[%lg]\n", x1);
+                        fclose(result);
+                    }
 
-                    fprintf(result, "At your request we show the number at the top of\n"
-                                    "the stack at the time of the call : [%lg]\n\n", x1);
+
                     push_stack(Stack, x1);
-                    fclose(result);
                     break;
                 }
                 case DEL:/*del*/
