@@ -1,0 +1,24 @@
+push 9
+pop rax
+push 1
+pop rbx
+
+call :Function
+push rbx
+out
+hlt
+Function:
+push 0
+push rax
+je :L2
+push rax
+push rbx
+mul
+pop rbx
+push rax
+push 1
+sub
+pop rax
+call :Function
+L2:
+ret
