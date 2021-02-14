@@ -8,11 +8,11 @@ void disassembler(ass_code* ass_s, FILE* result)
 
     int skip_first  = -1;
     int skip_second = -1;
-
+    //printf("size = %d\n", ass_s->max_ass_size);
     for (int i = 0; i < ass_s->max_ass_size; i++)
     {
-        if (EXIT_CONDITION == 1)
-            break;
+        //if (EXIT_CONDITION == 1)
+            //break;
         if ((skip_first == i) || (skip_second == i))
             continue;
         //printf("ass_s->data[%d] = %lg\n", i, ass_s->data[i]);
@@ -90,7 +90,7 @@ void disassembler(ass_code* ass_s, FILE* result)
             {
                 case HLT:/*hlt*/
                 {
-                    EXIT_CONDITION = 1;
+                    //EXIT_CONDITION = 1;
                     fprintf(result, "hlt\n");
                     break;
                 }
@@ -226,6 +226,17 @@ void disassembler(ass_code* ass_s, FILE* result)
                     int number_command = (int)ass_s->data[i + 1];
                     fprintf(result, "jb :LAB%d\n", number_command);
                     skip_first = i + 1;
+                    break;
+                }
+                case RET:
+                {
+                    fprintf(result, "ret\n");
+                    break;
+                }
+                case CALL:
+                {
+                    int number_command = (int)ass_s->data[i + 1];
+                    fprintf(result, "call :LAB%d\n", number_command);
                     break;
                 }
                 default:
