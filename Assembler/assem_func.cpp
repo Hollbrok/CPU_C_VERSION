@@ -96,20 +96,21 @@ void get_code(text_t* text_s, code_t* code_s)
         if(code_s->data[i] == ' ')
             code_s->terms++;
 
-    code_s->terms++;
+    //code_s->terms++;
 
     return;
 }
 
 void get_ass_code(code_t* code_s, ass_code* ass_s)
 {
+    //printf("terms = %d\n", code_s->terms);
     assert(code_s);
     assert(ass_s);
 
-    ass_s->data      = (double*) calloc(code_s->terms + 2, sizeof(double));
+    ass_s->data      = (double*) calloc(code_s->terms, sizeof(double));
     assert(ass_s->data);
 
-    double* rix_call = (double*) calloc(code_s->terms + 2, sizeof(double));
+    double* rix_call = (double*) calloc(code_s->terms, sizeof(double));
     assert(rix_call);
 
     int rix_cur_size   = 0;
@@ -119,8 +120,8 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
     for (int i = 0; i < code_s->terms; i++)
     {
-        if(END_STATE)
-            break;
+        //if(END_STATE)
+            //break;
 
         char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
@@ -234,17 +235,24 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         else if (!strcmp(temp, "hlt"))
         {
             ass_s->data[i] = 0;
-            END_STATE = 1;
+            //END_STATE = 1;
         }
 
         else if (IS_LAST_COMMAND_PUSH)
         {
             ass_s->data[i]           = (double) std::atof(temp);
             rix_call[rix_cur_size++] = 1;
-            IS_LAST_COMMAND_PUSH = 0;
+            IS_LAST_COMMAND_PUSH     = 0;
         }
         else if (temp[strlen(temp) - 1] == ':')
             ass_s->data[i] = 22;
+        else if (!strcmp(temp, "ret"))
+            ass_s->data[i] = 30;
+        else if (!strcmp(temp, "call"))
+        {
+            ass_s->data[i] = 31;
+            IS_LAST_COMMAND_JMP = 1;
+        }
         else if (!strcmp(temp, "jmp"))
         {
             ass_s->data[i]      = 23;
