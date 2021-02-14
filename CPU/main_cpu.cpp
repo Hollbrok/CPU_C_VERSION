@@ -16,12 +16,18 @@ int main()
     START_ACTIONS(Stack);
     Construct(&Stack, START_SIZE);
 
+    START_ACTIONS(Stack_call);
+    Construct(&Stack_call, START_SIZE);
+
     struct ass_code ass_s = {};
     make_ass_s(text, &ass_s);
 
-    CPU(&ass_s, &Stack);
+    CPU(&ass_s, &Stack, &Stack_call);
+
     stack_dump(&Stack);
     ass_code_destruct(&ass_s);
+    stack_destruct(&Stack);
+    stack_destruct(&Stack_call);
     printf("DONE!!\n");
 
     return 0;
