@@ -1,6 +1,6 @@
 #include "disassembler.h"
 
-int EXIT_CONDITION = 0;
+//static int EXIT_CONDITION = 0;
 
 void disassembler(ass_code* ass_s, FILE* result)
 {
