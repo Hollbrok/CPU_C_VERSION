@@ -1,12 +1,12 @@
 #include "assem.h"
 
-int END_STATE               = 0;   // Статус выхода из ассемблирования кода
-int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
+//int END_STATE               = 0;   // Статус выхода из ассемблирования кода
+//int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
 
 
-int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
-int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
-int IS_LAST_COMMAND_JMP     = 0;
+static int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
+static int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
+static int IS_LAST_COMMAND_JMP     = 0;   // если был jmp или условные переход или выхов функции
 
 
 
@@ -292,13 +292,14 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
                     for (int iter_2 = 0; iter_2 < (int)(strlen(temp) - 1); iter_2++)
                         if (temp_str[iter_2] != temp[iter_2 + 1])
                         {
-                            printf("ERROR_LABEL\n");
+                            //printf("ERROR_LABEL. i = %d\n", i);
                             ERROR_LABEL = 1;
                             break;
                         }
 
                     if((!ERROR_LABEL) && (temp_str[strlen(temp) - 1] == temp[0]))
                     {
+                        //printf("i = %d, GOOD\n", i);
                         //printf("correction is %d, index is %d\n", correction, index);
                         ass_s->data[i] = index + correction;     // index теперь смотрит на ... 22 ..., В CPU будет после итерации на след. действие -- GOOD.
                         free(temp_str);
