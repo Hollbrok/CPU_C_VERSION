@@ -1,7 +1,7 @@
 #include "cpu.h"
 
-int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
-int SECOND_PRINT            = 0;
+static int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
+static int SECOND_PRINT            = 0;   // Для принта for_user
 
 void make_ass_s(FILE* text, ass_code* ass_s)
 {
