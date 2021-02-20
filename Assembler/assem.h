@@ -31,8 +31,7 @@ char* set_time(struct tm *time);
 
 char* define_date(void);
 
+inline make_full_text_struct(long length, long n_structs, int file_lines, text_t* text_s, line_t *lines);
+
 long size_of_file(FILE* text);
-
-inline other_sizes(long length, long n_structs, int file_lines, text_t* text_s, line_t *lines);
-
 #endif // ASSEM_H_INCLUDED
