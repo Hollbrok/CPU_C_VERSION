@@ -1,9 +1,5 @@
 #include "assem.h"
 
-//int END_STATE               = 0;   // Статус выхода из ассемблирования кода
-//int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
-
-
 static int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
 static int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
 static int IS_LAST_COMMAND_JMP     = 0;   // если был jmp или условные переход или выхов функции
@@ -33,7 +29,7 @@ void text_construct(text_t* text_s, FILE* text)
     long length    = 0;
     long n_structs = 0;
 
-    other_sizes(length, n_structs, file_length, text_s, lines);
+    make_full_text_struct(length, n_structs, file_length, text_s, lines);
     free(lines);
 
     FILE* test = fopen("[!]info.txt", "w");
@@ -53,7 +49,7 @@ void text_construct(text_t* text_s, FILE* text)
         fprintf(test, "\tlength = %ld\n\n", text_s->lines[x].length - 1);
     }
 
-    printf_text_s(text_s);
+    //printf_text_s(text_s);        // NEED FOR DEBUG
     fclose(test);
 }
 
@@ -74,7 +70,7 @@ void get_code(text_t* text_s, code_t* code_s)
     {
         for(int y = 0; y < text_s->lines[x].length - 1; y++)
         {
-            if(x == text_s->n_struct - 1)                       //lines[text_s->n_struct - 1].length)
+            if(x == text_s->n_struct - 1)
             {
                 for(int temp = 0; temp < 3; temp++)
                     code_s->data[cur_size++] = text_s->lines[x].line[temp];
@@ -96,14 +92,11 @@ void get_code(text_t* text_s, code_t* code_s)
         if(code_s->data[i] == ' ')
             code_s->terms++;
 
-    //code_s->terms++;
-
     return;
 }
 
 void get_ass_code(code_t* code_s, ass_code* ass_s)
 {
-    //printf("terms = %d\n", code_s->terms);
     assert(code_s);
     assert(ass_s);
 
@@ -120,15 +113,18 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
     for (int i = 0; i < code_s->terms; i++)
     {
-        //if(END_STATE)
-            //break;
-
         char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
-        int j = 0;
+        while(isspace(code_s->data[cur_code_size]))                                       // Пропускаем лишние пробелы
+                cur_code_size++;                                                          // между командами
+        if(code_s->data[cur_code_size] == ';')                                            // Если комментрий,
+            while((code_s->data[cur_code_size] != '\n') && (code_s->data[cur_code_size])) // до конца строки игнорим
+                cur_code_size++;                                                          // текст
 
+        int j = 0;
         for (j = 0; j < MAX_SIZE_COMMAND; j++)
         {
+
             if(code_s->data[j + cur_code_size] != ' ')
                 temp[j] = code_s->data[j + cur_code_size];
             else
@@ -392,7 +388,7 @@ void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_length
     }
 }
 
-void printf_text_s(text_t* text_s)
+void printf_text_s(text_t* text_s) // DEBUG function
 {
     assert(text_s);
 
@@ -408,7 +404,7 @@ void printf_text_s(text_t* text_s)
     fclose(res);
 }
 
-inline other_sizes(long length, long n_structs, int file_length, text_t* text_s, line_t *lines)
+inline make_full_text_struct(long length, long n_structs, int file_length, text_t* text_s, line_t *lines)
 {
     while(TRUE)
     {
@@ -440,7 +436,6 @@ inline other_sizes(long length, long n_structs, int file_length, text_t* text_s,
         length++;
 
         lines[n_structs].length = length - lines[n_structs].length;
-        //text_s->lines[n_structs].lenght = lines[n_structs].length;
         n_structs++;
     }
 
@@ -452,7 +447,6 @@ inline other_sizes(long length, long n_structs, int file_length, text_t* text_s,
 
     text_s->n_struct    = n_structs;
     text_s->length_file = file_length;
-
 }
 
 void code_destruct(code_t* code_s)
