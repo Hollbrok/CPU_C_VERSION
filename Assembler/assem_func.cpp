@@ -3,6 +3,7 @@
 static int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
 static int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
 static int IS_LAST_COMMAND_JMP     = 0;   // если был jmp или условные переход или выхов функции
+static int END_STATE               = 0;
 
 
 
@@ -26,10 +27,59 @@ void text_construct(text_t* text_s, FILE* text)
     assert(lines);
 
 
-    long length    = 0;
+    long length  = 0;
     long n_structs = 0;
 
-    make_full_text_struct(length, n_structs, file_length, text_s, lines);
+    while(TRUE)
+    {
+        int iter_length = 0;
+
+        while(isspace(text_s->data[length])) // !!! это не равно следующему:
+            length++;                        // while(isspace(text_s->data[length++]));
+                                             // с точностью до единицы !!!
+
+        if(length >= file_length)
+            break;
+
+        lines[n_structs].line   = &(text_s->data)[length];  // length = кол-ву символом разделителей
+        //lines[n_structs].length = length;                 // -//-
+
+        while ((text_s->data[length] != '\n') && (length < file_length))
+        {
+            //printf("length = %d\n", length);
+            //printf("string = %d, length = %d\n", n_structs, length);
+            if ((text_s->data[length] == ';'))
+            {
+                while (text_s->data[length] != '\n')
+                    length++;
+                //printf("BREAK\n");
+                break;
+            }
+            length++;
+            iter_length++;
+        }
+        //if()
+        //printf("AFTER WHILE\n");
+
+        //length++; // мб убрать
+        //iter_length++;
+
+        lines[n_structs].length = iter_length;
+        while (isspace(lines[n_structs].line[lines[n_structs].length - 1]))
+                (lines[n_structs].length)--;
+
+        n_structs++;
+    }
+
+    for(int j = 0; j < n_structs; j++)
+    {
+        text_s->lines[j].line   = lines[j].line;
+        text_s->lines[j].length = lines[j].length;
+    }
+
+    text_s->n_struct    = n_structs;
+    text_s->length_file = file_length;
+
     free(lines);
 
     FILE* test = fopen("[!]info.txt", "w");
@@ -40,47 +90,65 @@ void text_construct(text_t* text_s, FILE* text)
 
     for(int x = 0; x < text_s->n_struct; x++)
     {
-        fprintf(test, "lines[%d]. $", x + 1);
+        fprintf(test, "lines[%d]. [", x + 1);
 
-        for(int y = 0; y < text_s->lines[x].length - 1; y++)
+        for(int y = 0; y < text_s->lines[x].length; y++)
             fprintf(test, "%c", text_s->lines[x].line[y]);
 
-        fprintf(test, "$\n");
-        fprintf(test, "\tlength = %ld\n\n", text_s->lines[x].length - 1);
+        fprintf(test, "]\n");
+        fprintf(test, "\tlength = %ld\n\n", text_s->lines[x].length);
     }
 
     //printf_text_s(text_s);        // NEED FOR DEBUG
     fclose(test);
 }
 
-void get_code(text_t* text_s, code_t* code_s)
+void text_destruct(text_t* text_s)  // FOR DEBUG
+{
+    free(text_s->data);
+    text_s->data = nullptr;
+
+    free(text_s->lines);
+    text_s->lines = nullptr;
+}
+
+void code_construct(text_t* text_s, code_t* code_s)
 {
     assert(text_s);
     assert(code_s);
 
-    int size_of_code = text_s->length_file + 3;
-    code_s->length = size_of_code;
+    // Тут обрабатывать комментарии
+    code_s->length = text_s->length_file + 3; // не надо + 3
 
     code_s->data = (char*) calloc(code_s->length, sizeof(char));
     assert(code_s->data);
 
     int cur_size = 0;
+    //printf("n_struct = %d\n", text_s->n_struct);
 
     for(int x = 0; x < text_s->n_struct; x++)
     {
-        for(int y = 0; y < text_s->lines[x].length - 1; y++)
+        for(int y = 0; y < text_s->lines[x].length; y++)
         {
-            if(x == text_s->n_struct - 1)
+            code_s->data[cur_size++] = text_s->lines[x].line[y];
+            if (isspace(text_s->lines[x].line[y]))
+                while(isspace(text_s->lines[x].line[y + 1]))
+                    y++;
+            /*if(x == text_s->n_struct - 1)
             {
                 for(int temp = 0; temp < 3; temp++)
                     code_s->data[cur_size++] = text_s->lines[x].line[temp];
                 break;
             }
             else
+            {
+                //if(text_s->lines[x].line[y])
                 code_s->data[cur_size++] = text_s->lines[x].line[y];
+            }   */
+
         }
 
-        if((cur_size < size_of_code + 1))
+        if((cur_size < code_s->length + 1))
             code_s->data[cur_size++] = ' ';
     }
 
@@ -88,15 +156,32 @@ void get_code(text_t* text_s, code_t* code_s)
     int terms = 0;
     code_s->terms = terms;
 
-    for(int i = 0; i < size_of_code; i++)
+    for(int i = 0; i < code_s->length; i++)
         if(code_s->data[i] == ' ')
+        {
             code_s->terms++;
+            while(isspace(code_s->data[i]))
+                i++;
+        }
+    //printf("terms = %d\n", code_s->terms);
+    print_code_buffer(code_s);
+    return;
+}
+
+void print_code_buffer(code_t* code_s)
+{
+    assert(code_s);
+    FILE* code_text = fopen("[!]code_struct.txt", "w");
+
+    fwrite(code_s->data, sizeof(char), strlen(code_s->data), code_text);
 
     return;
 }
 
 void get_ass_code(code_t* code_s, ass_code* ass_s)
 {
+    // На этом этапе я уже гарантирую отсутствие комментариев и лишних разделительных
+    // символов, поэтому дополнительная обработка не нужна
     assert(code_s);
     assert(ass_s);
 
@@ -111,21 +196,42 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
 
 
+    //printf("code_s->terms = %d\n", code_s->terms);
     for (int i = 0; i < code_s->terms; i++)
     {
+        if(NEW_COMMAND_ERROR)
+            break;
         char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
-        while(isspace(code_s->data[cur_code_size]))                                       // Пропускаем лишние пробелы
-                cur_code_size++;                                                          // между командами
-        if(code_s->data[cur_code_size] == ';')                                            // Если комментрий,
+        /*while(isspace(code_s->data[cur_code_size]))
+        {
+            if (code_s->data[cur_code_size] == '\0')
+            {
+                break;
+                END_STATE = 1;
+            }
+            cur_code_size++;
+        }
+        if(END_STATE)
+        {
+            printf("END_STATE, break\n");
+            break;
+        }*/
+        /*if(code_s->data[cur_code_size] == ';')
+        {                                            // Если комментрий,
             while((code_s->data[cur_code_size] != '\n') && (code_s->data[cur_code_size])) // до конца строки игнорим
                 cur_code_size++;                                                          // текст
+            continue;
+        } */
 
+        //if(code_s->data[cur_code_size] == '\0')
+            //break;
         int j = 0;
+
         for (j = 0; j < MAX_SIZE_COMMAND; j++)
         {
 
-            if(code_s->data[j + cur_code_size] != ' ')
+            if((code_s->data[j + cur_code_size] != ' '))
                 temp[j] = code_s->data[j + cur_code_size];
             else
             {
@@ -133,6 +239,10 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
                 break;
             }
         }
+        //printf("[");
+        //for (int index = 0; temp[index]; index++)
+            //printf("%c", temp[index]);
+        //printf("]\n");
 
         cur_code_size += j + 1;
 
@@ -267,6 +377,21 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
                 int iter = 0;
 
+                /*while(isspace(code_s->data[temp_cur_code_size]))
+                {
+                    if (code_s->data[temp_cur_code_size] == '\0')
+                    {
+                        break;
+                        END_STATE = 1;
+                    }
+                    temp_cur_code_size++;
+                }
+                if(END_STATE)
+                {
+                    END_STATE = 0;
+                    break;
+                }*/
+
                 for (iter = 0; iter < MAX_SIZE_COMMAND; iter++)
                 {
                     if(code_s->data[iter + temp_cur_code_size] != ' ')
@@ -297,6 +422,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
                     {
                         //printf("i = %d, GOOD\n", i);
                         //printf("correction is %d, index is %d\n", correction, index);
+                        //printf("LABEL = %d\n", index + correction);
                         ass_s->data[i] = index + correction;     // index теперь смотрит на ... 22 ..., В CPU будет после итерации на след. действие -- GOOD.
                         free(temp_str);
                         break;
@@ -311,10 +437,16 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
         }
         else
         {
+            //printf("ERRORERRORERRORERRORERRORERROR\n");
+            //printf("i = %d\n[", i);
+            //for(int index = 0; temp[index]; index++)
+               // printf("%c", temp[index]);
+            //printf("]\n");
+
             FILE* error = fopen("[!]ERRORS.txt", "ab");
             fprintf(error, "\n\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
             fprintf(error, "Unknown command..\n");
-            fprintf(error, "assembler_code[%d] = %s\n", i, temp);
+            fprintf(error, "assembler_code[%d] = [%s]\n", i, temp);
             fclose(error);
             NEW_COMMAND_ERROR = 1;
             free(temp);
@@ -333,7 +465,7 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
     rix_cur_size = 0;
 
-
+    //printf("HERE size = %d", ass_s->ass_size);
     for(int i = 0; i < ass_s->ass_size; i++)
     {
         if(((int)ass_s->data[i] == 1) || ((int)ass_s->data[i] == 21))
@@ -350,15 +482,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     free(rix_call);
     fclose(assembler_txt);
     return;
-}
-
-void text_destruct(text_t* text_s)
-{
-    free(text_s->data);
-    text_s->data = nullptr;
-
-    free(text_s->lines);
-    text_s->lines = nullptr;
 }
 
 long size_of_file(FILE* text)
@@ -388,65 +511,20 @@ void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_length
     }
 }
 
-void printf_text_s(text_t* text_s) // DEBUG function
+void printf_text_s(text_t* text_s) // FOR DEBUG
 {
     assert(text_s);
 
-    FILE* res = fopen("[!]complied_code.txt", "w");
+    FILE* res = fopen("[!]string_text.txt", "w");
 
     for(int i = 0; i < text_s->n_struct; i++)
     {
-        for(int k = 0; k < text_s->lines[i].length - 1; k++)
+        for(int k = 0; k < text_s->lines[i].length; k++)
             fprintf(res, "%c", text_s->lines[i].line[k]);
         fprintf(res, " ");
     }
 
     fclose(res);
-}
-
-inline make_full_text_struct(long length, long n_structs, int file_length, text_t* text_s, line_t *lines)
-{
-    while(TRUE)
-    {
-        while(TRUE)
-        {
-            if(length >= file_length)
-                break;
-            if((text_s->data[length] == ' ') || (text_s->data[length] == '\t') || (text_s->data[length] == '\n'))
-                length++;
-            else
-                break;
-        }
-
-        if(length >= file_length)
-            break;
-
-        lines[n_structs].line = &(text_s->data)[length];
-        lines[n_structs].length = length;
-
-
-        while(text_s->data[length] != '\n')
-        {
-            if(length >= file_length)
-                break;
-
-            length++;
-        }
-
-        length++;
-
-        lines[n_structs].length = length - lines[n_structs].length;
-        n_structs++;
-    }
-
-    for(int j = 0; j < n_structs; j++)
-    {
-        text_s->lines[j].line   = lines[j].line;
-        text_s->lines[j].length = lines[j].length;
-    }
-
-    text_s->n_struct    = n_structs;
-    text_s->length_file = file_length;
 }
 
 void code_destruct(code_t* code_s)
@@ -458,7 +536,7 @@ void code_destruct(code_t* code_s)
 
 }
 
-void ass_code_destruct(ass_code* ass_s) //перед free нужно еще пройтись по всем элементам занулить их
+void ass_code_destruct(ass_code* ass_s)
 {
     assert(ass_s);
 
