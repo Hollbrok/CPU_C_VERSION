@@ -3,10 +3,10 @@
 
 constexpr int size_time     = 40;
 
-struct ass_code
+struct Bytecode
 {
-    double* data            = nullptr;
-    int     max_ass_size    = 0;
+    double* data              = nullptr;
+    int     bytecode_capacity = 0;
 };
 
 #endif // DISASSEMBLER_INFO_H_INCLUDED
