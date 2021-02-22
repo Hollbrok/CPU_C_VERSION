@@ -8,15 +8,17 @@ int main()
 
     FILE* text   = fopen("[!]assembler_code.txt", "r");
     FILE* result = fopen("disassem_result[for user].txt",   "wb");
+    assert(text);
+    assert(result);
 
-    struct ass_code ass_s = {};
-    make_ass_s(text, &ass_s);
+    struct Bytecode bytecode = {};
+    make_bytecode(text, &bytecode);
 
-    disassembler(&ass_s, result);
+    disassembler(&bytecode, result);
 
     printf("DONE!!\n");
 
-    ass_code_destruct(&ass_s);
+    bytecode_destruct(&bytecode);
 
     return 0;
 }
