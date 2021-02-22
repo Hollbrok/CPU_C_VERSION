@@ -11,27 +11,28 @@
 
 #include "Commands.h"
 
-void text_construct(text_t* text, FILE* onegin);
+auto text_construct(Text* text_struct, FILE* user_code) -> void;
 
-void useful_sizes(FILE* text, text_t* text_s, int* file_lines, long* file_lenght);
+auto text_destruct(Text* text_struct) -> void;
 
-void code_construct(text_t* text_s, code_t* code_s);
+auto print_text_struct(Text* text_struct) -> void;                      // печатает в файл string_text текст без комментариев в виде строки
 
-void print_code_buffer(code_t* code_s); // печатает в файл code_struct буфер структуры code (для просмотра как робят комментарии)
+auto code_construct(Text* text_struct, Code* code_struct) -> void;
 
-void get_ass_code(code_t* code_s, ass_code* ass_s);
+auto code_destruct(Code* code_struct) -> void;
 
-void text_destruct(text_t* text);
+auto print_code_buffer(Code* code_struct) -> void;                  // печатает в файл code_struct буфер структуры code (для просмотра как робят комментарии)
 
-void code_destruct(code_t* code_s);
+auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void;
 
-void ass_code_destruct(ass_code* ass_s);
+auto bytecode_destruct(Bytecode* byte_struct) -> void;
 
-void printf_text_s(text_t* text_s); // печатает в файл string_text текст без комментариев в виде строки
+auto useful_sizes(FILE* user_code, Text* text_struct, int* file_lines, long* file_length) -> void;
 
-char* set_time(struct tm *time);
+auto set_time(struct tm *time) -> char*;
 
-char* define_date(void);
+auto define_date(void) -> char*;
 
-long size_of_file(FILE* text);
+auto size_of_file(FILE* user_code) -> long;
+
 #endif // ASSEM_H_INCLUDED
