@@ -272,14 +272,15 @@ auto disassembler(Bytecode* byte_struct, FILE* result) -> void
                 {
                     int number_command = static_cast<int>(byte_struct->data[i + 1]);
                     fprintf(result, "call :LAB%d\n", number_command);
+                    skip_first = i + 1;
                     break;
                 }
                 default:
                 {
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
                     fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
-                    fprintf(error, "Unknown command..\n");
-                    fprintf(error, "assembler_code[%d] = %d", i, static_cast<int>(byte_struct->data[i]));
+                    fprintf(error, "Disassemblers doesn't know this command..\n");
+                    fprintf(error, "bytecode[%d] = [%d]", i, static_cast<int>(byte_struct->data[i]));
                     fclose(error);
                 }
             }
