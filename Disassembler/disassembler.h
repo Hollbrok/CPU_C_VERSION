@@ -6,18 +6,19 @@
 #include "disassembler_info.h"
 #include "Commands.h"
 
-void make_ass_s(FILE* text, ass_code* ass_s);
+auto make_bytecode(FILE* text, Bytecode* byte_struct) -> void;
 
-void ignore_spaces(char** buffer);
+auto bytecode_destruct(Bytecode* byte_struct) -> void;
 
-void ass_code_destruct(ass_code* ass_s);
+auto disassembler(Bytecode* byte_struct, FILE* result) -> void;
 
-double get_number(char** buffer);
+auto ignore_spaces(char** buffer) -> void;
 
-char* set_time(struct tm *u);
+auto set_time(struct tm *time) -> char*;
 
-char* define_date(void);
+auto define_date(void) -> char*;
 
-void disassembler(ass_code* ass_s, FILE* result);
+auto get_number(char** buffer) -> double;
+
 
 #endif // DISASSEMBLER_H_INCLUDED
