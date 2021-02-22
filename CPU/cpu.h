@@ -11,20 +11,20 @@
 
 #include "Commands.h"
 
-void make_ass_s(FILE* text, ass_code* ass_s);
+auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void;
 
-void ignore_spaces(char** buffer);
+auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void;
 
-void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call);
+auto bytecode_destruct(Bytecode* byte_struct) -> void;
 
-void print_for_user(stack_t* Stack);
+auto print_for_user(stack_t* Stack) -> void;
 
-void ass_code_destruct(ass_code* ass_s);
+auto ignore_spaces(char** buffer) -> void;
 
-char* set_time(struct tm *u);
+auto get_number(char** buffer) -> double;
 
-char* define_date();
+auto set_time(struct tm *time) -> char*;
 
-double get_number(char** buffer);
+auto define_date() -> char*;
 
 #endif // CPU_H_INCLUDED
