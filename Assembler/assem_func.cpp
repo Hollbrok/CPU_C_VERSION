@@ -194,43 +194,15 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
     int rix_cur_size   = 0;
     int cur_code_size  = 0;
 
-
-
-    //printf("code_s->terms = %d\n", code_s->terms);
     for (int i = 0; i < code_s->terms; i++)
     {
         if(NEW_COMMAND_ERROR)
             break;
         char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
-        /*while(isspace(code_s->data[cur_code_size]))
-        {
-            if (code_s->data[cur_code_size] == '\0')
-            {
-                break;
-                END_STATE = 1;
-            }
-            cur_code_size++;
-        }
-        if(END_STATE)
-        {
-            printf("END_STATE, break\n");
-            break;
-        }*/
-        /*if(code_s->data[cur_code_size] == ';')
-        {                                            // Если комментрий,
-            while((code_s->data[cur_code_size] != '\n') && (code_s->data[cur_code_size])) // до конца строки игнорим
-                cur_code_size++;                                                          // текст
-            continue;
-        } */
-
-        //if(code_s->data[cur_code_size] == '\0')
-            //break;
         int j = 0;
-
         for (j = 0; j < MAX_SIZE_COMMAND; j++)
         {
-
             if((code_s->data[j + cur_code_size] != ' '))
                 temp[j] = code_s->data[j + cur_code_size];
             else
@@ -239,10 +211,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
                 break;
             }
         }
-        //printf("[");
-        //for (int index = 0; temp[index]; index++)
-            //printf("%c", temp[index]);
-        //printf("]\n");
 
         cur_code_size += j + 1;
 
@@ -376,22 +344,6 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
                 assert(temp_str);
 
                 int iter = 0;
-
-                /*while(isspace(code_s->data[temp_cur_code_size]))
-                {
-                    if (code_s->data[temp_cur_code_size] == '\0')
-                    {
-                        break;
-                        END_STATE = 1;
-                    }
-                    temp_cur_code_size++;
-                }
-                if(END_STATE)
-                {
-                    END_STATE = 0;
-                    break;
-                }*/
-
                 for (iter = 0; iter < MAX_SIZE_COMMAND; iter++)
                 {
                     if(code_s->data[iter + temp_cur_code_size] != ' ')
@@ -463,9 +415,9 @@ void get_ass_code(code_t* code_s, ass_code* ass_s)
 
 
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
+    assert(assembler_txt);
     rix_cur_size = 0;
 
-    //printf("HERE size = %d", ass_s->ass_size);
     for(int i = 0; i < ass_s->ass_size; i++)
     {
         if(((int)ass_s->data[i] == 1) || ((int)ass_s->data[i] == 21))
