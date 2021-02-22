@@ -3,7 +3,7 @@
 static int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
 static int SECOND_PRINT            = 0;   // Для принта for_user
 
-void make_ass_s(FILE* text, ass_code* ass_s)
+auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
 {
     fseek(text, 0, SEEK_END);
     int file_length = ftell(text);
@@ -20,23 +20,23 @@ void make_ass_s(FILE* text, ass_code* ass_s)
         if(buffer_char[index] == ' ')
             space_counter++;
 
-    ass_s->max_ass_size = space_counter;
+    byte_struct->bytecode_capacity = space_counter;
 
-    ass_s->data     = (double*) calloc(ass_s->max_ass_size, sizeof(double));
-    assert(ass_s->data);
+    byte_struct->data     = (double*) calloc(byte_struct->bytecode_capacity, sizeof(double));
+    assert(byte_struct->data);
     int ass_cur_size = 0;
 
     while (*buffer_char)
     {
         double temp_val             = get_number(&buffer_char);
-        ass_s->data[ass_cur_size++] = temp_val;
+        byte_struct->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
-    ass_s->max_ass_size = ass_cur_size;
+    byte_struct->bytecode_capacity = ass_cur_size;
     return;
 }
 
-double get_number(char** buffer)
+auto get_number(char** buffer) -> double
 {
     ignore_spaces(buffer);
     double number = atof(*buffer);
@@ -48,26 +48,26 @@ double get_number(char** buffer)
     return number;
 }
 
-void ignore_spaces(char** buffer)
+auto ignore_spaces(char** buffer) -> void
 {
     while (isspace(**buffer))
         (*buffer)++;
 }
 
-void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
+auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 {
     assert(Stack);
     assert(Stack_call);
-    assert(ass_s);
+    assert(byte_struct);
 
-    struct rix rix_s = {}; // сделать просто массив и поменять кодировку регистров
+    struct Rix rix_struct = {}; // сделать просто массив и поменять кодировку регистров
 
     int skip_first  = -1;
     int skip_second = -1;
 
-    for (int i = 0; i < ass_s->max_ass_size; i++)
+    for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
-
+        //printf("i = %d\n", i);
         if(EXIT_CONDITION == 1)
             break;
 
@@ -76,27 +76,27 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
             //printf("skip_f_s = [%d],[%d]\n", skip_first, skip_second);
             continue;
         }
-        //printf("in start i = %d, ass[i] = %.0lf\n", i, ass_s->data[i]);
-        if((int)ass_s->data[i] == 1)//PUSH
+        //printf("in start i = %d, ass[i] = %.0lf\n", i, byte_struct->data[i]);
+        if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_PUSH))//PUSH
         {
-            if ((int)ass_s->data[i + 1] == 1)
-                push_stack(Stack, ass_s->data[i + 2]);
-            else if ((int)ass_s->data[i + 1] == 2)
+            if (static_cast<int>(byte_struct->data[i + 1]) == 1)
+                push_stack(Stack, byte_struct->data[i + 2]);
+            else if (static_cast<int>(byte_struct->data[i + 1]) == 2)
             {
-                if ((int)ass_s->data[i + 2] == 17)
-                    push_stack(Stack, rix_s.rax);
-                else if ((int)ass_s->data[i + 2] == 18)
-                    push_stack(Stack, rix_s.rbx);
-                else if ((int)ass_s->data[i + 2] == 19)
-                    push_stack(Stack, rix_s.rcx);
-                else if ((int)ass_s->data[i + 2] == 20)
-                    push_stack(Stack, rix_s.rdx);
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                    push_stack(Stack, rix_struct.rax);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                    push_stack(Stack, rix_struct.rbx);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                    push_stack(Stack, rix_struct.rcx);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                    push_stack(Stack, rix_struct.rdx);
             }
 
             skip_first  = i + 1;
             skip_second = i + 2;
         }
-        else if((int)ass_s->data[i] == 21)//POP / POPrix
+        else if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_POP))//POP / POPrix
         {
             if(Stack->cur_size < 1)
             {
@@ -104,18 +104,18 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                 EXIT_CONDITION = 1;
                 break;
             }
-            if ((int)ass_s->data[i + 1] == 1)
+            if (static_cast<int>(byte_struct->data[i + 1]) == 1)
                 pop_stack(Stack);
-            else if ((int)ass_s->data[i + 1] == 2)
+            else if (static_cast<int>(byte_struct->data[i + 1]) == 2)
             {
-                if ((int)ass_s->data[i + 2] == 17)
-                    rix_s.rax = pop_stack(Stack);
-                else if ((int)ass_s->data[i + 2] == 18)
-                    rix_s.rbx = pop_stack(Stack);
-                else if ((int)ass_s->data[i + 2] == 19)
-                    rix_s.rcx = pop_stack(Stack);
-                else if ((int)ass_s->data[i + 2] == 20)
-                    rix_s.rdx = pop_stack(Stack);
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                    rix_struct.rax = pop_stack(Stack);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                    rix_struct.rbx = pop_stack(Stack);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                    rix_struct.rcx = pop_stack(Stack);
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                    rix_struct.rdx = pop_stack(Stack);
             }
 
             skip_first  = i + 1;
@@ -124,14 +124,14 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
         }
         else
         {
-            switch((int)(ass_s->data[i]))
+            switch((int)(byte_struct->data[i]))
             {
-                case HLT:/*hlt*/
+                case static_cast<int>(Commands::CMD_HLT):/*hlt*/
                 {
                     EXIT_CONDITION = 1;
                     break;
                 }
-                case PUSH:/*push(то есть error, так как если push, то сюда не должно дойти)*/
+                case static_cast<int>(Commands::CMD_PUSH):/*push(то есть error, так как если push, то сюда не должно дойти)*/
                 {
                     FILE* error = fopen("ERROR_PRINT.txt", "ab");
                     fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
@@ -139,7 +139,7 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     fclose(error);
                     break;
                 }
-                case ADD:/*add*/
+                case static_cast<int>(Commands::CMD_ADD):/*add*/
                 {
                     if (Stack->cur_size < 2)
                     {
@@ -153,7 +153,7 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, x1 + x2);
                     break;
                 }
-                case MUL:/*mul*/
+                case static_cast<int>(Commands::CMD_MUL):/*mul*/
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -166,7 +166,7 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, x1 * x2);
                     break;
                 }
-                case DIV:/*div*/
+                case static_cast<int>(Commands::CMD_DIV):/*div*/
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -179,7 +179,7 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, x2 / x1);
                     break;
                 }
-                case SUB:/*sub*/
+                case static_cast<int>(Commands::CMD_SUB):/*sub*/
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -192,19 +192,19 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, x2 - x1);
                     break;
                 }
-                case SIN:/*sin*/
+                case static_cast<int>(Commands::CMD_SIN):/*sin*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, sin(x1));
                     break;
                 }
-                case COS:/*cos*/
+                case static_cast<int>(Commands::CMD_COS):/*cos*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, cos(x1));
                     break;
                 }
-                case POW:/*pow*/
+                case static_cast<int>(Commands::CMD_POW):/*pow*/
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -227,20 +227,20 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, pow(x2, x1));
                     break;
                 }
-                case SQRT:/*sqrt*/
+                case static_cast<int>(Commands::CMD_SQRT):/*sqrt*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, sqrt(x1));
                     break;
                 }
-                case IN:/*in*/
+                case static_cast<int>(Commands::CMD_IN):/*in*/
                 {
                     double x1 = 0;
                     scanf("%lf", &x1);
                     push_stack(Stack, x1);
                     break;
                 }
-                case PRINT:/*out*/
+                case static_cast<int>(Commands::CMD_OUT):/*out*/
                 {
                     //printf("in out\n");
                     if(Stack->cur_size == 0)
@@ -269,37 +269,37 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     push_stack(Stack, x1);
                     break;
                 }
-                case DEL:/*del*/
+                case static_cast<int>(Commands::CMD_DEL):/*del*/
                 {
                     pop_stack(Stack);
                     break;
                 }
-                case LN:/*ln*/
+                case static_cast<int>(Commands::CMD_LN):/*ln*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, log(x1));
                     break;
                 }
-                case LOG10:/*log10*/
+                case static_cast<int>(Commands::CMD_LOG10):/*log10*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, log10(x1));
                     break;
                 }
-                case LOG2:/*log2*/
+                case static_cast<int>(Commands::CMD_LOG2):/*log2*/
                 {
                     double x1 = pop_stack(Stack);
                     push_stack(Stack, log2(x1));
                     break;
                 }
-                case CALL:
+                case static_cast<int>(Commands::CMD_CALL):
                 {
                     //printf("CALL in i = [%d]\n", i);
                     push_stack(Stack_call, i);
-                    i = (int)ass_s->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
+                    i = (int)byte_struct->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
                     break;
                 }
-                case RET:
+                case static_cast<int>(Commands::CMD_RET):
                 {
                     //printf("RET is command number i = [%d]\n", i);
                     if(Stack_call->cur_size < 1)
@@ -308,20 +308,20 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                         EXIT_CONDITION = 1;
                         break;
                     }
-                    i = pop_stack(Stack_call) + 1;
+                    i = static_cast<int>(pop_stack(Stack_call)) + 1;
                     //printf("Next command will be i = %d\n", i + 1);
                     break;
                 }
-                case JMP:/*23*/
+                case static_cast<int>(Commands::CMD_JMP):/*23*/
                 {
-                    i = (int)ass_s->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
+                    i = static_cast<int>(byte_struct->data[i + 1]); // и так целое число, (int) чтобы убрать варнинг
                     break;
                 }
-                case LABEL:/*22*/
+                case static_cast<int>(Commands::CMD_LABEL):/*22*/
                 {
                     break;
                 }
-                case JE:/*24 ==   */
+                case static_cast<int>(Commands::CMD_JE):/*24 ==   */
                 {
                     //printf("in JE\n");
                     if(Stack->cur_size < 2)
@@ -337,14 +337,14 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     if (x2 == x1) // JAE -- TRUE, то нужно выполнить переход на метку
                     {
                         //printf("РАВНЫ\n");
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                         //printf("Идем на i = %d\n", i);
                     }
                     else
                         i++;
                     break;
                 }
-                case JAB:/*25 !=  */
+                case static_cast<int>(Commands::CMD_JAB):/*25 !=  */
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -356,12 +356,12 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     double x2 = pop_stack(Stack);
 
                     if (x2 != x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
                     break;
                 }
-                case JAE:/*26 >=  */
+                case static_cast<int>(Commands::CMD_JAE):/*26 >=  */
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -373,12 +373,12 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     double x2 = pop_stack(Stack);
 
                     if (x2 >= x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
                     break;
                 }
-                case JBE:/*27 <=  */
+                case static_cast<int>(Commands::CMD_JBE):/*27 <=  */
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -390,12 +390,12 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     double x2 = pop_stack(Stack);
 
                     if (x2 <= x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
                     break;
                 }
-                case JA:/*28 >    */
+                case static_cast<int>(Commands::CMD_JA):/*28 >    */
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -407,12 +407,12 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     double x2 = pop_stack(Stack);
 
                     if (x2 > x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
                     break;
                 }
-                case JB:/*29 <    */
+                case static_cast<int>(Commands::CMD_JB):/*29 <    */
                 {
                     if(Stack->cur_size < 2)
                     {
@@ -424,7 +424,7 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     double x2 = pop_stack(Stack);
 
                     if (x2 < x1) // JAE -- TRUE, то нужно выполнить переход на метку
-                        i = (int)ass_s->data[i + 1];
+                        i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
                     break;
@@ -434,17 +434,25 @@ void CPU(ass_code* ass_s, stack_t* Stack, stack_t* Stack_call)
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
                     fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
                     fprintf(error, "Unknown command..\n");
-                    fprintf(error, "assembler_code[%d] = %d", i, (int)ass_s->data[i]);
+                    fprintf(error, "bytecode[%d] = %d", i, static_cast<int>(byte_struct->data[i]));
                     fclose(error);
                 }
             }
         }
     }
-
-
 }
 
-void print_for_user(stack_t* Stack)
+auto bytecode_destruct(Bytecode* byte_struct) -> void
+{
+    assert(byte_struct);
+
+    free(byte_struct->data);
+    byte_struct->data = nullptr;
+
+    byte_struct->bytecode_capacity = 0;
+}
+
+auto print_for_user(stack_t* Stack) -> void
 {
     FILE* result = fopen("results[for user].txt", "wb");
 
@@ -543,7 +551,7 @@ void print_for_user(stack_t* Stack)
     fclose(result);
 }
 
-char* set_time(struct tm *time)
+auto set_time(struct tm *time) -> char*
 {
     char string_time[size_time] = {};
     char *tmp                   = nullptr;
@@ -556,7 +564,7 @@ char* set_time(struct tm *time)
     return(tmp);
 }
 
-char* define_date()
+auto define_date() -> char*
 {
     const time_t timer    = time(nullptr);
     struct tm* local_time = localtime(&timer);
@@ -564,15 +572,7 @@ char* define_date()
     return set_time(local_time);
 }
 
-void ass_code_destruct(ass_code* ass_s)//перед free нужно еще пройтись по всем элементам занулить их
-{
-    assert(ass_s);
 
-    free(ass_s->data);
-    ass_s->data = nullptr;
-
-    ass_s->max_ass_size = 0;
-}
 
 
 
