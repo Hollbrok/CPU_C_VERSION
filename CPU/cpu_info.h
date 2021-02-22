@@ -4,13 +4,13 @@
 constexpr int START_SIZE = 10; // Начальный размер стека.
 constexpr int size_time  = 40;
 
-struct ass_code
+struct Bytecode
 {
-    double* data            = nullptr;
-    int     max_ass_size    = 0;
+    double* data              = nullptr;
+    int     bytecode_capacity = 0;
 };
 
-struct rix
+struct Rix
 {
     double rax = NAN;
     double rbx = NAN;
