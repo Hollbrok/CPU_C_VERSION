@@ -12,20 +12,21 @@ int main()
     fprintf(res, "\tDate of the log_stack : %s (dd/mm/yy)\n\n", define_date());
     fclose(res);
 
-    char* name = nullptr;
-    START_ACTIONS(Stack);
-    Construct(&Stack, START_SIZE);
+    struct Bytecode byte_struct = {};
+    get_bytecode(text, &byte_struct);
 
-    START_ACTIONS(Stack_call);
-    Construct(&Stack_call, START_SIZE);
 
-    struct ass_code ass_s = {};
-    make_ass_s(text, &ass_s);
+    char* name = nullptr;                   // this is need for stack name
+    START_ACTIONS(Stack);                   // make stack struct
+    Construct(&Stack, START_SIZE);          // constructor of stack
 
-    CPU(&ass_s, &Stack, &Stack_call);
+    START_ACTIONS(Stack_call);              // similarly, but this is
+    Construct(&Stack_call, START_SIZE);     // the stack of calls
+    CPU(&byte_struct, &Stack, &Stack_call);
 
-    stack_dump(&Stack);
-    ass_code_destruct(&ass_s);
+    //stack_dump(&Stack);
+
+    bytecode_destruct(&byte_struct);
     stack_destruct(&Stack);
     stack_destruct(&Stack_call);
     printf("DONE!!\n");
