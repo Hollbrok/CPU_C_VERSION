@@ -1,7 +1,9 @@
 #ifndef ASSEM_INFO_H_INCLUDED
 #define ASSEM_INFO_H_INCLUDED
 
-constexpr int size_time = 40;
+constexpr int size_time      = 40;
+constexpr int MAX_LABELS     = 50;
+constexpr int MAX_LABEL_SIZE = 20;
 
 struct Line
 {
@@ -19,15 +21,22 @@ struct Text
 
 struct Code
 {
-    char*   data            = nullptr;  // указатель на буфер кода
-    int     length          = 0;        // длина буфера
-    int     terms           = 0;        // кол-во лексем
+    char*   data   = nullptr;  // указатель на буфер кода
+    int     length = 0;        // длина буфера
+    int     terms  = 0;        // кол-во лексем
 };
 
 struct Bytecode
 {
     double* data              = nullptr;
     int     bytecode_capacity = 0;
+};
+
+struct Label
+{
+    char* name    = nullptr;
+    size_t length = 0;
+    int adress    = 0;
 };
 
 
