@@ -34,9 +34,9 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
     {
         int iter_length = 0;
 
-        while(isspace(text_struct->data[length])) // !!! это не равно следующему:
-            length++;                        // while(isspace(text_struct->data[length++]));
-                                             // с точностью до единицы !!!
+        while(isspace(text_struct->data[length]))   // !!! это не равно следующему:
+            length++;                               // while(isspace(text_struct->data[length++]));
+                                                    // с точностью до единицы !!!
 
         if(length >= file_length)
             break;
@@ -195,9 +195,66 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 {
     // На этом этапе я уже гарантирую отсутствие комментариев и лишних разделительных
     // символов, поэтому дополнительная обработка не нужна
+    //using namespace Commands;
 
     assert(code_struct);
     assert(byte_struct);
+
+    Label* labels = (Label*) calloc(MAX_LABELS + 1, sizeof(Label));
+    assert(labels);
+
+    for(int y = 0; y < MAX_LABELS; y++)
+    {
+        labels[y].name = (char*) calloc(MAX_LABEL_SIZE, sizeof(char));
+        assert(labels[y].name);
+    }
+
+    int cur_labels = 0;
+    int correction = 0;
+    int temp_cur_code_size = 0;
+
+    char* temp = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
+
+    for(int i = 0; i < code_struct->terms; i++)
+    {
+        int iter = 0;
+        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // теперь в temp_str хранится лексема
+        {
+            if(code_struct->data[iter + temp_cur_code_size] != ' ')
+                temp[iter] = code_struct->data[iter + temp_cur_code_size];
+            else
+            {
+                temp[iter] = '\0';
+                break;
+            }
+        }
+
+        if (!strcmp(temp, "push"))
+                correction++;
+        else if (!strcmp(temp, "pop"))
+                correction++;
+        else if (temp[strlen(temp) - 1] == ':')                         // нашли метку
+        {
+            //printf("GOOD FIND\n");
+            strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);                               // поместили указатель
+
+            labels[cur_labels].length = strlen(temp);                       // запомнили длину (в будущем можно будет отсортировать по длинам, чтобы
+                                                                                // ускорить процесс обнаржуения меток при ассемблировании) -- эффект. для большого кода
+            labels[cur_labels].adress = i + correction;
+            cur_labels++;
+        }
+
+        temp_cur_code_size += iter + 1;
+    }
+
+    int amount_labels = cur_labels;
+    cur_labels = 0;
+
+
+
+    //for(int iter = 0; iter < amount_labels; iter++)
+    //    printf("[%d][%s]\nadress = %d\n", iter, labels[iter].name, labels[iter].adress);
+
 
     byte_struct->data = (double*) calloc(code_struct->terms, sizeof(double));
     assert(byte_struct->data);
@@ -212,7 +269,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     {
         if(NEW_COMMAND_ERROR)
             break;
-        char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
+        //char* temp = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
 
         int j = 0;
         for (j = 0; j < MAX_SIZE_COMMAND; j++)
@@ -230,175 +287,134 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
         if (!strcmp(temp, "push"))
         {
-            byte_struct->data[i]           = 1;
-            IS_LAST_COMMAND_PUSH     = 1;
+            byte_struct->data[i] = 1;
+            IS_LAST_COMMAND_PUSH = 1;
         }
         else if (!strcmp(temp, "add"))
-            byte_struct->data[i] = 2;
+            byte_struct->data[i] = com_to_int(Commands::CMD_ADD);
         else if (!strcmp(temp, "mul"))
-            byte_struct->data[i] = 3;
+            byte_struct->data[i] = com_to_int(Commands::CMD_MUL);
         else if (!strcmp(temp, "div"))
-            byte_struct->data[i] = 4;
+            byte_struct->data[i] = com_to_int(Commands::CMD_DIV);
         else if (!strcmp(temp, "sub"))
-            byte_struct->data[i] = 5;
+            byte_struct->data[i] = com_to_int(Commands::CMD_SUB);
         else if (!strcmp(temp, "sin"))
-            byte_struct->data[i] = 6;
+            byte_struct->data[i] = com_to_int(Commands::CMD_SIN);
         else if (!strcmp(temp, "cos"))
-            byte_struct->data[i] = 7;
+            byte_struct->data[i] = com_to_int(Commands::CMD_COS);
         else if (!strcmp(temp, "pow"))
-            byte_struct->data[i] = 8;
+            byte_struct->data[i] = com_to_int(Commands::CMD_POW);
         else if (!strcmp(temp, "sqr"))
-            byte_struct->data[i] = 9;
+            byte_struct->data[i] = com_to_int(Commands::CMD_SQRT);
         else if (!strcmp(temp, "in"))
-            byte_struct->data[i] = 10;
+            byte_struct->data[i] = com_to_int(Commands::CMD_IN);
         else if (!strcmp(temp, "out"))
-            byte_struct->data[i] = 11;
+            byte_struct->data[i] = com_to_int(Commands::CMD_OUT);
         else if (!strcmp(temp, "del"))
-            byte_struct->data[i] = 12;
+            byte_struct->data[i] = com_to_int(Commands::CMD_DEL);
         else if (!strcmp(temp, "ln"))
-            byte_struct->data[i] = 13;
+            byte_struct->data[i] = com_to_int(Commands::CMD_LN);
         else if (!strcmp(temp, "log10"))
-            byte_struct->data[i] = 14;
+            byte_struct->data[i] = com_to_int(Commands::CMD_LOG10);
         else if (!strcmp(temp, "quadratic"))
             byte_struct->data[i] = 15;
         else if (!strcmp(temp, "log2"))
-            byte_struct->data[i] = 16;
+            byte_struct->data[i] = com_to_int(Commands::CMD_LOG2);
         else if (!strcmp(temp, "rax"))
         {
-            byte_struct->data[i]     = 17;
+            byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
             numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH     = 0;
+            IS_LAST_COMMAND_PUSH       = FALSE;
         }
         else if (!strcmp(temp, "rbx"))
         {
-            byte_struct->data[i]           = 18;
+            byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
             numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH = 0;
+            IS_LAST_COMMAND_PUSH       = FALSE;
 
         }
         else if (!strcmp(temp, "rcx"))
         {
-            byte_struct->data[i]           = 19;
+            byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
             numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH     = 0;
+            IS_LAST_COMMAND_PUSH       = FALSE;
+
         }
         else if (!strcmp(temp, "rdx"))
         {
-            byte_struct->data[i]           = 20;
+            byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
             numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH     = 0;
+            IS_LAST_COMMAND_PUSH       = FALSE;
+
         }
         else if (!strcmp(temp, "pop"))
-            byte_struct->data[i] = 21;
+        {
+            byte_struct->data[i]     = com_to_int(Commands::CMD_POP);
+            numbers_flag[flags_size] = 1;
+        }
         else if (!strcmp(temp, "je"))
         {
-            byte_struct->data[i]      = 24;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JE);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "jab"))
         {
-            byte_struct->data[i]      = 25;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JAB);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "jae"))
         {
-            byte_struct->data[i]      = 26;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JAE);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "jbe"))
         {
-            byte_struct->data[i]      = 27;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JBE);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "ja"))
         {
-            byte_struct->data[i]      = 28;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JA);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "jb"))
         {
-            byte_struct->data[i]      = 29;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JB);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "hlt"))
-        {
-            byte_struct->data[i] = 0;
-            //END_STATE = 1;
-        }
-
+            byte_struct->data[i] = com_to_int(Commands::CMD_HLT);
         else if (IS_LAST_COMMAND_PUSH)
         {
-            byte_struct->data[i]           = (double) std::atof(temp);
+            byte_struct->data[i]       = (double) std::atof(temp);
             numbers_flag[flags_size++] = 1;
-            IS_LAST_COMMAND_PUSH     = 0;
+            IS_LAST_COMMAND_PUSH       = FALSE;
         }
         else if (temp[strlen(temp) - 1] == ':')
-            byte_struct->data[i] = 22;
+            byte_struct->data[i] = com_to_int(Commands::CMD_LABEL);
         else if (!strcmp(temp, "ret"))
-            byte_struct->data[i] = 30;
+            byte_struct->data[i] = com_to_int(Commands::CMD_RET);
         else if (!strcmp(temp, "call"))
         {
-            byte_struct->data[i] = 31;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_CALL);
+            IS_LAST_COMMAND_JMP  = TRUE;
         }
         else if (!strcmp(temp, "jmp"))
         {
-            byte_struct->data[i]      = 23;
-            IS_LAST_COMMAND_JMP = 1;
+            byte_struct->data[i] = com_to_int(Commands::CMD_JMP);
+            IS_LAST_COMMAND_JMP  = TRUE;
 
         }
         else if (IS_LAST_COMMAND_JMP)
         {
-            int temp_cur_code_size = 0;
-            int correction         = 0;
-
-            for (int index = 0; index < code_struct->terms; index++)
-            {
-                char* temp_str = (char*) calloc(MAX_SIZE_COMMAND + 1, sizeof(char));
-                assert(temp_str);
-
-                int iter = 0;
-                for (iter = 0; iter < MAX_SIZE_COMMAND; iter++)
+            temp++;
+            for (int index = 0; index < amount_labels; index++)
+                if(!strcmp(temp, labels[index].name))
                 {
-                    if(code_struct->data[iter + temp_cur_code_size] != ' ')
-                        temp_str[iter] = code_struct->data[iter + temp_cur_code_size];
-                    else
-                    {
-                        temp_str[iter] = '\0';
-                        break;
-                    }
+                    byte_struct->data[i] = labels[index].adress;
+                    break;
                 }
-
-                if (!strcmp(temp_str, "push"))
-                    correction++;
-                else if (!strcmp(temp_str, "pop"))
-                    correction++;
-                else if (temp_str[strlen(temp) - 1] == ':')
-                {
-                    int ERROR_LABEL = 0;
-                    for (int iter_2 = 0; iter_2 < (int)(strlen(temp) - 1); iter_2++)
-                        if (temp_str[iter_2] != temp[iter_2 + 1])
-                        {
-                            //printf("ERROR_LABEL. i = %d\n", i);
-                            ERROR_LABEL = 1;
-                            break;
-                        }
-
-                    if((!ERROR_LABEL) && (temp_str[strlen(temp) - 1] == temp[0]))
-                    {
-                        //printf("i = %d, GOOD\n", i);
-                        //printf("correction is %d, index is %d\n", correction, index);
-                        //printf("LABEL = %d\n", index + correction);
-                        byte_struct->data[i] = index + correction;     // index теперь смотрит на ... 22 ..., В CPU будет после итерации на след. действие -- GOOD.
-                        free(temp_str);
-                        break;
-                    }
-                }
-
-                free(temp_str);
-                temp_cur_code_size += iter + 1;
-            }
-
+            temp--;
             IS_LAST_COMMAND_JMP = 0;
         }
         else
@@ -413,9 +429,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             break;
         }
         byte_struct->bytecode_capacity++;
-        free(temp);
     }
-
 
 
     if(NEW_COMMAND_ERROR)
@@ -440,6 +454,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     }
 
     free(numbers_flag);
+
+    for(int y = 0; y < amount_labels; y++)
+        if (labels[y].name)
+            free(labels[y].name);
+
+    free(labels);
+    free(temp);
     fclose(assembler_txt);
     return;
 }
@@ -500,4 +521,9 @@ auto size_of_file(FILE* user_code) -> long
     file_length++;
 
     return file_length;
+}
+
+auto com_to_int(Commands command) -> int
+{
+    return static_cast<int>(command);
 }
