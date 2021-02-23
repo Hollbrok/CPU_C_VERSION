@@ -105,7 +105,10 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 break;
             }
             if (static_cast<int>(byte_struct->data[i + 1]) == 1)
+            {
                 pop_stack(Stack);
+                skip_first  = i + 1;
+            }
             else if (static_cast<int>(byte_struct->data[i + 1]) == 2)
             {
                 if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
@@ -116,11 +119,10 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     rix_struct.rcx = pop_stack(Stack);
                 else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
                     rix_struct.rdx = pop_stack(Stack);
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
             }
-
-            skip_first  = i + 1;
-            skip_second = i + 2;
-
         }
         else
         {
