@@ -35,6 +35,6 @@ auto define_date(void) -> char*;
 
 auto size_of_file(FILE* user_code) -> long;
 
-auto com_to_int(Commands command) -> int;
+auto com_to_int(my_commands::Commands command) -> int;
 
 #endif // ASSEM_H_INCLUDED
