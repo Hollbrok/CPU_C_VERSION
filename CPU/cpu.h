@@ -27,4 +27,6 @@ auto set_time(struct tm *time) -> char*;
 
 auto define_date() -> char*;
 
+auto is_equal(double a, double b) -> bool;
+
 #endif // CPU_H_INCLUDED
