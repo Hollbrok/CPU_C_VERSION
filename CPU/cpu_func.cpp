@@ -65,6 +65,8 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
     int skip_first  = -1;
     int skip_second = -1;
 
+    using namespace my_commands;
+
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
         //printf("i = %d\n", i);
@@ -126,11 +128,11 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
         }
         else
         {
-            switch((int)(byte_struct->data[i]))
+            switch((int)(byte_struct->data[i]))          // В switch'e нельзя использовать non-constexpr constants, поэтому тут без команды com_to_int
             {
                 case static_cast<int>(Commands::CMD_HLT):/*hlt*/
                 {
-                    EXIT_CONDITION = 1;
+                    EXIT_CONDITION = TRUE;
                     break;
                 }
                 case static_cast<int>(Commands::CMD_PUSH):/*push(то есть error, так как если push, то сюда не должно дойти)*/
@@ -248,7 +250,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size == 0)
                     {
                         printf("not enough space in Stack to out. Exit..\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
@@ -256,7 +258,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(!SECOND_PRINT)
                     {
                         FILE* result = fopen("results[for user].txt", "wb");
-                        SECOND_PRINT = 1;
+                        SECOND_PRINT = TRUE;
                         fprintf(result, "[%lg]\n", x1);
                         fclose(result);
                     }
@@ -307,7 +309,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack_call->cur_size < 1)
                     {
                         printf("no number in stack_call to return\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     i = static_cast<int>(pop_stack(Stack_call)) + 1;
@@ -329,14 +331,14 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JE\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
                     //printf("x1 = %lg, x2 = %lg\n", x1, x2);
-                    if (x2 == x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                    if (is_equal(x2, x1)) // JAE -- TRUE, то нужно выполнить переход на метку
                     {
                         //printf("РАВНЫ\n");
                         i = static_cast<int>(byte_struct->data[i + 1]);
@@ -351,13 +353,13 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JAB\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 != x1) // JAE -- TRUE, то нужно выполнить переход на метку
+                    if (!is_equal(x2, x1)) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
@@ -368,7 +370,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JAE\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
@@ -385,7 +387,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JBE\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
@@ -402,7 +404,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JA\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
@@ -419,7 +421,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack->cur_size < 2)
                     {
                         printf("not enough numbers to JB\n");
-                        EXIT_CONDITION = 1;
+                        EXIT_CONDITION = TRUE;
                         break;
                     }
                     double x1 = pop_stack(Stack);
@@ -572,6 +574,17 @@ auto define_date() -> char*
     struct tm* local_time = localtime(&timer);
 
     return set_time(local_time);
+}
+
+auto is_equal(double a, double b) -> bool
+{
+    // Проверяем числа на их близость - это нужно в случаях, когда сравниваемые числа являются нулевыми или около нуля
+	double diff = fabs(a - b);
+	if (diff <= absEpsilon)
+		return true;
+
+	// В противном случае, возвращаемся к алгоритму Кнута
+	return diff <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * epsilon);
 }
 
 
