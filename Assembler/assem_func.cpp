@@ -265,6 +265,8 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     int flags_size     = 0;
     int cur_code_size  = 0;
 
+    using namespace my_commands;
+
     for (int i = 0; i < code_struct->terms; i++)
     {
         if(NEW_COMMAND_ERROR)
@@ -523,7 +525,7 @@ auto size_of_file(FILE* user_code) -> long
     return file_length;
 }
 
-auto com_to_int(Commands command) -> int
+auto com_to_int(my_commands::Commands command) -> int
 {
     return static_cast<int>(command);
 }
