@@ -30,11 +30,11 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
     long length  = 0;
     long n_structs = 0;
 
-    while(TRUE)
+    while (TRUE)
     {
         int iter_length = 0;
 
-        while(isspace(text_struct->data[length]))   // !!! это не равно следующему:
+        while (isspace(text_struct->data[length]))   // !!! это не равно следующему:
             length++;                               // while(isspace(text_struct->data[length++]));
                                                     // с точностью до единицы !!!
 
@@ -71,7 +71,7 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
         n_structs++;
     }
 
-    for(int j = 0; j < n_structs; j++)
+    for (int j = 0; j < n_structs; j++)
     {
         text_struct->lines[j].line   = lines[j].line;
         text_struct->lines[j].length = lines[j].length;
@@ -88,11 +88,11 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
     fprintf(info, "Number of lines      = %d\n", text_struct->n_struct);
     fprintf(info, "Length of the file   = %d\n", text_struct->length_file);
 
-    for(int x = 0; x < text_struct->n_struct; x++)
+    for (int x = 0; x < text_struct->n_struct; x++)
     {
         fprintf(info, "lines[%d]. [", x + 1);
 
-        for(int y = 0; y < text_struct->lines[x].length; y++)
+        for (int y = 0; y < text_struct->lines[x].length; y++)
             fprintf(info, "%c", text_struct->lines[x].line[y]);
 
         fprintf(info, "]\n");
@@ -118,9 +118,9 @@ auto print_text_struct(Text* text_struct) -> void // FOR DEBUG
 
     FILE* res = fopen("[!]string_text.txt", "w");
 
-    for(int i = 0; i < text_struct->n_struct; i++)
+    for (int i = 0; i < text_struct->n_struct; i++)
     {
-        for(int k = 0; k < text_struct->lines[i].length; k++)
+        for (int k = 0; k < text_struct->lines[i].length; k++)
             fprintf(res, "%c", text_struct->lines[i].line[k]);
         fprintf(res, " ");
     }
@@ -142,13 +142,13 @@ auto code_construct(Text* text_struct, Code* code_struct) -> void
     int cur_size = 0;
     //printf("n_struct = %d\n", text_struct->n_struct);
 
-    for(int x = 0; x < text_struct->n_struct; x++)
+    for (int x = 0; x < text_struct->n_struct; x++)
     {
-        for(int y = 0; y < text_struct->lines[x].length; y++)
+        for (int y = 0; y < text_struct->lines[x].length; y++)
         {
             code_struct->data[cur_size++] = text_struct->lines[x].line[y];
             if (isspace(text_struct->lines[x].line[y]))
-                while(isspace(text_struct->lines[x].line[y + 1]))
+                while (isspace(text_struct->lines[x].line[y + 1]))
                     y++;
         }
 
@@ -164,7 +164,7 @@ auto code_construct(Text* text_struct, Code* code_struct) -> void
         if (code_struct->data[i] == ' ')
         {
             code_struct->terms++;
-            while(isspace(code_struct->data[i]))
+            while (isspace(code_struct->data[i]))
                 i++;
         }
     //printf("terms = %d\n", code_struct->terms);
@@ -203,7 +203,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     Label* labels = (Label*) calloc(MAX_LABELS + 1, sizeof(Label));
     assert(labels);
 
-    for(int y = 0; y < MAX_LABELS; y++)
+    for (int y = 0; y < MAX_LABELS; y++)
     {
         labels[y].name = (char*) calloc(MAX_LABEL_SIZE, sizeof(char));
         assert(labels[y].name);
@@ -215,7 +215,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
     char* temp = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
 
-    for(int i = 0; i < code_struct->terms; i++)
+    for (int i = 0; i < code_struct->terms; i++)
     {
         int iter = 0;
         for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // теперь в temp_str хранится лексема
@@ -442,9 +442,9 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     assert(assembler_txt);
     flags_size = 0;
 
-    for(int i = 0; i < byte_struct->bytecode_capacity; i++)
+    for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
-        if(((int)byte_struct->data[i] == 1) || ((int)byte_struct->data[i] == 21))
+        if ((static_cast<int>(byte_struct->data[i]) == 1) || (static_cast<int>(byte_struct->data[i]) == 21))
         {
             fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
             fprintf(assembler_txt, "%lg ", numbers_flag[flags_size++]);
@@ -457,7 +457,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
     free(numbers_flag);
 
-    for(int y = 0; y < amount_labels; y++)
+    for (int y = 0; y < amount_labels; y++)
         if (labels[y].name)
             free(labels[y].name);
 
@@ -484,9 +484,9 @@ auto useful_sizes(FILE* user_code, Text* text_struct, int* file_lines, long* fil
     assert(file_lines);
     assert(file_length);
 
-    while((text_struct->data[*file_length] = fgetc(user_code)) && (!feof(user_code)))
+    while ((text_struct->data[*file_length] = fgetc(user_code)) && (!feof(user_code)))
     {
-        if(text_struct->data[*file_length] == '\n')
+        if (text_struct->data[*file_length] == '\n')
             (*file_lines)++;
         (*file_length)++;
     }
