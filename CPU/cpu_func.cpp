@@ -60,30 +60,28 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
     assert(Stack_call);
     assert(byte_struct);
 
-    struct Rix rix_struct = {}; // сделать просто массив и поменять кодировку регистров
+    struct Rix rix_struct = {};  // сделать просто массив и поменять кодировку регистров
 
     int skip_first  = -1;
     int skip_second = -1;
 
     using namespace my_commands;
 
+    char* OP = (char*) calloc(OP_SIZE, sizeof(char));
+
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
-        //printf("i = %d\n", i);
         if(EXIT_CONDITION == 1)
             break;
 
         if((skip_first == i) || (skip_second == i))
-        {
-            //printf("skip_f_s = [%d],[%d]\n", skip_first, skip_second);
             continue;
-        }
-        //printf("in start i = %d, ass[i] = %.0lf\n", i, byte_struct->data[i]);
-        if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_PUSH))//PUSH
+
+        if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_PUSH))  //PUSH
         {
-            if (static_cast<int>(byte_struct->data[i + 1]) == 1)
+            if (static_cast<int>(byte_struct->data[i + 1]) == S_NUMBER_SPEC)
                 push_stack(Stack, byte_struct->data[i + 2]);
-            else if (static_cast<int>(byte_struct->data[i + 1]) == 2)
+            else if (static_cast<int>(byte_struct->data[i + 1]) == S_REGIST_SPEC)
             {
                 if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
                     push_stack(Stack, rix_struct.rax);
@@ -94,11 +92,59 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
                     push_stack(Stack, rix_struct.rdx);
             }
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_NUMBER)
+            {
+                int adress = static_cast<int>(byte_struct->data[i + 2]);
+                double *temp_pointer = (double*) (OP + adress);
+                double x = *temp_pointer;
+                printf("Push in stack from OP(number)[%d] number [%lg]\n", adress, x);
+                push_stack(Stack, x);
+            }
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_REGIST)
+            {
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                {
+                    int adress = static_cast<int>(rix_struct.rax);
+                    double* temp_pointer = (double*) (OP + adress);
+                    double x = *temp_pointer;
+                    printf("Pushing in stack from OP(rix)[%d] number [%lg]\n", adress, x);
+                    push_stack(Stack, x);
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                {
+                    int adress = static_cast<int>(rix_struct.rbx);
+                    double* temp_pointer = (double*) (OP + adress);
+                    double x = *temp_pointer;
+                    printf("Pushing in stack from OP(rix)[%d] number [%lg]\n", adress, x);
+                    push_stack(Stack, x);
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                {
+                    int adress = static_cast<int>(rix_struct.rcx);
+                    double* temp_pointer = (double*) (OP + adress);
+                    double x = *temp_pointer;
+                    printf("Pushing in stack from OP(rix)[%d number [%lg]\n", adress, x);
+                    push_stack(Stack, x);
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                {
+                    int adress = static_cast<int>(rix_struct.rdx);
+                    double* temp_pointer = (double*) (OP + adress);
+                    double x = *temp_pointer;
+                    printf("Pushing in stack from OP(rix)[%d number [%lg]\n", adress, x);
+                    push_stack(Stack, x);
+                }
+            }
+            else
+            {
+                printf("Error in push\n");
+                EXIT_CONDITION = 1;
+            }
 
             skip_first  = i + 1;
             skip_second = i + 2;
         }
-        else if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_POP))//POP / POPrix
+        else if(static_cast<int>(byte_struct->data[i]) == static_cast<int>(Commands::CMD_POP))//POP
         {
             if(Stack->cur_size < 1)
             {
@@ -106,12 +152,12 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 EXIT_CONDITION = 1;
                 break;
             }
-            if (static_cast<int>(byte_struct->data[i + 1]) == 1)
+            if (static_cast<int>(byte_struct->data[i + 1]) == S_NUMBER_SPEC)
             {
                 pop_stack(Stack);
                 skip_first  = i + 1;
             }
-            else if (static_cast<int>(byte_struct->data[i + 1]) == 2)
+            else if (static_cast<int>(byte_struct->data[i + 1]) == S_REGIST_SPEC)       // Сделать через switch
             {
                 if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
                     rix_struct.rax = pop_stack(Stack);
@@ -124,6 +170,56 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
                 skip_first  = i + 1;
                 skip_second = i + 2;
+            }
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_NUMBER) // следующее число -- это адрес оперативки
+            {
+                double x = pop_stack(Stack);
+
+                double* temp_pointer = (double*) (OP + static_cast<int>(byte_struct->data[i + 2]));
+                *temp_pointer        = x;
+                printf("Pushing from Stack to OP[%d] number [%lg]\n", static_cast<int>(byte_struct->data[i + 2]), x);
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
+            }
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_REGIST)
+            {
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                {
+                    double x = pop_stack(Stack);
+
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct.rax));
+                    *temp_pointer        = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                {
+                    double x = pop_stack(Stack);
+
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct.rbx));
+                    *temp_pointer        = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                {
+                    double x = pop_stack(Stack);
+
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct.rcx));
+                    *temp_pointer        = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                {
+                    double x = pop_stack(Stack);
+
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct.rdx));
+                    *temp_pointer        = x;
+                }
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
+            }
+            else
+            {
+                printf("Error in pop\n");
+                EXIT_CONDITION = 1;
             }
         }
         else
@@ -444,6 +540,8 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
             }
         }
     }
+
+    free(OP);
 }
 
 auto bytecode_destruct(Bytecode* byte_struct) -> void
