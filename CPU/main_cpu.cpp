@@ -4,8 +4,6 @@ int main()
 {
     printf("CPU in progress..\n");
 
-    setlocale(LC_ALL, "russian");
-
     FILE* text = fopen("[!]assembler_code.txt", "r");
     FILE* res  = fopen("[!]log_stack.txt", "ab");
 
