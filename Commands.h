@@ -5,6 +5,12 @@ constexpr int MAX_SIZE_COMMAND  = 20;
 constexpr int MAX_SIZE_LABLE    = 15;
 constexpr int DEBUG_STATE       = 0;
 
+constexpr int S_NUMBER_SPEC     = 10;   // push 2       S -- working with a Stack
+constexpr int S_REGIST_SPEC     = 20;   // push rbx     S -- working with a Stack
+constexpr int OP_NUMBER         = 11;   // push [2]     OP -- working with Operative memory
+constexpr int OP_REGIST         = 21;   // push [rbx]   OP -- working with Operative memory
+
+
 namespace my_commands
 {
     enum class Commands
