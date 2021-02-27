@@ -1,297 +1,99 @@
-At your request we show the number at the top of
-the stack at the time of the call : [1]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9]
-
-At your request we show the number at the top of
-the stack at the time of the call : [16]
-
-At your request we show the number at the top of
-the stack at the time of the call : [25]
-
-At your request we show the number at the top of
-the stack at the time of the call : [36]
-
-At your request we show the number at the top of
-the stack at the time of the call : [49]
-
-At your request we show the number at the top of
-the stack at the time of the call : [64]
-
-At your request we show the number at the top of
-the stack at the time of the call : [81]
-
-At your request we show the number at the top of
-the stack at the time of the call : [100]
-
-At your request we show the number at the top of
-the stack at the time of the call : [121]
-
-At your request we show the number at the top of
-the stack at the time of the call : [144]
-
-At your request we show the number at the top of
-the stack at the time of the call : [169]
-
-At your request we show the number at the top of
-the stack at the time of the call : [196]
-
-At your request we show the number at the top of
-the stack at the time of the call : [225]
-
-At your request we show the number at the top of
-the stack at the time of the call : [256]
-
-At your request we show the number at the top of
-the stack at the time of the call : [289]
-
-At your request we show the number at the top of
-the stack at the time of the call : [324]
-
-At your request we show the number at the top of
-the stack at the time of the call : [361]
-
-At your request we show the number at the top of
-the stack at the time of the call : [400]
-
-At your request we show the number at the top of
-the stack at the time of the call : [441]
-
-At your request we show the number at the top of
-the stack at the time of the call : [484]
-
-At your request we show the number at the top of
-the stack at the time of the call : [529]
-
-At your request we show the number at the top of
-the stack at the time of the call : [576]
-
-At your request we show the number at the top of
-the stack at the time of the call : [625]
-
-At your request we show the number at the top of
-the stack at the time of the call : [676]
-
-At your request we show the number at the top of
-the stack at the time of the call : [729]
-
-At your request we show the number at the top of
-the stack at the time of the call : [784]
-
-At your request we show the number at the top of
-the stack at the time of the call : [841]
-
-At your request we show the number at the top of
-the stack at the time of the call : [900]
-
-At your request we show the number at the top of
-the stack at the time of the call : [961]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1024]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1089]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1156]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1225]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1296]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1369]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1444]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1521]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1600]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1681]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1764]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1849]
-
-At your request we show the number at the top of
-the stack at the time of the call : [1936]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2025]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2116]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2209]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2304]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2401]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2500]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2601]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2704]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2809]
-
-At your request we show the number at the top of
-the stack at the time of the call : [2916]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3025]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3136]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3249]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3364]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3481]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3600]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3721]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3844]
-
-At your request we show the number at the top of
-the stack at the time of the call : [3969]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4096]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4225]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4356]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4489]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4624]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4761]
-
-At your request we show the number at the top of
-the stack at the time of the call : [4900]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5041]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5184]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5329]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5476]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5625]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5776]
-
-At your request we show the number at the top of
-the stack at the time of the call : [5929]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6084]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6241]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6400]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6561]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6724]
-
-At your request we show the number at the top of
-the stack at the time of the call : [6889]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7056]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7225]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7396]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7569]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7744]
-
-At your request we show the number at the top of
-the stack at the time of the call : [7921]
-
-At your request we show the number at the top of
-the stack at the time of the call : [8100]
-
-At your request we show the number at the top of
-the stack at the time of the call : [8281]
-
-At your request we show the number at the top of
-the stack at the time of the call : [8464]
-
-At your request we show the number at the top of
-the stack at the time of the call : [8649]
-
-At your request we show the number at the top of
-the stack at the time of the call : [8836]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9025]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9216]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9409]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9604]
-
-At your request we show the number at the top of
-the stack at the time of the call : [9801]
-
+[1]
+[4]
+[9]
+[16]
+[25]
+[36]
+[49]
+[64]
+[81]
+[100]
+[121]
+[144]
+[169]
+[196]
+[225]
+[256]
+[289]
+[324]
+[361]
+[400]
+[441]
+[484]
+[529]
+[576]
+[625]
+[676]
+[729]
+[784]
+[841]
+[900]
+[961]
+[1024]
+[1089]
+[1156]
+[1225]
+[1296]
+[1369]
+[1444]
+[1521]
+[1600]
+[1681]
+[1764]
+[1849]
+[1936]
+[2025]
+[2116]
+[2209]
+[2304]
+[2401]
+[2500]
+[2601]
+[2704]
+[2809]
+[2916]
+[3025]
+[3136]
+[3249]
+[3364]
+[3481]
+[3600]
+[3721]
+[3844]
+[3969]
+[4096]
+[4225]
+[4356]
+[4489]
+[4624]
+[4761]
+[4900]
+[5041]
+[5184]
+[5329]
+[5476]
+[5625]
+[5776]
+[5929]
+[6084]
+[6241]
+[6400]
+[6561]
+[6724]
+[6889]
+[7056]
+[7225]
+[7396]
+[7569]
+[7744]
+[7921]
+[8100]
+[8281]
+[8464]
+[8649]
+[8836]
+[9025]
+[9216]
+[9409]
+[9604]
+[9801]
