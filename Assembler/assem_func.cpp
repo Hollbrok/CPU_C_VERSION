@@ -3,7 +3,7 @@
 static int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
 static int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
 static int IS_LAST_COMMAND_JMP     = 0;   // если был jmp или условные переход или выхов функции
-//static int END_STATE               = 0;
+//static int END_STATE             = 0;
 
 
 
@@ -324,35 +324,69 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = com_to_int(Commands::CMD_LOG2);
         else if (!strcmp(temp, "rax"))
         {
-            byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
-            numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH       = FALSE;
+            if(temp[0] == '[')
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
+                numbers_flag[flags_size++] = 21;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
+                numbers_flag[flags_size++] = 20;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
         }
         else if (!strcmp(temp, "rbx"))
         {
-            byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
-            numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH       = FALSE;
-
+            if(temp[0] == '[')
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
+                numbers_flag[flags_size++] = 21;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
+                numbers_flag[flags_size++] = 20;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
         }
         else if (!strcmp(temp, "rcx"))
         {
-            byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
-            numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH       = FALSE;
-
+            if(temp[0] == '[')
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
+                numbers_flag[flags_size++] = 21;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
+                numbers_flag[flags_size++] = 20;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
         }
         else if (!strcmp(temp, "rdx"))
         {
-            byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
-            numbers_flag[flags_size++] = 2;
-            IS_LAST_COMMAND_PUSH       = FALSE;
-
+            if(temp[0] == '[')
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
+                numbers_flag[flags_size++] = 21;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else
+            {
+                byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
+                numbers_flag[flags_size++] = 20;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
         }
         else if (!strcmp(temp, "pop"))
         {
             byte_struct->data[i]     = com_to_int(Commands::CMD_POP);
-            numbers_flag[flags_size] = 1;
+            numbers_flag[flags_size] = 10;
+            //IS_LAST_COMMAND_POP      = true;
         }
         else if (!strcmp(temp, "je"))
         {
@@ -386,10 +420,49 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         }
         else if (!strcmp(temp, "hlt"))
             byte_struct->data[i] = com_to_int(Commands::CMD_HLT);
+        else if(temp[0] == '[')
+        {
+            if(isdigit(*(temp + 1)))
+            {
+                byte_struct->data[i] = std::atoi(temp + 1);
+                printf("adress = %lg\n", byte_struct->data[i]);
+                numbers_flag[flags_size++] = 11;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else if(strlen(temp) == 5)
+            {
+                char new_temp[] = {temp[1], temp[2], temp[3]}; // так как длина 5, то [xxx], то в new_temp теперь просто xxx
+                if (!strncmp(new_temp, "rax", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
+                    numbers_flag[flags_size++] = 21;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rbx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
+                    numbers_flag[flags_size++] = 21;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rcx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
+                    numbers_flag[flags_size++] = 21;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rdx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
+                    numbers_flag[flags_size++] = 21;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+            }
+            else printf("BAD(((\n");
+        }
         else if (IS_LAST_COMMAND_PUSH)
         {
             byte_struct->data[i]       = (double) std::atof(temp);
-            numbers_flag[flags_size++] = 1;
+            numbers_flag[flags_size++] = 10;
             IS_LAST_COMMAND_PUSH       = FALSE;
         }
         else if (temp[strlen(temp) - 1] == ':')
