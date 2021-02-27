@@ -6,6 +6,8 @@ constexpr int size_time     = 40;
 constexpr double epsilon    = 1e-8;
 constexpr double absEpsilon = 1e-12;
 
+constexpr int OP_SIZE       = 10000;
+
 struct Bytecode
 {
     double* data              = nullptr;
