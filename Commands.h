@@ -9,6 +9,8 @@ constexpr int S_NUMBER_SPEC     = 10;   // push 2       S -- working with a Stac
 constexpr int S_REGIST_SPEC     = 20;   // push rbx     S -- working with a Stack
 constexpr int OP_NUMBER         = 11;   // push [2]     OP -- working with Operative memory
 constexpr int OP_REGIST         = 21;   // push [rbx]   OP -- working with Operative memory
+constexpr int OP_CHAR_NUM       = 22;   // push (2)
+constexpr int OP_CHAR_REG       = 23;   // push (rbx)   -- побайтовой пуш, а не double
 
 
 namespace my_commands
@@ -46,7 +48,8 @@ namespace my_commands
         CMD_JA          = 28,
         CMD_JB          = 29,
         CMD_RET         = 30,
-        CMD_CALL        = 31
+        CMD_CALL        = 31,
+        CMD_DRAW        = 32
     };
 }
 
