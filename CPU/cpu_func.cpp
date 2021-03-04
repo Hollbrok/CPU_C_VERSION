@@ -29,6 +29,7 @@ auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
     while (*buffer_char)
     {
         double temp_val             = get_number(&buffer_char);
+        //printf("[%lg]\n", temp_val);
         byte_struct->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
@@ -41,7 +42,7 @@ auto get_number(char** buffer) -> double
     ignore_spaces(buffer);
     double number = atof(*buffer);
 
-    while (isdigit(**buffer) || (**buffer == ','))
+    while (isdigit(**buffer) || (**buffer == '.'))
         (*buffer)++;
 
     ignore_spaces(buffer);
@@ -68,6 +69,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
     using namespace my_commands;
 
     char* OP = (char*) calloc(OP_SIZE, sizeof(char));
+    assert(OP);
 
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
@@ -211,6 +213,40 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
                     double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct.rdx));
                     *temp_pointer        = x;
+                }
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
+            }
+            else  if (static_cast<int>(byte_struct->data[i + 1]) == OP_CHAR_REG)
+            {
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rax));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rbx));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rcx));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rdx));
+                    *temp_pointer      = x;
                 }
 
                 skip_first  = i + 1;
@@ -361,6 +397,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     else
                     {
                         FILE* result = fopen("results[for user].txt", "a");
+                        assert(result);
                         fprintf(result, "[%lg]\n", x1);
                         fclose(result);
                     }
@@ -442,6 +479,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     }
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JAB):/*25 !=  */
@@ -459,6 +497,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JAE):/*26 >=  */
@@ -476,6 +515,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JBE):/*27 <=  */
@@ -493,6 +533,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JA):/*28 >    */
@@ -510,6 +551,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JB):/*29 <    */
@@ -527,6 +569,24 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_DRAW):
+                {
+                    system("clear");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+
+                    for (int y = 0; y < SIZEY; y++)
+                        for (int x = 0; x < SIZEX; x++)
+                        {
+                            //printf("x = %d, y = %d\n", x, y);
+                            int cur_pixel = 3 * (SIZEX * y + x);
+                            txSetPixel(x, y, RGB(OP[cur_pixel], OP[cur_pixel + 1], OP[cur_pixel + 2]));
+                        }
+
+                    //txDestroyWindow();
                     break;
                 }
                 default:
