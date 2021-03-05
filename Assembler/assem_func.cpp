@@ -1,8 +1,8 @@
 #include "assem.h"
 
-static int NEW_COMMAND_ERROR       = 0;   // Р•СЃР»Рё Р±С‹Р»Р° РѕР±РЅР°СЂСѓР¶РµРЅР° РЅРѕРІР°СЏ РєРѕРјР°РЅРґР°, С‚Рѕ Р·Р°РІРµСЂС€Р°РµРј С€Р°СЂРјР°РЅРєСѓ
-static int IS_LAST_COMMAND_PUSH    = 0;   // Р”Р»СЏ РїСЂРѕРІРµСЂРєРё РЅР° РЅРµРѕРїРѕР·РЅР°РЅРЅСѓСЋ РєРѕРјР°РЅРґСѓ
-static int IS_LAST_COMMAND_JMP     = 0;   // РµСЃР»Рё Р±С‹Р» jmp РёР»Рё СѓСЃР»РѕРІРЅС‹Рµ РїРµСЂРµС…РѕРґ РёР»Рё РІС‹С…РѕРІ С„СѓРЅРєС†РёРё
+static int NEW_COMMAND_ERROR       = 0;   // Если была обнаружена новая команда, то завершаем шарманку
+static int IS_LAST_COMMAND_PUSH    = 0;   // Для проверки на неопознанную команду
+static int IS_LAST_COMMAND_JMP     = 0;   // если был jmp или условные переход или выхов функции
 //static int END_STATE             = 0;
 
 
@@ -34,14 +34,14 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
     {
         int iter_length = 0;
 
-        while (isspace(text_struct->data[length]))   // !!! СЌС‚Рѕ РЅРµ СЂР°РІРЅРѕ СЃР»РµРґСѓСЋС‰РµРјСѓ:
+        while (isspace(text_struct->data[length]))   // !!! это не равно следующему:
             length++;                               // while(isspace(text_struct->data[length++]));
-                                                    // СЃ С‚РѕС‡РЅРѕСЃС‚СЊСЋ РґРѕ РµРґРёРЅРёС†С‹ !!!
+                                                    // с точностью до единицы !!!
 
         if(length >= file_length)
             break;
 
-        lines[n_structs].line   = &(text_struct->data)[length];  // length = РєРѕР»-РІСѓ СЃРёРјРІРѕР»РѕРј СЂР°Р·РґРµР»РёС‚РµР»РµР№
+        lines[n_structs].line   = &(text_struct->data)[length];  // length = кол-ву символом разделителей
         //lines[n_structs].length = length;                 // -//-
 
         while ((text_struct->data[length] != '\n') && (length < file_length))
@@ -61,7 +61,7 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void
         //if()
         //printf("AFTER WHILE\n");
 
-        //length++; // РјР± СѓР±СЂР°С‚СЊ
+        //length++; // мб убрать
         //iter_length++;
 
         lines[n_structs].length = iter_length;
@@ -133,8 +133,8 @@ auto code_construct(Text* text_struct, Code* code_struct) -> void
     assert(text_struct);
     assert(code_struct);
 
-    // РўСѓС‚ РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёРё
-    code_struct->length = text_struct->length_file + 3; // РЅРµ РЅР°РґРѕ + 3
+    // Тут обрабатывать комментарии
+    code_struct->length = text_struct->length_file + 3; // не надо + 3
 
     code_struct->data = (char*) calloc(code_struct->length, sizeof(char));
     assert(code_struct->data);
@@ -193,8 +193,8 @@ auto print_code_buffer(Code* code_struct) -> void
 
 auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 {
-    // РќР° СЌС‚РѕРј СЌС‚Р°РїРµ СЏ СѓР¶Рµ РіР°СЂР°РЅС‚РёСЂСѓСЋ РѕС‚СЃСѓС‚СЃС‚РІРёРµ РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ Рё Р»РёС€РЅРёС… СЂР°Р·РґРµР»РёС‚РµР»СЊРЅС‹С…
-    // СЃРёРјРІРѕР»РѕРІ, РїРѕСЌС‚РѕРјСѓ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР° РЅРµ РЅСѓР¶РЅР°
+    // На этом этапе я уже гарантирую отсутствие комментариев и лишних разделительных
+    // символов, поэтому дополнительная обработка не нужна
     //using namespace Commands;
 
     assert(code_struct);
@@ -218,7 +218,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     for (int i = 0; i < code_struct->terms; i++)
     {
         int iter = 0;
-        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // С‚РµРїРµСЂСЊ РІ temp_str С…СЂР°РЅРёС‚СЃСЏ Р»РµРєСЃРµРјР°
+        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // теперь в temp_str хранится лексема
         {
             if(code_struct->data[iter + temp_cur_code_size] != ' ')
                 temp[iter] = code_struct->data[iter + temp_cur_code_size];
@@ -233,13 +233,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
                 correction++;
         else if (!strcmp(temp, "pop"))
                 correction++;
-        else if (temp[strlen(temp) - 1] == ':')                         // РЅР°С€Р»Рё РјРµС‚РєСѓ
+        else if (temp[strlen(temp) - 1] == ':')                         // нашли метку
         {
             //printf("GOOD FIND\n");
-            strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);                               // РїРѕРјРµСЃС‚РёР»Рё СѓРєР°Р·Р°С‚РµР»СЊ
+            strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);                               // поместили указатель
 
-            labels[cur_labels].length = strlen(temp);                       // Р·Р°РїРѕРјРЅРёР»Рё РґР»РёРЅСѓ (РІ Р±СѓРґСѓС‰РµРј РјРѕР¶РЅРѕ Р±СѓРґРµС‚ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ РїРѕ РґР»РёРЅР°Рј, С‡С‚РѕР±С‹
-                                                                                // СѓСЃРєРѕСЂРёС‚СЊ РїСЂРѕС†РµСЃСЃ РѕР±РЅР°СЂР¶СѓРµРЅРёСЏ РјРµС‚РѕРє РїСЂРё Р°СЃСЃРµРјР±Р»РёСЂРѕРІР°РЅРёРё) -- СЌС„С„РµРєС‚. РґР»СЏ Р±РѕР»СЊС€РѕРіРѕ РєРѕРґР°
+            labels[cur_labels].length = strlen(temp);                       // запомнили длину (в будущем можно будет отсортировать по длинам, чтобы
+                                                                                // ускорить процесс обнаржуения меток при ассемблировании) -- эффект. для большого кода
             labels[cur_labels].adress = i + correction;
             cur_labels++;
         }
@@ -314,6 +314,12 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = com_to_int(Commands::CMD_OUT);
         else if (!strcmp(temp, "del"))
             byte_struct->data[i] = com_to_int(Commands::CMD_DEL);
+        else if (!strcmp(temp, "abs"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_ABS);
+        else if (!strcmp(temp, "circ"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_CIRC);
+        else if (!strcmp(temp, "cat"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_CAT);
         else if (!strcmp(temp, "ln"))
             byte_struct->data[i] = com_to_int(Commands::CMD_LN);
         else if (!strcmp(temp, "log10"))
@@ -327,13 +333,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             if(temp[0] == '[')
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
-                numbers_flag[flags_size++] = 21;
+                numbers_flag[flags_size++] = OP_REGIST;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
             else
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
-                numbers_flag[flags_size++] = 20;
+                numbers_flag[flags_size++] = S_REGIST_SPEC;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
         }
@@ -342,13 +348,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             if(temp[0] == '[')
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
-                numbers_flag[flags_size++] = 21;
+                numbers_flag[flags_size++] = OP_REGIST;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
             else
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
-                numbers_flag[flags_size++] = 20;
+                numbers_flag[flags_size++] = S_REGIST_SPEC;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
         }
@@ -357,13 +363,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             if(temp[0] == '[')
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
-                numbers_flag[flags_size++] = 21;
+                numbers_flag[flags_size++] = OP_REGIST;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
             else
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
-                numbers_flag[flags_size++] = 20;
+                numbers_flag[flags_size++] = S_REGIST_SPEC;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
         }
@@ -372,20 +378,20 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             if(temp[0] == '[')
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
-                numbers_flag[flags_size++] = 21;
+                numbers_flag[flags_size++] = OP_REGIST;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
             else
             {
                 byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
-                numbers_flag[flags_size++] = 20;
+                numbers_flag[flags_size++] = S_REGIST_SPEC;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
         }
         else if (!strcmp(temp, "pop"))
         {
             byte_struct->data[i]     = com_to_int(Commands::CMD_POP);
-            numbers_flag[flags_size] = 10;
+            numbers_flag[flags_size] = S_NUMBER_SPEC;
             //IS_LAST_COMMAND_POP      = true;
         }
         else if (!strcmp(temp, "je"))
@@ -426,34 +432,73 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             {
                 byte_struct->data[i] = std::atoi(temp + 1);
                 printf("adress = %lg\n", byte_struct->data[i]);
-                numbers_flag[flags_size++] = 11;
+                numbers_flag[flags_size++] = OP_NUMBER;
                 IS_LAST_COMMAND_PUSH       = FALSE;
             }
             else if(strlen(temp) == 5)
             {
-                char new_temp[] = {temp[1], temp[2], temp[3]}; // С‚Р°Рє РєР°Рє РґР»РёРЅР° 5, С‚Рѕ [xxx], С‚Рѕ РІ new_temp С‚РµРїРµСЂСЊ РїСЂРѕСЃС‚Рѕ xxx
+                char new_temp[] = {temp[1], temp[2], temp[3]}; // так как длина 5, то [xxx], то в new_temp теперь просто xxx
                 if (!strncmp(new_temp, "rax", 3))
                 {
                     byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
-                    numbers_flag[flags_size++] = 21;
+                    numbers_flag[flags_size++] = OP_REGIST;
                     IS_LAST_COMMAND_PUSH       = FALSE;
                 }
                 else if (!strncmp(new_temp, "rbx", 3))
                 {
                     byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
-                    numbers_flag[flags_size++] = 21;
+                    numbers_flag[flags_size++] = OP_REGIST;
                     IS_LAST_COMMAND_PUSH       = FALSE;
                 }
                 else if (!strncmp(new_temp, "rcx", 3))
                 {
                     byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
-                    numbers_flag[flags_size++] = 21;
+                    numbers_flag[flags_size++] = OP_REGIST;
                     IS_LAST_COMMAND_PUSH       = FALSE;
                 }
                 else if (!strncmp(new_temp, "rdx", 3))
                 {
                     byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
-                    numbers_flag[flags_size++] = 21;
+                    numbers_flag[flags_size++] = OP_REGIST;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+            }
+            else printf("BAD(((\n");
+        }
+        else if (temp[0] == '(')
+        {
+            if(isdigit(*(temp + 1)))
+            {
+                byte_struct->data[i] = std::atoi(temp + 1);
+                printf("adress = %lg\n", byte_struct->data[i]);
+                numbers_flag[flags_size++] = OP_CHAR_NUM;
+                IS_LAST_COMMAND_PUSH       = FALSE;
+            }
+            else if(strlen(temp) == 5)
+            {
+                char new_temp[] = {temp[1], temp[2], temp[3]}; // так как длина 5, то [xxx], то в new_temp теперь просто xxx
+                if (!strncmp(new_temp, "rax", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RAX);
+                    numbers_flag[flags_size++] = OP_CHAR_REG;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rbx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RBX);
+                    numbers_flag[flags_size++] = OP_CHAR_REG;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rcx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RCX);
+                    numbers_flag[flags_size++] = OP_CHAR_REG;
+                    IS_LAST_COMMAND_PUSH       = FALSE;
+                }
+                else if (!strncmp(new_temp, "rdx", 3))
+                {
+                    byte_struct->data[i]       = com_to_int(Commands::CMD_RDX);
+                    numbers_flag[flags_size++] = OP_CHAR_REG;
                     IS_LAST_COMMAND_PUSH       = FALSE;
                 }
             }
@@ -462,7 +507,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         else if (IS_LAST_COMMAND_PUSH)
         {
             byte_struct->data[i]       = (double) std::atof(temp);
-            numbers_flag[flags_size++] = 10;
+            numbers_flag[flags_size++] = S_NUMBER_SPEC;
             IS_LAST_COMMAND_PUSH       = FALSE;
         }
         else if (temp[strlen(temp) - 1] == ':')
@@ -492,10 +537,14 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             temp--;
             IS_LAST_COMMAND_JMP = 0;
         }
+        else if (!strcmp(temp, "draw"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_DRAW);
+        else if (!strcmp(temp, "fill"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_FILL);
         else
         {
             FILE* error = fopen("[!]ERRORS.txt", "ab");
-            fprintf(error, "\n\tР”Р°С‚Р° error'a : %s (С‡С‡/РјРј/РіРі)\n\n", define_date());
+            fprintf(error, "\n\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
             fprintf(error, "Assembler doesn't know this command..\n");
             fprintf(error, "bytecode[%d] = [%s]\n", i, temp);
             fclose(error);

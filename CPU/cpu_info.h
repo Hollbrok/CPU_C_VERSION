@@ -1,12 +1,14 @@
 #ifndef CPU_INFO_H_INCLUDED
 #define CPU_INFO_H_INCLUDED
 
-constexpr int START_SIZE    = 10; // РќР°С‡Р°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ СЃС‚РµРєР°.
+constexpr int START_SIZE    = 10; // Начальный размер стека.
 constexpr int size_time     = 40;
 constexpr double epsilon    = 1e-8;
 constexpr double absEpsilon = 1e-12;
 
-constexpr int OP_SIZE       = 10000;
+constexpr int SIZEX         = 300;
+constexpr int SIZEY         = 300;
+constexpr int OP_SIZE       = 3 * SIZEX * SIZEY;
 
 struct Bytecode
 {

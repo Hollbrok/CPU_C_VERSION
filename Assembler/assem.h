@@ -15,13 +15,13 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void;
 
 auto text_destruct(Text* text_struct) -> void;
 
-auto print_text_struct(Text* text_struct) -> void;                      // Ð¿ÐµÑ‡Ð°Ñ‚Ð°ÐµÑ‚ Ð² Ñ„Ð°Ð¹Ð» string_text Ñ‚ÐµÐºÑÑ‚ Ð±ÐµÐ· ÐºÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸ÐµÐ² Ð² Ð²Ð¸Ð´Ðµ ÑÑ‚Ñ€Ð¾ÐºÐ¸
+auto print_text_struct(Text* text_struct) -> void;                      // ïå÷àòàåò â ôàéë string_text òåêñò áåç êîììåíòàðèåâ â âèäå ñòðîêè
 
 auto code_construct(Text* text_struct, Code* code_struct) -> void;
 
 auto code_destruct(Code* code_struct) -> void;
 
-auto print_code_buffer(Code* code_struct) -> void;                  // Ð¿ÐµÑ‡Ð°Ñ‚Ð°ÐµÑ‚ Ð² Ñ„Ð°Ð¹Ð» code_struct Ð±ÑƒÑ„ÐµÑ€ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹ code (Ð´Ð»Ñ Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð° ÐºÐ°Ðº Ñ€Ð¾Ð±ÑÑ‚ ÐºÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¸)
+auto print_code_buffer(Code* code_struct) -> void;                  // ïå÷àòàåò â ôàéë code_struct áóôåð ñòðóêòóðû code (äëÿ ïðîñìîòðà êàê ðîáÿò êîììåíòàðèè)
 
 auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void;
 

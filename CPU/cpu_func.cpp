@@ -1,7 +1,7 @@
 #include "cpu.h"
 
-static int EXIT_CONDITION          = 0;   // РЎС‚Р°С‚СѓСЃ РІС‹С…РѕРґР° РёР· РїРµСЂРµРІРѕРґР° Р°СЃСЃРµР±Р»РµСЂРЅРѕРіРѕ РєРѕРґР° РІ РґРµР№СЃС‚РІРёСЏ
-static int SECOND_PRINT            = 0;   // Р”Р»СЏ РїСЂРёРЅС‚Р° for_user
+static int EXIT_CONDITION          = 0;   // Статус выхода из перевода ассеблерного кода в действия
+static int SECOND_PRINT            = 0;   // Для принта for_user
 
 auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
 {
@@ -29,6 +29,7 @@ auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
     while (*buffer_char)
     {
         double temp_val             = get_number(&buffer_char);
+        //printf("[%lg]\n", temp_val);
         byte_struct->data[ass_cur_size++] = temp_val;
         ignore_spaces(&buffer_char);
     }
@@ -41,7 +42,7 @@ auto get_number(char** buffer) -> double
     ignore_spaces(buffer);
     double number = atof(*buffer);
 
-    while (isdigit(**buffer) || (**buffer == ','))
+    while (isdigit(**buffer) || (**buffer == '.'))
         (*buffer)++;
 
     ignore_spaces(buffer);
@@ -60,7 +61,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
     assert(Stack_call);
     assert(byte_struct);
 
-    struct Rix rix_struct = {};  // СЃРґРµР»Р°С‚СЊ РїСЂРѕСЃС‚Рѕ РјР°СЃСЃРёРІ Рё РїРѕРјРµРЅСЏС‚СЊ РєРѕРґРёСЂРѕРІРєСѓ СЂРµРіРёСЃС‚СЂРѕРІ
+    struct Rix rix_struct = {};  // сделать просто массив и поменять кодировку регистров
 
     int skip_first  = -1;
     int skip_second = -1;
@@ -68,6 +69,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
     using namespace my_commands;
 
     char* OP = (char*) calloc(OP_SIZE, sizeof(char));
+    assert(OP);
 
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
@@ -157,7 +159,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 pop_stack(Stack);
                 skip_first  = i + 1;
             }
-            else if (static_cast<int>(byte_struct->data[i + 1]) == S_REGIST_SPEC)       // РЎРґРµР»Р°С‚СЊ С‡РµСЂРµР· switch
+            else if (static_cast<int>(byte_struct->data[i + 1]) == S_REGIST_SPEC)       // Сделать через switch
             {
                 if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
                     rix_struct.rax = pop_stack(Stack);
@@ -171,7 +173,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 skip_first  = i + 1;
                 skip_second = i + 2;
             }
-            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_NUMBER) // СЃР»РµРґСѓСЋС‰РµРµ С‡РёСЃР»Рѕ -- СЌС‚Рѕ Р°РґСЂРµСЃ РѕРїРµСЂР°С‚РёРІРєРё
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_NUMBER) // следующее число -- это адрес оперативки
             {
                 double x = pop_stack(Stack);
 
@@ -216,6 +218,51 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 skip_first  = i + 1;
                 skip_second = i + 2;
             }
+            else  if (static_cast<int>(byte_struct->data[i + 1]) == OP_CHAR_REG)
+            {
+                if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RAX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rax));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RBX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rbx));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RCX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rcx));
+                    *temp_pointer      = x;
+                }
+                else if (static_cast<int>(byte_struct->data[i + 2]) == static_cast<int>(Commands::CMD_RDX))
+                {
+                    char x = static_cast<char>(pop_stack(Stack));
+
+                    char* temp_pointer = (char*) (OP + static_cast<int>(rix_struct.rdx));
+                    *temp_pointer      = x;
+                }
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
+            }
+            else if (static_cast<int>(byte_struct->data[i + 1]) == OP_CHAR_NUM)
+            {
+                char x = static_cast<char>(pop_stack(Stack));
+
+                char* temp_pointer = (char*) (OP + static_cast<int>(byte_struct->data[i + 2]));
+                *temp_pointer        = x;
+                //printf("Pushing from Stack to OP[%d] number [%lg]\n", static_cast<int>(byte_struct->data[i + 2]), x);
+
+                skip_first  = i + 1;
+                skip_second = i + 2;
+            }
             else
             {
                 printf("Error in pop\n");
@@ -224,17 +271,17 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
         }
         else
         {
-            switch((int)(byte_struct->data[i]))          // Р’ switch'e РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ non-constexpr constants, РїРѕСЌС‚РѕРјСѓ С‚СѓС‚ Р±РµР· РєРѕРјР°РЅРґС‹ com_to_int
+            switch((int)(byte_struct->data[i]))          // В switch'e нельзя использовать non-constexpr constants, поэтому тут без команды com_to_int
             {
                 case static_cast<int>(Commands::CMD_HLT):/*hlt*/
                 {
                     EXIT_CONDITION = TRUE;
                     break;
                 }
-                case static_cast<int>(Commands::CMD_PUSH):/*push(С‚Рѕ РµСЃС‚СЊ error, С‚Р°Рє РєР°Рє РµСЃР»Рё push, С‚Рѕ СЃСЋРґР° РЅРµ РґРѕР»Р¶РЅРѕ РґРѕР№С‚Рё)*/
+                case static_cast<int>(Commands::CMD_PUSH):/*push(то есть error, так как если push, то сюда не должно дойти)*/
                 {
                     FILE* error = fopen("ERROR_PRINT.txt", "ab");
-                    fprintf(error, "\tР”Р°С‚Р° error'a : %s (С‡С‡/РјРј/РіРі)\n\n", define_date());
+                    fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
                     fprintf(error, "ERROR in LINE %d", __LINE__);
                     fclose(error);
                     break;
@@ -361,6 +408,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     else
                     {
                         FILE* result = fopen("results[for user].txt", "a");
+                        assert(result);
                         fprintf(result, "[%lg]\n", x1);
                         fclose(result);
                     }
@@ -396,7 +444,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 {
                     //printf("CALL in i = [%d]\n", i);
                     push_stack(Stack_call, i);
-                    i = (int)byte_struct->data[i + 1]; // Рё С‚Р°Рє С†РµР»РѕРµ С‡РёСЃР»Рѕ, (int) С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ РІР°СЂРЅРёРЅРі
+                    i = (int)byte_struct->data[i + 1]; // и так целое число, (int) чтобы убрать варнинг
                     break;
                 }
                 case static_cast<int>(Commands::CMD_RET):
@@ -414,7 +462,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 }
                 case static_cast<int>(Commands::CMD_JMP):/*23*/
                 {
-                    i = static_cast<int>(byte_struct->data[i + 1]); // Рё С‚Р°Рє С†РµР»РѕРµ С‡РёСЃР»Рѕ, (int) С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ РІР°СЂРЅРёРЅРі
+                    i = static_cast<int>(byte_struct->data[i + 1]); // и так целое число, (int) чтобы убрать варнинг
                     break;
                 }
                 case static_cast<int>(Commands::CMD_LABEL):/*22*/
@@ -434,14 +482,15 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x2 = pop_stack(Stack);
 
                     //printf("x1 = %lg, x2 = %lg\n", x1, x2);
-                    if (is_equal(x2, x1)) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (is_equal(x2, x1)) // JAE -- TRUE, то нужно выполнить переход на метку
                     {
-                        //printf("Р РђР’РќР«\n");
+                        //printf("РАВНЫ\n");
                         i = static_cast<int>(byte_struct->data[i + 1]);
-                        //printf("РРґРµРј РЅР° i = %d\n", i);
+                        //printf("Идем на i = %d\n", i);
                     }
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JAB):/*25 !=  */
@@ -455,10 +504,11 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (!is_equal(x2, x1)) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (!is_equal(x2, x1)) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JAE):/*26 >=  */
@@ -472,10 +522,11 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 >= x1) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (x2 >= x1) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JBE):/*27 <=  */
@@ -489,10 +540,11 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 <= x1) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (x2 <= x1) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JA):/*28 >    */
@@ -506,10 +558,11 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 > x1) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (x2 > x1) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
                     break;
                 }
                 case static_cast<int>(Commands::CMD_JB):/*29 <    */
@@ -520,19 +573,137 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                         EXIT_CONDITION = TRUE;
                         break;
                     }
+
                     double x1 = pop_stack(Stack);
                     double x2 = pop_stack(Stack);
 
-                    if (x2 < x1) // JAE -- TRUE, С‚Рѕ РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ РїРµСЂРµС…РѕРґ РЅР° РјРµС‚РєСѓ
+                    if (x2 < x1) // JAE -- TRUE, то нужно выполнить переход на метку
                         i = static_cast<int>(byte_struct->data[i + 1]);
                     else
                         i++;
+
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_ABS):
+                {
+                    if(Stack->cur_size < 1)
+                    {
+                        printf("not enough numbers to abs\n");
+                        EXIT_CONDITION = TRUE;
+                        break;
+                    }
+
+                    double x = pop_stack(Stack);
+                    push_stack(Stack, abs(x));
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_DRAW):
+                {
+                    system("clear");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+
+                    for (int y = 0; y < SIZEY; y++)
+                        for (int x = 0; x < SIZEX; x++)
+                        {
+                            //printf("x = %d, y = %d\n", x, y);
+                            int cur_pixel = 3 * (SIZEX * y + x);
+                            txSetPixel(x, y, RGB(OP[cur_pixel], OP[cur_pixel + 1], OP[cur_pixel + 2]));
+                        }
+
+                    //txDestroyWindow();
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_FILL):
+                {
+                    system("cls");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+                    for (int y = 0; y < SIZEY; y++)
+                        for (int x = 0; x < SIZEX; x++)
+                            txSetPixel(x, y, RGB(OP[0], OP[1], OP[2]));
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_CIRC):
+                {
+                    system("cls");
+                    //txCreateWindow(SIZEX, SIZEY);
+                    //txSetDefaults();
+
+                    if(Stack->cur_size < 3)
+                    {
+                        printf("not enough numbers to circ. Size = %d\n", Stack->cur_size);
+                        EXIT_CONDITION = TRUE;
+                        break;
+                    }
+
+                    int Radius = static_cast<int>(pop_stack(Stack));
+                    int y_center = static_cast<int>(pop_stack(Stack));
+                    int x_center = static_cast<int>(pop_stack(Stack));
+
+                    for (int y = 0; y < SIZEY; y++)
+                        for (int x = 0; x < SIZEX; x++)
+                            if (( pow((x - x_center), 2) + pow((y - y_center), 2) ) < pow(Radius, 2))
+                                txSetPixel(x, y, RGB(OP[3], OP[4], OP[5]));
+                    break;
+                }
+                case static_cast<int>(Commands::CMD_CAT):
+                {
+                    system("cls");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+
+                    txSetFillColor(RGB(0, 100, 167));
+                    txFloodFill(5 , 5);
+
+                    txSetFillColor(RGB(125, 125, 125)); // цвет тела
+                    txEllipse(100, 70, 180, 180);       // рисуем тело
+
+                    txSetFillColor(RGB(0, 0, 0));       // черный цвет
+                    txEllipse(130, 90, 160, 150);       // рисуев внутри туловища
+
+                    txSetFillColor(RGB(154, 148, 148)); // цвет головы
+                    txCircle(140, 45, 25);              // голова
+
+                    txSetColor(RGB(0, 0, 0), 1);        // цвет и толщина усиков
+                    txLine(140, 55, 170, 45);           // сами усики
+                    txLine(140, 55, 175, 53);
+                    txLine(140, 55, 181, 61);
+                    txLine(140, 55, 120, 45);
+                    txLine(140, 55, 115, 53);
+                    txLine(140, 55, 109, 61);
+
+                    txSetFillColor(RGB(255, 255, 255)); // Цвет глаз (белый)
+                    txEllipse(130, 35, 141, 50);        // глаз Л
+                    txEllipse(145, 35, 156, 50);        // глаз П
+
+                    txLine(120, 30, 125, 10);           // ухо Л
+                    txLine(125, 10, 133, 23);
+
+                    txSetFillColor(RGB(154, 148, 148)); // цвет заливки уха
+                    txFloodFill(125, 12);               // заливаем ухо
+
+                    txLine(150, 22, 158, 10);           // ухо П
+                    txLine(158, 10, 160, 32);
+
+                    txSetFillColor(RGB(154, 148, 148)); // цвет заливки уха
+                    txFloodFill(157, 17);               // заливаем ухо
+
+
+                    txSetFillColor(RGB(0, 0, 0));       // цвет заливки зрачка
+                    txEllipse(132, 39, 137, 48);        // зрачок Л
+                    txEllipse(147, 39, 152, 48);        // зрачок П
+
+                    txTextOut(180, 45, "Meow-meow!");
+
+
+
                     break;
                 }
                 default:
                 {
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
-                    fprintf(error, "\tР”Р°С‚Р° error'a : %s (С‡С‡/РјРј/РіРі)\n\n", define_date());
+                    fprintf(error, "\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
                     fprintf(error, "Unknown command..\n");
                     fprintf(error, "bytecode[%d] = %d", i, static_cast<int>(byte_struct->data[i]));
                     fclose(error);
@@ -560,7 +731,7 @@ auto print_for_user(stack_t* Stack) -> void
 
     if(Stack->cur_size > 0)
     {
-        fprintf(result, "С‡РёСЃР»Р° РІ СЃС‚РµРєРµ:\n");
+        fprintf(result, "числа в стеке:\n");
 
         int Size = Stack->cur_size;
         int max_order = 0;
@@ -646,7 +817,7 @@ auto print_for_user(stack_t* Stack) -> void
             }
         }
     }
-    else fprintf(result, "Р§РёСЃРµР» РІ СЃС‚РµРєРµ РЅРµС‚.\n"
+    else fprintf(result, "Чисел в стеке нет.\n"
                          "Currently size of Stack is %d", Stack->cur_size);
 
 
@@ -676,12 +847,12 @@ auto define_date() -> char*
 
 auto is_equal(double a, double b) -> bool
 {
-    // РџСЂРѕРІРµСЂСЏРµРј С‡РёСЃР»Р° РЅР° РёС… Р±Р»РёР·РѕСЃС‚СЊ - СЌС‚Рѕ РЅСѓР¶РЅРѕ РІ СЃР»СѓС‡Р°СЏС…, РєРѕРіРґР° СЃСЂР°РІРЅРёРІР°РµРјС‹Рµ С‡РёСЃР»Р° СЏРІР»СЏСЋС‚СЃСЏ РЅСѓР»РµРІС‹РјРё РёР»Рё РѕРєРѕР»Рѕ РЅСѓР»СЏ
+    // Проверяем числа на их близость - это нужно в случаях, когда сравниваемые числа являются нулевыми или около нуля
 	double diff = fabs(a - b);
 	if (diff <= absEpsilon)
 		return true;
 
-	// Р’ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ, РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ Рє Р°Р»РіРѕСЂРёС‚РјСѓ РљРЅСѓС‚Р°
+	// В противном случае, возвращаемся к алгоритму Кнута
 	return diff <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * epsilon);
 }
 
