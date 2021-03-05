@@ -1,0 +1,42 @@
+		push 25
+		push 100
+		push 125
+		pop rcx
+		pop rbx
+		pop rax
+		push 269999		; кол-во пикселей	
+		pop rdx			; счетчик цикла
+
+FOR:
+		push rcx
+		pop (rdx)		; кладем пиксель из стека в оперативку
+
+		push rdx		; декремент
+		push 1			; счетчика
+		sub				; на 1
+		pop rdx			; каждый раз
+
+		push rbx
+		pop (rdx)		; кладем пиксель из стека в оперативку
+
+		push rdx		; декремент
+		push 1			; счетчика
+		sub				; на 1
+		pop rdx			; каждый раз
+
+		push rax
+		pop (rdx)		; кладем пиксель из стека в оперативку
+
+		push rdx		; декремент
+		push 1			; счетчика
+		sub				; на 1
+		pop rdx			; каждый раз
+
+		push rdx
+		push 1
+		jbe :END			; условие входа из цикла
+		jmp :FOR
+END:
+
+		draw
+		hlt
