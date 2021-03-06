@@ -320,6 +320,8 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = com_to_int(Commands::CMD_CIRC);
         else if (!strcmp(temp, "cat"))
             byte_struct->data[i] = com_to_int(Commands::CMD_CAT);
+        else if (!strcmp(temp, "KOPM"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_KOPM);
         else if (!strcmp(temp, "ln"))
             byte_struct->data[i] = com_to_int(Commands::CMD_LN);
         else if (!strcmp(temp, "log10"))

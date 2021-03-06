@@ -647,6 +647,42 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                                 txSetPixel(x, y, RGB(OP[3], OP[4], OP[5]));
                     break;
                 }
+                case static_cast<int>(Commands::CMD_KOPM):
+                {
+                    system("cls");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+
+                    txSetFillColor(RGB(100, 100, 230));
+                    txFloodFill(5, 5);
+
+
+                    txTextOut(100, 145, "KOPM ONE LOVE");
+
+                    txSetColor(RGB(0, 0, 0), 1);
+                    txLine(175, 160, 165, 145);
+                    txLine(175, 160, 185, 145);
+                    txArc(165, 140, 175, 150, 0, 182);
+                    txArc(175, 140, 185, 150, 0, 182);
+
+
+                    txSetColor(RGB(237, 19, 19), 1);
+                    txLine(215, 140, 205, 125);
+                    txLine(215, 140, 225, 125);
+                    txArc(205, 120, 215, 130, 0, 182);
+                    txArc(215, 120, 225, 130, 0, 182);
+
+                    txSetColor(RGB(48, 217, 65), 1);
+                    txLine(115, 100, 105, 85);
+                    txLine(115, 100, 125, 85);
+                    txArc(105, 80, 115, 90, 0, 182);
+                    txArc(115, 80, 125, 90, 0, 182);
+
+                    //txSetFillColor(RGB(237, 19, 19));
+                    //txFloodFill(215, 135);
+
+                    break;
+                }
                 case static_cast<int>(Commands::CMD_CAT):
                 {
                     system("cls");
