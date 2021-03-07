@@ -54,7 +54,8 @@ namespace my_commands
         CMD_ABS         = 34,
         CMD_CIRC        = 35,
         CMD_CAT         = 36,
-        CMD_KOPM        = 37
+        CMD_KOPM        = 37,
+        CMD_MEM         = 38
     };
 }
 

@@ -736,6 +736,132 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
                     break;
                 }
+                case static_cast<int>(Commands::CMD_MEM):
+                {
+                    system("cls");
+                    txCreateWindow(SIZEX, SIZEY);
+                    txSetDefaults();
+
+                    HDC mem = txLoadImage("C:/Users/Danik/Documents/Задачи_СИ/Projects/ASSEM_CPU/bin/Debug/Mem.bmp");
+                    txBitBlt(txDC(), 0, 0, SIZEX, SIZEY, mem, 0, 0);
+
+                    srand(time(nullptr));
+
+                    int number =  rand() % 6;
+
+                    switch(number)
+                    {
+                        case 0:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 123, "Этот код не написал");
+
+                            txTextOut(160, 110, "Тут вообще всё");
+                            txTextOut(160, 123, "в одном файле");
+
+                            txTextOut(8, 262, "У этого вообще");
+                            txTextOut(8, 275, "нет функций!");
+
+
+                            txTextOut(160, 262, "Ну нахер, дропа-");
+                            txTextOut(160, 275, "ем проект");
+
+                            break;
+                        }
+                        case 1:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 110, "Никто не ответил");
+                            txTextOut(6, 123, "\"да\" или \"понятно\"");
+
+                            txTextOut(160, 110, "Не задали ни");
+                            txTextOut(160, 123, "одного вопроса");
+
+                            txTextOut(8, 262, "Воскресенье очень");
+                            txTextOut(8, 275, "напряженный день");
+
+
+                            txTextOut(160, 262, "Скорее всего при-");
+                            txTextOut(160, 275, "дется дропать ILAB");
+
+                            break;
+                        }
+                        case 2:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 110, "Полторашка убежала,");
+                            txTextOut(6, 123, "когда я ее гладил");
+
+                            txTextOut(160, 110, "По физ-ре 0 посе-");
+                            txTextOut(160, 123, "щений за семак");
+
+                            txTextOut(8, 262, "БРС не сильно боль-");
+                            txTextOut(8, 275, "ше, чем посещений");
+
+
+                            txTextOut(160, 262, "Ухожу в академ, бу-");
+                            txTextOut(160, 275, "ду гладить котиков");
+
+                            break;
+                        }
+                        case 3:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 110, "Поступил на физ-");
+                            txTextOut(6, 123, "тех чтоб бухать");
+
+                            txTextOut(160, 110, "Эти на нк не поз-");
+                            txTextOut(160, 123, "вали в пятницу");
+
+                            txTextOut(8, 262, "Эти курить пошли без");
+                            txTextOut(8, 275, "тебя уже который раз");
+
+
+                            txTextOut(160, 262, "Ну нахер, лучше");
+                            txTextOut(160, 275, "пойду в бомонку");
+
+                            break;
+                        }
+                        case 4:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 110, "Пошел к деду");
+                            txTextOut(6, 123, "чтобы прогать");
+
+                            txTextOut(160, 110, "На матан времени");
+                            txTextOut(160, 123, "не хватает");
+
+                            txTextOut(8, 262, "На общесос почти ни");
+                            txTextOut(8, 275, "разу не успел сходить");
+
+
+                            txTextOut(160, 262, "Ну нахер, переве-");
+                            txTextOut(160, 275, "дусь к Хохлову");
+
+                            break;
+                        }
+                        case 5:
+                        {
+                            txSetColor(RGB(0, 0, 0));
+                            txTextOut(6, 110, "Пишешь проект");
+                            txTextOut(6, 123, "на ILAB'e");
+
+                            txTextOut(160, 110, "Там пару сотен");
+                            txTextOut(160, 123, "багов");
+
+                            txTextOut(8, 262, "Там еще почему-то");
+                            txTextOut(8, 275, "ничего не работает");
+
+
+                            txTextOut(160, 262, "Ну нахер, ли-");
+                            txTextOut(160, 275, "ваю с ILAB'a");
+
+                            break;
+                        }
+                    }
+
+                    break;
+                }
                 default:
                 {
                     FILE* error = fopen("[!]ERRORS.txt", "ab");

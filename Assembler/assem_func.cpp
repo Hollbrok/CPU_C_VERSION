@@ -324,6 +324,8 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = com_to_int(Commands::CMD_KOPM);
         else if (!strcmp(temp, "ln"))
             byte_struct->data[i] = com_to_int(Commands::CMD_LN);
+        else if (!strcmp(temp, "mem"))
+            byte_struct->data[i] = com_to_int(Commands::CMD_MEM);
         else if (!strcmp(temp, "log10"))
             byte_struct->data[i] = com_to_int(Commands::CMD_LOG10);
         else if (!strcmp(temp, "quadratic"))
