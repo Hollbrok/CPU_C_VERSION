@@ -1,7 +1,7 @@
 #ifndef CPU_INFO_H_INCLUDED
 #define CPU_INFO_H_INCLUDED
 
-constexpr int START_SIZE    = 10; // Начальный размер стека.
+constexpr int START_SIZE    = 10; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 constexpr int size_time     = 40;
 constexpr double epsilon    = 1e-8;
 constexpr double absEpsilon = 1e-12;
@@ -23,5 +23,18 @@ struct Rix
     double rcx = NAN;
     double rdx = NAN;
 };
+
+namespace memes_names
+{
+    enum Commands
+    {
+		DED_CODESTYLE 	 = 0,
+		DED_ILAB_CLASSIC = 1,
+		CAT              = 2,
+		BOMONKA			 = 3,
+		DED_HOHLOV		 = 4,
+		CODING_BUGS		 = 5
+	};
+}
 
 #endif // CPU_INFO_H_INCLUDED

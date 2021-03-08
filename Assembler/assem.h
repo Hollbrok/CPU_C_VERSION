@@ -15,13 +15,13 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void;
 
 auto text_destruct(Text* text_struct) -> void;
 
-auto print_text_struct(Text* text_struct) -> void;                      // печатает в файл string_text текст без комментариев в виде строки
+auto print_text_struct(Text* text_struct) -> void;                      
 
 auto code_construct(Text* text_struct, Code* code_struct) -> void;
 
 auto code_destruct(Code* code_struct) -> void;
 
-auto print_code_buffer(Code* code_struct) -> void;                  // печатает в файл code_struct буфер структуры code (для просмотра как робят комментарии)
+auto print_code_buffer(Code* code_struct) -> void;              
 
 auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void;
 

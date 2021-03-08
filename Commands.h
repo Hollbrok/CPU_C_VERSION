@@ -10,12 +10,12 @@ constexpr int S_REGIST_SPEC     = 20;   // push rbx     S -- working with a Stac
 constexpr int OP_NUMBER         = 11;   // push [2]     OP -- working with Operative memory
 constexpr int OP_REGIST         = 21;   // push [rbx]   OP -- working with Operative memory
 constexpr int OP_CHAR_NUM       = 22;   // push (2)
-constexpr int OP_CHAR_REG       = 23;   // push (rbx)   -- побайтовой пуш, а не double
+constexpr int OP_CHAR_REG       = 23;   // push (rbx)
 
 
 namespace my_commands
 {
-    enum class Commands
+    enum Commands
     {
         CMD_HLT         = 0,
         CMD_PUSH        = 1,
@@ -32,7 +32,7 @@ namespace my_commands
         CMD_DEL         = 12,
         CMD_LN          = 13,
         CMD_LOG10       = 14,
-        CMD_QUADRATIC   = 15, // лишн€€
+        CMD_QUADRATIC   = 15,
         CMD_LOG2        = 16,
         CMD_RAX         = 17,
         CMD_RBX         = 18,

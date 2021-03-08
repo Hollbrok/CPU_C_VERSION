@@ -29,4 +29,16 @@ auto define_date() -> char*;
 
 auto is_equal(double a, double b) -> bool;
 
+auto fill_screen(char* OP) -> void;
+
+auto draw_kopm() -> void;
+
+auto draw_circ(char* OP, stack_t* Stack) -> void;
+
+auto draw_screen(char* OP) -> void;
+
+auto draw_mem() -> void;
+
+auto draw_cat() -> void;
+
 #endif // CPU_H_INCLUDED

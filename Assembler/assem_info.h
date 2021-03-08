@@ -7,23 +7,23 @@ constexpr int MAX_LABEL_SIZE = 20;
 
 struct Line
 {
-    char *line  = nullptr;              // указатель на буфер строки
-    long length = 0;                    // длина строки
+    char *line  = nullptr;              // pointer to line
+    long length = 0;                    // length of line
 };
 
 struct Text
 {
-    char* data              = nullptr;  // указатель на буфер
-    Line* lines             = nullptr;  // указатель на структуру строки (то есть массив структур строк)
-    int n_struct            = 0;        // кол-во непустых строк
-    int length_file         = 0;        // длина файла, то есть размер буфера
+    char* data              = nullptr;  // pointer on buffer
+    Line* lines             = nullptr;  // pointer to the line struct
+    int n_struct            = 0;        // number of lines
+    int length_file         = 0;        // size of buffer
 };
 
 struct Code
 {
-    char*   data   = nullptr;  // указатель на буфер кода
-    int     length = 0;        // длина буфера
-    int     terms  = 0;        // кол-во лексем
+    char*   data   = nullptr;  // pointer to buffer of code
+    int     length = 0;        // length of buffer
+    int     terms  = 0;        // numbers of lexeme
 };
 
 struct Bytecode
