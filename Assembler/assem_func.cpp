@@ -201,7 +201,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     for (int i = 0; i < code_struct->terms; i++)
     {
         int iter = 0;
-        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð² temp_str Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑÑ Ð»ÐµÐºÑÐµÐ¼Ð°
+        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // òåïåðü â temp_str õðàíèòñÿ ëåêñåìà
         {
             if(code_struct->data[iter + temp_cur_code_size] != ' ')
                 temp[iter] = code_struct->data[iter + temp_cur_code_size];
@@ -212,17 +212,17 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             }
         }
 
-        if (!strcmp(temp, "push"))
+        //if (!strcmp(temp, "push"))
                 correction++;
-        else if (!strcmp(temp, "pop"))
+        //else if (!strcmp(temp, "pop"))
                 correction++;
-        else if (temp[strlen(temp) - 1] == ':')
+        /*else */ if (temp[strlen(temp) - 1] == ':')
         {
             strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);
 
             labels[cur_labels].length = strlen(temp);
 
-            labels[cur_labels].adress = i + correction;
+            labels[cur_labels].adress = i;// + correction;
             cur_labels++;
         }
 
@@ -231,7 +231,6 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
     int amount_labels = cur_labels;
     cur_labels = 0;
-
 
     byte_struct->data = (double*) calloc(code_struct->terms, sizeof(double));
     assert(byte_struct->data);
@@ -265,7 +264,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
         if (!strcmp(temp, "push"))
         {
-            byte_struct->data[i] = 1;
+            byte_struct->data[i] = CMD_PUSH;
             IS_LAST_COMMAND_PUSH = 1;
         }
         else if (!strcmp(temp, "add"))
@@ -322,8 +321,8 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         else if (!strcmp(temp, "log10"))
             byte_struct->data[i] = CMD_LOG10;
 
-        else if (!strcmp(temp, "quadratic"))
-            byte_struct->data[i] = CMD_QUADRATIC;
+        //else if (!strcmp(temp, "quadratic"))
+        //    byte_struct->data[i] = CMD_QUADRATIC;
 
         else if (!strcmp(temp, "log2"))
             byte_struct->data[i] =  CMD_LOG2;
@@ -407,34 +406,34 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             {
                 byte_struct->data[i] = std::atoi(temp + 1);
                 printf("adress = %lg\n", byte_struct->data[i]);
-                numbers_flag[flags_size++] = OP_NUMBER;
+                numbers_flag[flags_size++] = OP_DOUBLE_NUMBER;
                 IS_LAST_COMMAND_PUSH       = false;
             }
             else if(strlen(temp) == 5)
             {
-                char new_temp[] = {temp[1], temp[2], temp[3]}; // Ñ‚Ð°Ðº ÐºÐ°Ðº Ð´Ð»Ð¸Ð½Ð° 5, Ñ‚Ð¾ [xxx], Ñ‚Ð¾ Ð² new_temp Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð¿Ñ€Ð¾ÑÑ‚Ð¾ xxx
+                char new_temp[] = {temp[1], temp[2], temp[3]}; // òàê êàê äëèíà 5, òî [xxx], òî â new_temp òåïåðü ïðîñòî xxx
                 if (!strncmp(new_temp, "rax", 3))
                 {
                     byte_struct->data[i]       = CMD_RAX;
-                    numbers_flag[flags_size++] = OP_REGIST;
+                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
                     IS_LAST_COMMAND_PUSH       = false;
                 }
                 else if (!strncmp(new_temp, "rbx", 3))
                 {
                     byte_struct->data[i]       = CMD_RBX;
-                    numbers_flag[flags_size++] = OP_REGIST;
+                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
                     IS_LAST_COMMAND_PUSH       = false;
                 }
                 else if (!strncmp(new_temp, "rcx", 3))
                 {
                     byte_struct->data[i]       = CMD_RCX;
-                    numbers_flag[flags_size++] = OP_REGIST;
+                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
                     IS_LAST_COMMAND_PUSH       = false;
                 }
                 else if (!strncmp(new_temp, "rdx", 3))
                 {
                     byte_struct->data[i]       = CMD_RDX;
-                    numbers_flag[flags_size++] = OP_REGIST;
+                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
                     IS_LAST_COMMAND_PUSH       = false;
                 }
             }
@@ -530,13 +529,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
         else if (!strcmp(temp, "fill"))
             byte_struct->data[i] = CMD_FILL;
-			
+
         else
         {
             FILE* error = fopen("[!]ERRORS.txt", "ab");
 			assert(error);
 
-            fprintf(error, "\n\tÐ”Ð°Ñ‚Ð° error'a : %s (Ñ‡Ñ‡/Ð¼Ð¼/Ð³Ð³)\n\n", define_date());
+            fprintf(error, "\n\tÄàòà error'a : %s (÷÷/ìì/ãã)\n\n", define_date());
             fprintf(error, "Assembler doesn't know this command..\n");
             fprintf(error, "bytecode[%d] = [%s]\n", i, temp);
 
@@ -561,10 +560,10 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
-        if ((static_cast<int>(byte_struct->data[i]) == 1) || (static_cast<int>(byte_struct->data[i]) == 21))
+        if ((static_cast<int>(byte_struct->data[i]) == CMD_POP) || (static_cast<int>(byte_struct->data[i]) == CMD_PUSH))
         {
-            fprintf(assembler_txt, "%lg ", byte_struct->data[i++]);
-            fprintf(assembler_txt, "%lg ", numbers_flag[flags_size++]);
+            fprintf(assembler_txt, "%lg ", byte_struct->data[i++] + numbers_flag[flags_size++]);
+            //fprintf(assembler_txt, "%lg ", numbers_flag[flags_size++]);
             fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
         }
         else

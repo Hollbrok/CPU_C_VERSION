@@ -1,7 +1,7 @@
 #ifndef CPU_INFO_H_INCLUDED
 #define CPU_INFO_H_INCLUDED
 
-constexpr int START_SIZE    = 10; // ��������� ������ �����.
+constexpr int START_SIZE    = 10;
 constexpr int size_time     = 40;
 constexpr double epsilon    = 1e-8;
 constexpr double absEpsilon = 1e-12;

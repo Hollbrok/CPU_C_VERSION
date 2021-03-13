@@ -4,6 +4,8 @@ int main()
 {
     printf("CPU in progress..\n");
 
+    //setlocale(LC_ALL, "russian");
+
     FILE* text = fopen("[!]assembler_code.txt", "r");
     FILE* res  = fopen("[!]log_stack.txt", "ab");
 
@@ -20,7 +22,9 @@ int main()
 
     START_ACTIONS(Stack_call);              // similarly, but this is
     Construct(&Stack_call, START_SIZE);     // the stack of calls
-    CPU(&byte_struct, &Stack, &Stack_call);
+
+    CPU(&byte_struct, &Stack, &Stack_call); // Сделать структуру CPU.
+
 
     //stack_dump(&Stack);
 
