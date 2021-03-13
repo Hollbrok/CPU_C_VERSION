@@ -261,120 +261,21 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     i = static_cast<int>(pop_stack(Stack_call)) + 1;
 
                     break;
-                case CMD_JMP:
-                    i = static_cast<int>(byte_struct->data[i + 1]);
+				case CMD_LABEL:
                     break;
-                case CMD_LABEL:
-                    break;
-                case CMD_JE:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JE\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
+				case CMD_JE:
+				case CMD_JAB:
+				case CMD_JAE:
+				case CMD_JBE:
+				case CMD_JA:
+ 				case CMD_JB:
+				case CMD_JMP:
+				{
+					cmd_compair_exe(command, Stack, byte_struct, &i);
+					break;
+				}
 
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (is_equal(x2, x1))
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_JAB:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JAB\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (!is_equal(x2, x1))
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_JAE:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JAE\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (x2 >= x1)
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_JBE:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JBE\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (x2 <= x1)
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_JA:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JA\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (x2 > x1)
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_JB:
-                {
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to JB\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if (x2 < x1)
-                        i = static_cast<int>(byte_struct->data[i + 1]);
-                    else i++;
-
-                    break;
-                }
-                case CMD_ABS:
+				case CMD_ABS:
                     if(Stack->cur_size < 1)
                     {
                         printf("not enough numbers to abs\n");
@@ -698,7 +599,7 @@ auto draw_mem() -> void
     txCreateWindow(SIZEX, SIZEY);
     txSetDefaults();
 
-    HDC mem = txLoadImage("C:/Users/Danik/Documents/Задачи_СИ/Projects/ASSEM_CPU/bin/Debug/Mem.bmp");
+    HDC mem = txLoadImage("C:/Users/Danik/Documents/C_PROGRAMS/Projects/ASSEM_CPU/bin/Debug/Mem.bmp");
     txBitBlt(txDC(), 0, 0, SIZEX, SIZEY, mem, 0, 0);
 
     srand(time(nullptr));
@@ -711,96 +612,97 @@ auto draw_mem() -> void
         case DED_CODESTYLE:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 123, "Этот код не написал");
+            txTextOut(6, 110, "This guy didn't");
+            txTextOut(6, 123, " write the code");
 
-            txTextOut(160, 110, "Тут вообще всё");
-            txTextOut(160, 123, "в одном файле");
+            txTextOut(160, 110, "Everything is ");
+            txTextOut(160, 123, "in one file here.");
 
-            txTextOut(8, 262, "У этого вообще");
-            txTextOut(8, 275, "нет функций!");
+            txTextOut(8, 262, "This has no func-");
+            txTextOut(8, 275, "tions at all!");
 
-            txTextOut(160, 262, "Ну нахер, дропа-");
-            txTextOut(160, 275, "ем проект");
+            txTextOut(160, 262, "Well fuck, let's ");
+            txTextOut(160, 275, "drop this project");
 
             break;
         case DED_ILAB_CLASSIC:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 110, "Никто не ответил");
-            txTextOut(6, 123, "\"да\" или \"понятно\"");
+            txTextOut(6, 110, "No one answered");
+            txTextOut(6, 123, "\"yes\" or \"understand\"");
 
-            txTextOut(160, 110, "Не задали ни");
-            txTextOut(160, 123, "одного вопроса");
+            txTextOut(160, 110, "No questions asked");
+            txTextOut(160, 123, "at all");
 
-            txTextOut(8, 262, "Воскресенье очень");
-            txTextOut(8, 275, "напряженный день");
+            txTextOut(8, 262, "Sunday is a ");
+            txTextOut(8, 275, "very busy day");
 
-            txTextOut(160, 262, "Скорее всего при-");
-            txTextOut(160, 275, "дется дропать ILAB");
+            txTextOut(160, 262, "Most likely I will ");
+            txTextOut(160, 275, "have to cancel ILAB");
 
             break;
         case CAT:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 110, "Полторашка убежала,");
-            txTextOut(6, 123, "когда я ее гладил");
+            txTextOut(6, 110, "Poltorashka ran away");
+            txTextOut(6, 123, " when I stroked her");
 
-            txTextOut(160, 110, "По физ-ре 0 посе-");
-            txTextOut(160, 123, "щений за семак");
+            txTextOut(160, 110, "Physical education 0 ");
+            txTextOut(160, 123, "visits for Semak");
 
-            txTextOut(8, 262, "БРС не сильно боль-");
-            txTextOut(8, 275, "ше, чем посещений");
+            txTextOut(8, 262, "BRS is not much ");
+            txTextOut(8, 275, "more than visits");
 
-            txTextOut(160, 262, "Ухожу в академ, бу-");
-            txTextOut(160, 275, "ду гладить котиков");
+            txTextOut(160, 262, "I go to the academy, ");
+            txTextOut(160, 275, "and I'll stroke the cats");
 
             break;
         case BOMONKA:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 110, "Поступил на физ-");
-            txTextOut(6, 123, "тех чтоб бухать");
+            txTextOut(6, 110, "I entered to the");
+            txTextOut(6, 123, " MIPT to get drunk");
 
-            txTextOut(160, 110, "Эти на нк не поз-");
-            txTextOut(160, 123, "вали в пятницу");
+            txTextOut(160, 110, "These guys didn’t call");
+            txTextOut(160, 123, "me to nk on friday");
 
-            txTextOut(8, 262, "Эти курить пошли без");
-            txTextOut(8, 275, "тебя уже который раз");
+            txTextOut(8, 262, "These smokes have gone ");
+            txTextOut(8, 275, "without you for the umpteenth time");
 
-            txTextOut(160, 262, "Ну нахер, лучше");
-            txTextOut(160, 275, "пойду в бомонку");
+            txTextOut(160, 262, "Well fuck, I'd ra-");
+            txTextOut(160, 275, "ther go to the Bomonka");
 
             break;
         case DED_HOHLOV:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 110, "Пошел к деду");
-            txTextOut(6, 123, "чтобы прогать");
+            txTextOut(6, 110, "I went to ded");
+            txTextOut(6, 123, "to coding");
 
-            txTextOut(160, 110, "На матан времени");
-            txTextOut(160, 123, "не хватает");
+            txTextOut(160, 110, "There is not enough");
+            txTextOut(160, 123, " time for matan");
 
-            txTextOut(8, 262, "На общесос почти ни");
-            txTextOut(8, 275, "разу не успел сходить");
+            txTextOut(8, 262, "I almost never had time");
+            txTextOut(8, 275, "to go to physos");
 
-            txTextOut(160, 262, "Ну нахер, переве-");
-            txTextOut(160, 275, "дусь к Хохлову");
+            txTextOut(160, 262, "Well fuck, I'll ");
+            txTextOut(160, 275, "transfer to Khokhlov");
 
             break;
         case CODING_BUGS:
             txSetColor(RGB(0, 0, 0));
 
-            txTextOut(6, 110, "Пишешь проект");
-            txTextOut(6, 123, "на ILAB'e");
+            txTextOut(6, 110, "You are writing");
+            txTextOut(6, 123, " a project on ILAB");
 
-            txTextOut(160, 110, "Там пару сотен");
-            txTextOut(160, 123, "багов");
+            txTextOut(160, 110, "There are a couple");
+            txTextOut(160, 123, " of hundred bugs");
 
-            txTextOut(8, 262, "Там еще почему-то");
-            txTextOut(8, 275, "ничего не работает");
+            txTextOut(8, 262, "For some reason, nothing");
+            txTextOut(8, 275, " else works there.");
 
-            txTextOut(160, 262, "Ну нахер, ли-");
-            txTextOut(160, 275, "ваю с ILAB'a");
+            txTextOut(160, 262, "Well fuck it, ");
+            txTextOut(160, 275, "I'm leaving with ILAB-");
 
             break;
         default:
@@ -1023,4 +925,58 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 	else EXIT_CONDITION = true;
 }
 
+inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i)
+{
+		using namespace my_commands;
 
+		if(Stack->cur_size < 2)
+        {
+            printf("not enough numbers to do contidional jump or common jump\n");
+            EXIT_CONDITION = true;
+        }
+
+		double x1 = pop_stack(Stack);
+        double x2 = pop_stack(Stack);
+
+		if (get_byte(command, BIT_EQUAL))
+		{
+			if (get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) 		// <=
+			{
+				if (x2 <= x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+			}
+			else if (!get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // >=
+			{
+				if (x2 >= x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+			}
+			else if (!get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) // ==
+			{
+				if (is_equal(x2,  x1))
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+			}
+			else if  (get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // !=
+			{
+				if (!is_equal(x2, x1))
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+			}
+		}
+		else if (get_byte(command, BIT_ABOVE))
+		{
+			if (x2 > x1)
+                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            else (*i)++;
+		}
+		else if (get_byte(command, BIT_BELOW))
+		{
+			if (x2 < x1)
+                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            else (*i)++;
+		}
+		else
+			(*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+}

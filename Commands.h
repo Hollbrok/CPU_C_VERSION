@@ -27,6 +27,10 @@ namespace my_commands
 		BIT_RBX		= 2, // 1 0010 00(1)0
 		BIT_RCX		= 3, // 1 0010 0(1)00
 		BIT_RDX		= 4, // 1 0010 (1)000
+
+		BIT_EQUAL 	= 1,
+		BIT_ABOVE 	= 3,
+		BIT_BELOW 	= 4,
 	};
 
     enum Commands
@@ -50,7 +54,7 @@ namespace my_commands
 
         CMD_LN          = 275,
         CMD_LOG10       = 276,
-        CMD_RESERVE   	= 277,	// not yet used command
+        CMD_LABEL   	= 277,	// not yet used command
         CMD_LOG2        = 278,	// 1 0001 0110
 
 		CMD_RAX         = 289,	// 1 0010 0001
@@ -69,15 +73,15 @@ namespace my_commands
         CMD_KOPM        = 323,
         CMD_MEM         = 324,	// 1 0100 0100
 
-		CMD_LABEL       = 336,  // 1 0101 0000
-        CMD_JMP         = 337, 	// 1 0101 0001
-        CMD_JE          = 338,	// 1 0101 0010
-        CMD_JAB         = 339,	// 1 0101 0011
-        CMD_JAE         = 340,	// 1 0101 0100
-        CMD_JBE         = 341,	// 1 0101 0101
-        CMD_JA          = 342,	// 1 0101 0110
-        CMD_JB          = 343, 	// 1 0101 0111
-    };
+		CMD_JMP      	= 336,  // 1 0101 0000 -> 0000
+
+        CMD_JE         	= 337, 	// 1 0101 0001 ==
+        CMD_JAB         = 349,	// 1 0101 1101 !=
+        CMD_JAE        	= 341,	// 1 0101 0101 >=
+        CMD_JBE         = 345,	// 1 0101 1001 <=
+        CMD_JA         	= 340,	// 1 0101 0100 >
+        CMD_JB          = 344,	// 1 0101 1000 <
+	};
 }
 
 

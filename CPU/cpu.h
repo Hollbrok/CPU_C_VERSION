@@ -46,4 +46,6 @@ auto get_byte(int digit, int number_of_bit) -> bool;
 inline cmd_push_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char* OP);
 
 inline cmd_pop_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char* OP);
+
+inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i);
 #endif // CPU_H_INCLUDED
