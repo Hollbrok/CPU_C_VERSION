@@ -1,7 +1,7 @@
 #include "cpu.h"
 
-static int EXIT_CONDITION          = 0;   // Ñòàòóñ âûõîäà èç ïåðåâîäà àññåáëåðíîãî êîäà â äåéñòâèÿ
-static int SECOND_PRINT            = 0;   // Äëÿ ïðèíòà for_user
+static bool EXIT_CONDITION          = 0;   
+static bool SECOND_PRINT            = 0;  
 
 auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
 {
@@ -75,11 +75,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
         if(EXIT_CONDITION == 1)
             break;
 
-        //if((skip_first == i) || (skip_second == i))
-        //    continue;
-
 		int command = static_cast<int>(byte_struct->data[i]);
-        //printf("i = [%d]\n", i);
 
         if (get_byte(command, BIT_PUSH))	// (command == CMD_PUSH) // PUSH
         {
@@ -420,8 +416,7 @@ auto print_for_user(stack_t* Stack) -> void
             }
         }
     }
-    else fprintf(result, "×èñåë â ñòåêå íåò.\n"
-                         "Currently size of Stack is %d", Stack->cur_size);
+    else fprintf(result, "Currently size of Stack is %d", Stack->cur_size);
 
 
     fclose(result);
@@ -550,42 +545,42 @@ auto draw_cat() -> void
     txSetFillColor(RGB(0, 100, 167));
     txFloodFill(5 , 5);
 
-    txSetFillColor(RGB(125, 125, 125)); // öâåò òåëà
-    txEllipse(100, 70, 180, 180);       // ðèñóåì òåëî
+    txSetFillColor(RGB(125, 125, 125)); // 
+    txEllipse(100, 70, 180, 180);       // 
 
-    txSetFillColor(RGB(0, 0, 0));       // ÷åðíûé öâåò
-    txEllipse(130, 90, 160, 150);       // ðèñóåâ âíóòðè òóëîâèùà
+    txSetFillColor(RGB(0, 0, 0));       // 
+    txEllipse(130, 90, 160, 150);       //  
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò ãîëîâû
-    txCircle(140, 45, 25);              // ãîëîâà
+    txSetFillColor(RGB(154, 148, 148)); // 
+    txCircle(140, 45, 25);              //
 
-    txSetColor(RGB(0, 0, 0), 1);        // öâåò è òîëùèíà óñèêîâ
-    txLine(140, 55, 170, 45);           // ñàìè óñèêè
+    txSetColor(RGB(0, 0, 0), 1);        // 
+    txLine(140, 55, 170, 45);           //ñàìè óñèêè
     txLine(140, 55, 175, 53);
     txLine(140, 55, 181, 61);
     txLine(140, 55, 120, 45);
     txLine(140, 55, 115, 53);
     txLine(140, 55, 109, 61);
 
-    txSetFillColor(RGB(255, 255, 255)); // Öâåò ãëàç (áåëûé)
-    txEllipse(130, 35, 141, 50);        // ãëàç Ë
-    txEllipse(145, 35, 156, 50);        // ãëàç Ï
+    txSetFillColor(RGB(255, 255, 255)); // 
+    txEllipse(130, 35, 141, 50);        // 
+    txEllipse(145, 35, 156, 50);        // 
 
-    txLine(120, 30, 125, 10);           // óõî Ë
+    txLine(120, 30, 125, 10);           // 
     txLine(125, 10, 133, 23);
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò çàëèâêè óõà
-    txFloodFill(125, 12);               // çàëèâàåì óõî
+    txSetFillColor(RGB(154, 148, 148)); // 
+    txFloodFill(125, 12);               //
 
-    txLine(150, 22, 158, 10);           // óõî Ï
+    txLine(150, 22, 158, 10);           // 
     txLine(158, 10, 160, 32);
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò çàëèâêè óõà
-    txFloodFill(157, 17);               // çàëèâàåì óõî
+    txSetFillColor(RGB(154, 148, 148)); // 
+    txFloodFill(157, 17);               //
 
-    txSetFillColor(RGB(0, 0, 0));       // öâåò çàëèâêè çðà÷êà
-    txEllipse(132, 39, 137, 48);        // çðà÷îê Ë
-    txEllipse(147, 39, 152, 48);        // çðà÷îê Ï
+    txSetFillColor(RGB(0, 0, 0));       //
+    txEllipse(132, 39, 137, 48);        //
+    txEllipse(147, 39, 152, 48);        // 
     txTextOut(180, 45, "Meow-meow!");
 
 	return;

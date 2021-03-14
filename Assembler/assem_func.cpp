@@ -153,7 +153,7 @@ auto code_construct(Text* text_struct, Code* code_struct) -> void
             while (isspace(code_struct->data[i]))
                 i++;
         }
-    //printf("terms = %d\n", code_struct->terms);
+   
     print_code_buffer(code_struct);
     return;
 }
@@ -458,7 +458,6 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         if ((static_cast<int>(byte_struct->data[i]) == CMD_POP) || (static_cast<int>(byte_struct->data[i]) == CMD_PUSH))
         {
             fprintf(assembler_txt, "%lg ", byte_struct->data[i++] + numbers_flag[flags_size++]);
-            //fprintf(assembler_txt, "%lg ", numbers_flag[flags_size++]);
             fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
         }
         else
