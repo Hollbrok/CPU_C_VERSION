@@ -1,7 +1,7 @@
 #include "cpu.h"
 
-static int EXIT_CONDITION          = 0;   // Ñòàòóñ âûõîäà èç ïåðåâîäà àññåáëåðíîãî êîäà â äåéñòâèÿ
-static int SECOND_PRINT            = 0;   // Äëÿ ïðèíòà for_user
+static int EXIT_CONDITION          = 0;   // Ã‘Ã²Ã Ã²Ã³Ã± Ã¢Ã»ÃµÃ®Ã¤Ã  Ã¨Ã§ Ã¯Ã¥Ã°Ã¥Ã¢Ã®Ã¤Ã  Ã Ã±Ã±Ã¥Ã¡Ã«Ã¥Ã°Ã­Ã®Ã£Ã® ÃªÃ®Ã¤Ã  Ã¢ Ã¤Ã¥Ã©Ã±Ã²Ã¢Ã¨Ã¿
+static int SECOND_PRINT            = 0;   // Ã„Ã«Ã¿ Ã¯Ã°Ã¨Ã­Ã²Ã  for_user
 
 auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
 {
@@ -62,8 +62,8 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
     struct Rix rix_struct = {};
 
-    int skip_first  = -1;
-    int skip_second = -1;
+    //int skip_first  = -1;
+    //int skip_second = -1;
 
     using namespace my_commands;
 
@@ -75,8 +75,8 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
         if(EXIT_CONDITION == 1)
             break;
 
-        if((skip_first == i) || (skip_second == i))
-            continue;
+        //if((skip_first == i) || (skip_second == i))
+        //    continue;
 
 		int command = static_cast<int>(byte_struct->data[i]);
         //printf("i = [%d]\n", i);
@@ -84,13 +84,13 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
         if (get_byte(command, BIT_PUSH))	// (command == CMD_PUSH) // PUSH
         {
 			cmd_push_exe(command, i, Stack, &rix_struct, byte_struct, OP);
-			skip_first = i + 1;
+			i++;
         }
 
         else if(get_byte(command, BIT_POP))	//(command == CMD_POP) //POP
         {
 			cmd_pop_exe(command, i, Stack, &rix_struct, byte_struct, OP);
-            skip_first = i + 1;
+            i++;
         }
 
         else
@@ -105,7 +105,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     FILE* error = fopen("ERROR_PRINT.txt", "ab");
 					assert(error);
 
-                    fprintf(error, "\tÄàòà error'a : %s (÷÷/ìì/ãã)\n\n", define_date());
+                    fprintf(error, "\tÃ„Ã Ã²Ã  error'a : %s (Ã·Ã·/Ã¬Ã¬/Ã£Ã£)\n\n", define_date());
                     fprintf(error, "ERROR in LINE %d", __LINE__);
 
 					fclose(error);
@@ -307,7 +307,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     FILE* error = fopen("[!]ERRORS.txt", "ab");
 					assert(error);
 
-                    fprintf(error, "\tÄàòà error'a : %s (÷÷/ìì/ãã)\n\n", define_date());
+                    fprintf(error, "\tData of error : %s (dd/mm/yy)\n\n", define_date());
                     fprintf(error, "Unknown command..\n");
                     fprintf(error, "bytecode[%d] = %d", i, command);
                     fclose(error);
@@ -336,8 +336,6 @@ auto print_for_user(stack_t* Stack) -> void
 
     if(Stack->cur_size > 0)
     {
-        fprintf(result, "÷èñëà â ñòåêå:\n");
-
         int Size = Stack->cur_size;
         int max_order = 0;
 
@@ -422,7 +420,7 @@ auto print_for_user(stack_t* Stack) -> void
             }
         }
     }
-    else fprintf(result, "×èñåë â ñòåêå íåò.\n"
+    else fprintf(result, "Ã—Ã¨Ã±Ã¥Ã« Ã¢ Ã±Ã²Ã¥ÃªÃ¥ Ã­Ã¥Ã².\n"
                          "Currently size of Stack is %d", Stack->cur_size);
 
 
@@ -552,42 +550,42 @@ auto draw_cat() -> void
     txSetFillColor(RGB(0, 100, 167));
     txFloodFill(5 , 5);
 
-    txSetFillColor(RGB(125, 125, 125)); // öâåò òåëà
-    txEllipse(100, 70, 180, 180);       // ðèñóåì òåëî
+    txSetFillColor(RGB(125, 125, 125)); // Ã¶Ã¢Ã¥Ã² Ã²Ã¥Ã«Ã 
+    txEllipse(100, 70, 180, 180);       // Ã°Ã¨Ã±Ã³Ã¥Ã¬ Ã²Ã¥Ã«Ã®
 
-    txSetFillColor(RGB(0, 0, 0));       // ÷åðíûé öâåò
-    txEllipse(130, 90, 160, 150);       // ðèñóåâ âíóòðè òóëîâèùà
+    txSetFillColor(RGB(0, 0, 0));       // Ã·Ã¥Ã°Ã­Ã»Ã© Ã¶Ã¢Ã¥Ã²
+    txEllipse(130, 90, 160, 150);       // Ã°Ã¨Ã±Ã³Ã¥Ã¢ Ã¢Ã­Ã³Ã²Ã°Ã¨ Ã²Ã³Ã«Ã®Ã¢Ã¨Ã¹Ã 
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò ãîëîâû
-    txCircle(140, 45, 25);              // ãîëîâà
+    txSetFillColor(RGB(154, 148, 148)); // Ã¶Ã¢Ã¥Ã² Ã£Ã®Ã«Ã®Ã¢Ã»
+    txCircle(140, 45, 25);              // Ã£Ã®Ã«Ã®Ã¢Ã 
 
-    txSetColor(RGB(0, 0, 0), 1);        // öâåò è òîëùèíà óñèêîâ
-    txLine(140, 55, 170, 45);           // ñàìè óñèêè
+    txSetColor(RGB(0, 0, 0), 1);        // Ã¶Ã¢Ã¥Ã² Ã¨ Ã²Ã®Ã«Ã¹Ã¨Ã­Ã  Ã³Ã±Ã¨ÃªÃ®Ã¢
+    txLine(140, 55, 170, 45);           // Ã±Ã Ã¬Ã¨ Ã³Ã±Ã¨ÃªÃ¨
     txLine(140, 55, 175, 53);
     txLine(140, 55, 181, 61);
     txLine(140, 55, 120, 45);
     txLine(140, 55, 115, 53);
     txLine(140, 55, 109, 61);
 
-    txSetFillColor(RGB(255, 255, 255)); // Öâåò ãëàç (áåëûé)
-    txEllipse(130, 35, 141, 50);        // ãëàç Ë
-    txEllipse(145, 35, 156, 50);        // ãëàç Ï
+    txSetFillColor(RGB(255, 255, 255)); // Ã–Ã¢Ã¥Ã² Ã£Ã«Ã Ã§ (Ã¡Ã¥Ã«Ã»Ã©)
+    txEllipse(130, 35, 141, 50);        // Ã£Ã«Ã Ã§ Ã‹
+    txEllipse(145, 35, 156, 50);        // Ã£Ã«Ã Ã§ Ã
 
-    txLine(120, 30, 125, 10);           // óõî Ë
+    txLine(120, 30, 125, 10);           // Ã³ÃµÃ® Ã‹
     txLine(125, 10, 133, 23);
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò çàëèâêè óõà
-    txFloodFill(125, 12);               // çàëèâàåì óõî
+    txSetFillColor(RGB(154, 148, 148)); // Ã¶Ã¢Ã¥Ã² Ã§Ã Ã«Ã¨Ã¢ÃªÃ¨ Ã³ÃµÃ 
+    txFloodFill(125, 12);               // Ã§Ã Ã«Ã¨Ã¢Ã Ã¥Ã¬ Ã³ÃµÃ®
 
-    txLine(150, 22, 158, 10);           // óõî Ï
+    txLine(150, 22, 158, 10);           // Ã³ÃµÃ® Ã
     txLine(158, 10, 160, 32);
 
-    txSetFillColor(RGB(154, 148, 148)); // öâåò çàëèâêè óõà
-    txFloodFill(157, 17);               // çàëèâàåì óõî
+    txSetFillColor(RGB(154, 148, 148)); // Ã¶Ã¢Ã¥Ã² Ã§Ã Ã«Ã¨Ã¢ÃªÃ¨ Ã³ÃµÃ 
+    txFloodFill(157, 17);               // Ã§Ã Ã«Ã¨Ã¢Ã Ã¥Ã¬ Ã³ÃµÃ®
 
-    txSetFillColor(RGB(0, 0, 0));       // öâåò çàëèâêè çðà÷êà
-    txEllipse(132, 39, 137, 48);        // çðà÷îê Ë
-    txEllipse(147, 39, 152, 48);        // çðà÷îê Ï
+    txSetFillColor(RGB(0, 0, 0));       // Ã¶Ã¢Ã¥Ã² Ã§Ã Ã«Ã¨Ã¢ÃªÃ¨ Ã§Ã°Ã Ã·ÃªÃ 
+    txEllipse(132, 39, 137, 48);        // Ã§Ã°Ã Ã·Ã®Ãª Ã‹
+    txEllipse(147, 39, 152, 48);        // Ã§Ã°Ã Ã·Ã®Ãª Ã
     txTextOut(180, 45, "Meow-meow!");
 
 	return;
@@ -663,7 +661,7 @@ auto draw_mem() -> void
             txTextOut(6, 110, "I entered to the");
             txTextOut(6, 123, " MIPT to get drunk");
 
-            txTextOut(160, 110, "These guys didn’t call");
+            txTextOut(160, 110, "These guys didnÂ’t call");
             txTextOut(160, 123, "me to nk on friday");
 
             txTextOut(8, 262, "These smokes have gone ");
@@ -756,11 +754,11 @@ inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecod
 		}
 	}
 
-	else if (get_byte(command, BIT_D_OP) && !get_byte(command, BIT_NUMBER))
+	else if (get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
 	{
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
 		{
-			double *temp_pointer = (double*) (OP + static_cast<int>(byte_struct->data[i + 2]));
+			double *temp_pointer = (double*) (OP + static_cast<int>(byte_struct->data[i + 1]));
         	push_stack(Stack, *temp_pointer);
 		}
 		else if (!get_byte(command, BIT_NUMBER)) 		// NOT NUMBER == RIX
@@ -794,7 +792,7 @@ inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecod
 	{
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
 		{
-			char *temp_pointer = (char*) (OP + static_cast<int>(byte_struct->data[i + 2]));
+			char *temp_pointer = (char*) (OP + static_cast<int>(byte_struct->data[i + 1]));
             push_stack(Stack, *temp_pointer);
 		}
 		else if (!get_byte(command, BIT_NUMBER)) 		// NOT NUMBER == RIX
@@ -855,7 +853,7 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 		}
 	}
 
-	else if (get_byte(command, BIT_D_OP) && !get_byte(command, BIT_NUMBER))
+	else if (get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
 	{
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
 		{
@@ -894,7 +892,8 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
 		{
 			char* temp_pointer = static_cast<char*> (OP + static_cast<int>(byte_struct->data[i + 1]));
-            *temp_pointer      = static_cast<char> (pop_stack(Stack));
+            *temp_pointer = static_cast<char> (pop_stack(Stack));
+
 		}
 		else if (!get_byte(command, BIT_NUMBER)) 		// NOT NUMBER == RIX
 		{
@@ -980,3 +979,4 @@ inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *
 		else
 			(*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
 }
+

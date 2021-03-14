@@ -5,12 +5,12 @@ constexpr int MAX_SIZE_COMMAND  = 20;
 constexpr int MAX_SIZE_LABLE    = 15;
 constexpr int DEBUG_STATE       = 0;
 
-constexpr int S_NUMBER_SPEC     = 1;   // push 2       S -- working with a Stack
-constexpr int S_REGIST_SPEC     = 0;   // push rbx     S -- working with a Stack
-constexpr int OP_DOUBLE_NUMBER  = 3;   // push [2]     OP -- working with Operative memory
-constexpr int OP_DOUBLE_REGIST  = 2;   // push [rbx]   OP -- working with Operative memory
-constexpr int OP_CHAR_NUM       = 5;   // push (2)
-constexpr int OP_CHAR_REG       = 4;   // push (rbx)
+constexpr int S_REGIST_SPEC     = 0x00;   // push rbx     S -- working with a Stack
+constexpr int S_NUMBER_SPEC     = 0x01;   // push 2       
+constexpr int OP_DOUBLE_REGIST  = 0x02;   // push [rbx]   OP -- working with Operative memory like double
+constexpr int OP_DOUBLE_NUMBER  = 0x03;   // push [2]     
+constexpr int OP_CHAR_REG       = 0x04;   // push (rbx)	  OP -- working with Operative memory like char	
+constexpr int OP_CHAR_NUM       = 0x05;   // push (2)
 
 
 namespace my_commands
@@ -54,7 +54,7 @@ namespace my_commands
 
         CMD_LN          = 275,
         CMD_LOG10       = 276,
-        CMD_LABEL   	= 277,	// not yet used command
+        CMD_LABEL   	= 277,
         CMD_LOG2        = 278,	// 1 0001 0110
 
 		CMD_RAX         = 289,	// 1 0010 0001
@@ -73,7 +73,7 @@ namespace my_commands
         CMD_KOPM        = 323,
         CMD_MEM         = 324,	// 1 0100 0100
 
-		CMD_JMP      	= 336,  // 1 0101 0000 -> 0000
+		CMD_JMP      	= 336,  // 1 0101 0000 ->
 
         CMD_JE         	= 337, 	// 1 0101 0001 ==
         CMD_JAB         = 349,	// 1 0101 1101 !=

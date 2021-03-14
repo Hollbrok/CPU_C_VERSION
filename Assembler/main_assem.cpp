@@ -1,24 +1,24 @@
 #include "assem.h"
 
-int main()//int main(int argc, char *argv[])
+int main()	//int main(int argc, char *argv[])
 {
     printf("Assembling in progress..\n");
 
-    FILE* user_code = fopen("user_code[for user].txt", "r");
+    FILE* user_code = fopen("user_code[for user].txt", "rb");	// fopen(argv[1], "rb");
     assert(user_code);
 
-    Text text_struct = {};                          // структура текста
-    text_construct(&text_struct, user_code);        // конструктор текста
+    Text text_struct = {};                          // text struct
+    text_construct(&text_struct, user_code);        // text construct
 
-    Code code_struct = {};                          // структура кода пользователя (нужна по-большей части для удаления комментариев, лишних пробелов и для удобного дебага)
-    code_construct(&text_struct, &code_struct);     // вычисляет кол-во команд + удобнее обрабатывать код
+    Code code_struct = {};                          // code struct (delete comments and etc.)
+    code_construct(&text_struct, &code_struct);     // code construct
 
-    Bytecode byte_struct = {};                      // структура ассемблерного кода
-    get_bytecode(&code_struct, &byte_struct);       // получает ассемблерный код из текста
+    Bytecode byte_struct = {};                      // bytecode struct
+    get_bytecode(&code_struct, &byte_struct);       // bytecode construct
 
-    text_destruct(&text_struct);                    // деконструктор текста
-    code_destruct(&code_struct);                    // деконструктор структуры кода (преобразованного текста)
-    bytecode_destruct(&byte_struct);                // деконструктор структуры ассемблерного кода
+    text_destruct(&text_struct);                    // deconstruct of text structure
+    code_destruct(&code_struct);                    // deconstruct of code structure
+    bytecode_destruct(&byte_struct);                // deconstruct of bytecode structure
 
     printf("DONE!!\n");
     fclose(user_code);

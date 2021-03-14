@@ -15,13 +15,13 @@ auto text_construct(Text* text_struct, FILE* user_code) -> void;
 
 auto text_destruct(Text* text_struct) -> void;
 
-auto print_text_struct(Text* text_struct) -> void;                      // печатает в файл string_text текст без комментариев в виде строки
+auto print_text_struct(Text* text_struct) -> void;                      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ string_text пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 auto code_construct(Text* text_struct, Code* code_struct) -> void;
 
 auto code_destruct(Code* code_struct) -> void;
 
-auto print_code_buffer(Code* code_struct) -> void;                  // печатает в файл code_struct буфер структуры code (для просмотра как робят комментарии)
+auto print_code_buffer(Code* code_struct) -> void;                  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ code_struct пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ code (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 
 auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void;
 
@@ -36,5 +36,11 @@ auto define_date(void) -> char*;
 auto size_of_file(FILE* user_code) -> long;
 
 auto com_to_int(my_commands::Commands command) -> int;
+
+inline get_lexeme(int *j, Code *code_struct, char *temp);
+
+inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size, double *numbers_flag, int i);
+
+inline define_specs(int* SPEC_NUMBER, int* SPEC_REGIST, char spec);
 
 #endif // ASSEM_H_INCLUDED

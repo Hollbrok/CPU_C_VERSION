@@ -21,9 +21,10 @@ struct Text
 
 struct Code
 {
-    char*   data   = nullptr;  // pointer to buffer of code
-    int     length = 0;        // length of buffer
-    int     terms  = 0;        // numbers of lexeme
+    char*   data   		= nullptr;  // pointer to buffer of code
+    int     length 		= 0;        // length of buffer
+    int     terms  		= 0;        // numbers of lexeme
+	int  	cur_size	= 0;		// cur code size need for lexeme reading
 };
 
 struct Bytecode

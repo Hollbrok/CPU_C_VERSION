@@ -195,38 +195,23 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 	assert(temp);
 
 	int cur_labels = 0;
-    int temp_cur_code_size = 0;
-	int correction = 0;
+	code_struct->cur_size = 0;
 
     for (int i = 0; i < code_struct->terms; i++)
     {
         int iter = 0;
-        for (iter = 0; iter < MAX_SIZE_COMMAND; iter++) // теперь в temp_str хранится лексема
-        {
-            if(code_struct->data[iter + temp_cur_code_size] != ' ')
-                temp[iter] = code_struct->data[iter + temp_cur_code_size];
-            else
-            {
-                temp[iter] = '\0';
-                break;
-            }
-        }
+        get_lexeme(&iter, code_struct, temp);
 
-        //if (!strcmp(temp, "push"))
-                correction++;
-        //else if (!strcmp(temp, "pop"))
-                correction++;
-        /*else */ if (temp[strlen(temp) - 1] == ':')
+		if (temp[strlen(temp) - 1] == ':')
         {
             strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);
 
             labels[cur_labels].length = strlen(temp);
 
-            labels[cur_labels].adress = i;// + correction;
-            cur_labels++;
+            labels[cur_labels++].adress = i;
         }
 
-        temp_cur_code_size += iter + 1;
+        code_struct->cur_size += iter + 1;
     }
 
     int amount_labels = cur_labels;
@@ -238,8 +223,8 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
     double* numbers_flag = (double*) calloc(code_struct->terms, sizeof(double));
     assert(numbers_flag);
 
-    int flags_size     = 0;
-    int cur_code_size  = 0;
+    int flags_size     	  = 0;
+    code_struct->cur_size = 0;
 
     using namespace my_commands;
 
@@ -249,18 +234,9 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             break;
 
         int j = 0;
-        for (j = 0; j < MAX_SIZE_COMMAND; j++)
-        {
-            if((code_struct->data[j + cur_code_size] != ' '))
-                temp[j] = code_struct->data[j + cur_code_size];
-            else
-            {
-                temp[j] = '\0';
-                break;
-            }
-        }
+		get_lexeme(&j, code_struct, temp);
 
-        cur_code_size += j + 1;
+		code_struct->cur_size += j + 1;
 
         if (!strcmp(temp, "push"))
         {
@@ -320,9 +296,6 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 
         else if (!strcmp(temp, "log10"))
             byte_struct->data[i] = CMD_LOG10;
-
-        //else if (!strcmp(temp, "quadratic"))
-        //    byte_struct->data[i] = CMD_QUADRATIC;
 
         else if (!strcmp(temp, "log2"))
             byte_struct->data[i] =  CMD_LOG2;
@@ -401,88 +374,10 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = CMD_HLT;
 
         else if(temp[0] == '[')
-        {
-            if(isdigit(*(temp + 1)))
-            {
-                byte_struct->data[i] = std::atoi(temp + 1);
-                printf("adress = %lg\n", byte_struct->data[i]);
-                numbers_flag[flags_size++] = OP_DOUBLE_NUMBER;
-                IS_LAST_COMMAND_PUSH       = false;
-            }
-            else if(strlen(temp) == 5)
-            {
-                char new_temp[] = {temp[1], temp[2], temp[3]}; // так как длина 5, то [xxx], то в new_temp теперь просто xxx
-                if (!strncmp(new_temp, "rax", 3))
-                {
-                    byte_struct->data[i]       = CMD_RAX;
-                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rbx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RBX;
-                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rcx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RCX;
-                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rdx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RDX;
-                    numbers_flag[flags_size++] = OP_DOUBLE_REGIST;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-            }
-            else printf("BAD(((\n");
-        }
+            bracket_exe('[', temp, byte_struct, flags_size, numbers_flag, i);
 
         else if (temp[0] == '(')
-        {
-            if(isdigit(*(temp + 1)))
-            {
-                byte_struct->data[i] = std::atoi(temp + 1);
-                printf("adress = %lg\n", byte_struct->data[i]);
-                numbers_flag[flags_size++] = OP_CHAR_NUM;
-                IS_LAST_COMMAND_PUSH       = false;
-            }
-            else if(strlen(temp) == 5)
-            {
-                char new_temp[] = {temp[1], temp[2], temp[3]};
-                if (!strncmp(new_temp, "rax", 3))
-                {
-                    byte_struct->data[i]       = CMD_RAX;
-                    numbers_flag[flags_size++] = OP_CHAR_REG;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rbx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RBX;
-                    numbers_flag[flags_size++] = OP_CHAR_REG;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rcx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RCX;
-                    numbers_flag[flags_size++] = OP_CHAR_REG;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-                else if (!strncmp(new_temp, "rdx", 3))
-                {
-                    byte_struct->data[i]       = CMD_RDX;
-                    numbers_flag[flags_size++] = OP_CHAR_REG;
-                    IS_LAST_COMMAND_PUSH       = false;
-                }
-            }
-            else
-			{
-				printf("Something went wrong in ()\n");
-				NEW_COMMAND_ERROR =   true;
-			}
-		}
+            bracket_exe('(', temp, byte_struct, flags_size, numbers_flag, i);
 
         else if (IS_LAST_COMMAND_PUSH)
         {
@@ -500,13 +395,13 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         else if (!strcmp(temp, "call"))
         {
             byte_struct->data[i] = CMD_CALL;
-            IS_LAST_COMMAND_JMP  =   true;
+            IS_LAST_COMMAND_JMP  = true;
         }
 
         else if (!strcmp(temp, "jmp"))
         {
             byte_struct->data[i] = CMD_JMP;
-            IS_LAST_COMMAND_JMP  =   true;
+            IS_LAST_COMMAND_JMP  = true;
         }
 
         else if (IS_LAST_COMMAND_JMP)
@@ -514,14 +409,14 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             temp++;
 
             for (int index = 0; index < amount_labels; index++)
-                if(!strcmp(temp, labels[index].name))
+                if (!strcmp(temp, labels[index].name))
                 {
                     byte_struct->data[i] = labels[index].adress;
                     break;
                 }
 
             temp--;
-            IS_LAST_COMMAND_JMP = 0;
+            IS_LAST_COMMAND_JMP = false;
         }
 
         else if (!strcmp(temp, "draw"))
@@ -535,7 +430,7 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             FILE* error = fopen("[!]ERRORS.txt", "ab");
 			assert(error);
 
-            fprintf(error, "\n\tДата error'a : %s (чч/мм/гг)\n\n", define_date());
+            fprintf(error, "\n\tData of error : %s (dd/mm/yy)\n\n", define_date());
             fprintf(error, "Assembler doesn't know this command..\n");
             fprintf(error, "bytecode[%d] = [%s]\n", i, temp);
 
@@ -642,3 +537,85 @@ auto size_of_file(FILE* user_code) -> long
     return file_length;
 }
 
+inline get_lexeme(int *j, Code *code_struct, char *temp)
+{
+	for (*j = 0; (*j) < MAX_SIZE_COMMAND; (*j)++)
+    {
+        if((code_struct->data[*j + code_struct->cur_size] != ' '))
+            temp[*j] = code_struct->data[*j + code_struct->cur_size];
+        else
+        {
+            temp[*j] = '\0';
+            break;
+        }
+    }
+}
+
+inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size, double *numbers_flag, int i)
+{
+	using namespace my_commands;
+
+	int SPEC_NUMBER = 0;
+	int SPEC_REGIST = 0;
+
+	define_specs(&SPEC_NUMBER, &SPEC_REGIST, spec);
+
+	if(isdigit(*(temp + 1)))
+    {
+        byte_struct->data[i] 	      = std::atoi(temp + 1);
+        numbers_flag[(*flags_size)++] = SPEC_NUMBER;
+        IS_LAST_COMMAND_PUSH          = false;
+    }
+    else if(strlen(temp) == 5)
+    {
+        char new_temp[] = {temp[1], temp[2], temp[3]};
+        if (!strncmp(new_temp, "rax", 3))
+        {
+            byte_struct->data[i]          = CMD_RAX;
+            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            IS_LAST_COMMAND_PUSH          = false;
+        }
+        else if (!strncmp(new_temp, "rbx", 3))
+        {
+            byte_struct->data[i]          = CMD_RBX;
+            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            IS_LAST_COMMAND_PUSH          = false;
+        }
+        else if (!strncmp(new_temp, "rcx", 3))
+        {
+            byte_struct->data[i]          = CMD_RCX;
+            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            IS_LAST_COMMAND_PUSH          = false;
+        }
+        else if (!strncmp(new_temp, "rdx", 3))
+        {
+            byte_struct->data[i]          = CMD_RDX;
+            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            IS_LAST_COMMAND_PUSH          = false;
+        }
+    }
+	else
+	{
+		printf("Something went wrong in ()\n");
+		NEW_COMMAND_ERROR = true;
+	}
+}
+
+inline define_specs(int* SPEC_NUMBER, int* SPEC_REGIST, char spec)
+{
+	if (spec == '[')
+	{
+		*SPEC_NUMBER = OP_DOUBLE_NUMBER;
+		*SPEC_REGIST = OP_DOUBLE_REGIST;
+	}
+	else if (spec == '(')
+	{
+		*SPEC_NUMBER = OP_CHAR_NUM;
+		*SPEC_REGIST = OP_CHAR_REG;
+	}
+	else
+	{
+		printf("Something went wrong in ()\n");
+		NEW_COMMAND_ERROR = true;
+	}
+}
