@@ -1,6 +1,6 @@
 
 # CPU_C_VERSION
-__C__ (with some __C++__ shit) version of __CPU__ with registers, labels, jump ,conditional jumps, functions, operative memory.
+__C__ version of __CPU__ with registers, labels, jump ,conditional jumps, functions, operative memory.
 _____________________
 ## Основная информация об проекте.
 В данном проекте были реализованные следующие основные понятие: __ассемблирование команд__ в __машинный код__ [:one::one::one::zero::zero::one::zero::zero:], симуляция работы __центрального обрабатывающего устройства__ (__CPU__), а      __дизассемблирование__ машинного кода обратно в ассемблерные команды.     
