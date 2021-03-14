@@ -31,6 +31,8 @@ int main()
     bytecode_destruct(&byte_struct);
     stack_destruct(&Stack);
     stack_destruct(&Stack_call);
+
+    //txMessageBox("Привет!");
     printf("DONE!!\n");
 
     return 0;
