@@ -13,8 +13,49 @@ constexpr int OP_CHAR_NUM       = 5;   // push (2)
 constexpr int OP_CHAR_REG       = 4;   // push (rbx)
 
 
+            /* ! 13417 -> 11010001101001 -> hi */
+#define print_assem_id(file_name)		\
+    fprintf(file_name, "13417 ");
+
+#define check_assem_id					\
+	if(byte_struct->data[0] != 13417)	\
+		byte_struct->error_state += ERROR_ID;
+
+#define stack_size_check(size, message)	\
+	if(Stack->cur_size < size)			\
+    {									\
+    	printf(#message);				\
+        byte_struct->error_state += ERROR_STACK_SIZE;	\
+    }                                   \
+
+
+//? ERROR_MESSAGE
+
 namespace my_commands
 {
+	enum Errors_code
+	{
+		ERROR_ID 			= 1,
+		ERROR_STACK_SIZE	= 2,
+		ERROR_UNKNOWN_COM	= 4,
+		ERROR_CMD_PUSH		= 8,
+		ERROR_CMD_POP		= 16,
+		ERROR_COMPAIR		= 32,
+		ERROR_STK_CALL_SIZE = 64,
+		NUMBER_OF_ERRORS	= 7,
+	};
+
+	enum Errors_bytes
+	{
+		ID_ID				= 1,
+		ID_STACK_SIZE		= 2,
+		ID_UNKNOWN_COM		= 3,
+		ID_CMD_PUSH			= 4,
+		ID_CMD_POP			= 5,
+		ID_COMPAIR			= 6,
+		ID_STK_CALL_SIZE    = 7,
+	};
+
 	enum Bit_positions
 	{
 		BIT_NUMBER 	= 1,

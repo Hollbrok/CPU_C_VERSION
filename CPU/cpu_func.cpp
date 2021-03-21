@@ -1,6 +1,5 @@
 #include "cpu.h"
 
-static int EXIT_CONDITION          = 0;
 static int SECOND_PRINT            = 0;
 
 auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
@@ -27,11 +26,12 @@ auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
     byte_struct->data = (double*) calloc(byte_struct->bytecode_capacity, sizeof(double));
     assert(byte_struct->data);
 
+    //byte_struct->unknown_command = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
+    //assert(byte_struct->unknown_command);
+
     int ass_cur_size = 0;
-    //printf("%d\n", __LINE__);
     while (*buffer_char)
         byte_struct->data[ass_cur_size++] = get_number(&buffer_char);
-    //printf("%d\n", __LINE__);
     byte_struct->bytecode_capacity = ass_cur_size;
     return;
 }
@@ -40,12 +40,10 @@ auto get_number(char** buffer) -> double
 {
     ignore_spaces(buffer);
     double number = atof(*buffer);
-    //printf("number = [%lg]\n", number);
 
     while (isdigit(**buffer) || (**buffer == '.') || (**buffer == '-'))
         (*buffer)++;
 
-    ignore_spaces(buffer);
     return number;
 }
 
@@ -67,34 +65,24 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
     char* OP = (char*) calloc(OP_SIZE, sizeof(char));
     assert(OP);
-    //printf("%d\n", __LINE__);
 
-    for (int i = 0; i < byte_struct->bytecode_capacity; i++)
+	bool FIND_HLT = 0;
+
+	check_assem_id
+
+    else for (int i = 1; !FIND_HLT; i++)
     {
-
-
-        if(EXIT_CONDITION == 1)
-        {
-            //printf("EXIT_CONDITION = 1\n");
-            //system("pause");
-            break;
-        }
-
 		int command = static_cast<int>(byte_struct->data[i]);
-
-		//printf("i = [%d]\ncommand = %d\n", i, command);
-        //printf("i = [%d]\n", i);
-        //printf("Stack size if [%d]\n", Stack->cur_size);
 
         if (get_byte(command, BIT_PUSH))	// (command == CMD_PUSH) // PUSH
         {
-			cmd_push_exe(command, i, Stack, &rix_struct, byte_struct, OP);
+			byte_struct->error_state += cmd_push_exe(command, i, Stack, &rix_struct, byte_struct, OP);
 			i++;
         }
 
         else if(get_byte(command, BIT_POP))	//(command == CMD_POP) //POP
         {
-			cmd_pop_exe(command, i, Stack, &rix_struct, byte_struct, OP);
+			byte_struct->error_state += cmd_pop_exe(command, i, Stack, &rix_struct, byte_struct, OP);
             i++;
         }
 
@@ -103,70 +91,37 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
             switch(command)
             {
                 case CMD_HLT:
-                    EXIT_CONDITION = TRUE;
+                    FIND_HLT = TRUE;
                     break;
-                case CMD_PUSH:
-                {
-                    FILE* error = fopen("ERROR_PRINT.txt", "ab");
-					assert(error);
-
-                    fprintf(error, "\tData� error'a : %s (dd/mm/yy)\n\n", define_date());
-                    fprintf(error, "ERROR in LINE %d", __LINE__);
-
-					fclose(error);
-                    break;
-                }
                 case CMD_ADD:
-                    if (Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers in the stack. Exit..\n");
-                        EXIT_CONDITION = 1;
-                        break;
-                    }
-
-                    push_stack(Stack, pop_stack(Stack) + pop_stack(Stack));
+					stack_size_check(2, not enough numbers in the stack. Exit..\n)
+                    else
+                        push_stack(Stack, pop_stack(Stack) + pop_stack(Stack));
                     break;
                 case CMD_MUL:
-                    if(Stack->cur_size < 2)
-                    {
-                        printf("not enough numbers to mul\n");
-                        EXIT_CONDITION = 1;
-                        break;
-                    }
-
-                    push_stack(Stack, pop_stack(Stack) * pop_stack(Stack));
+					stack_size_check(2, not enough numbers to mul\n)
+                    else
+                        push_stack(Stack, pop_stack(Stack) * pop_stack(Stack));
                     break;
                 case CMD_DIV:
                 {
-                    if(Stack->cur_size < 2)
+					stack_size_check(2, not enough numbers to div\n)
+                    else
                     {
-                        printf("not enough numbers to div\n");
-                        EXIT_CONDITION = 1;
-                        break;
+                        double x1 = pop_stack(Stack);
+                        double x2 = pop_stack(Stack);
+                        push_stack(Stack, x2 / x1);
                     }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    push_stack(Stack, x2 / x1);
-
                     break;
                 }
                 case CMD_SUB:
                 {
-                    if(Stack->cur_size < 2)
+					stack_size_check(2, not enough numbers to sub\n)
                     {
-                        printf("not enough numbers to sub\n");
-                        EXIT_CONDITION = 1;
-                        break;
+                        double x1 = pop_stack(Stack);
+                        double x2 = pop_stack(Stack);
+                        push_stack(Stack, x2 - x1);
                     }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    push_stack(Stack, x2 - x1);
-                    //printf("rdx  = rdx - %lg = %lg\n", x1, x2 - x1);
-
                     break;
                 }
                 case CMD_SIN:
@@ -177,26 +132,12 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     break;
                 case CMD_POW:
                 {
-                    if(Stack->cur_size < 2)
+					stack_size_check(2, no numbers to pow\n)
                     {
-                        printf("no numbers to pow\n");
-                        EXIT_CONDITION = 1;
-                        break;
+                        double x1 = pop_stack(Stack);
+                        double x2 = pop_stack(Stack);
+                        push_stack(Stack, pow(x2, x1));
                     }
-
-                    double x1 = pop_stack(Stack);
-                    double x2 = pop_stack(Stack);
-
-                    if ((x1 < 0))
-                    {
-                        FILE* result = fopen("results[for user].txt", "wb");
-
-                        fprintf(result, "sorry, but you should read more"
-                                        "about the rules for exponentiation");
-                        fclose(result);
-                    }
-
-                    push_stack(Stack, pow(x2, x1));
                     break;
                 }
                 case CMD_SQRT:
@@ -213,32 +154,29 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 }
                 case CMD_OUT:
                 {
-                    if(Stack->cur_size == 0)
-                    {
-                        printf("not enough space in Stack to out. Exit..\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    double x1 = pop_stack(Stack);
-
-                    if(!SECOND_PRINT)
-                    {
-                        FILE* result = fopen("results[for user].txt", "wb");
-                        SECOND_PRINT = TRUE;
-                        fprintf(result, "[%lg]\n", x1);
-                        fclose(result);
-                    }
-
+					stack_size_check(1, not enough space in Stack to out. Exit..\n)
                     else
                     {
-                        FILE* result = fopen("results[for user].txt", "a");
-                        assert(result);
-                        fprintf(result, "[%lg]\n", x1);
-                        fclose(result);
-                    }
+                        double x1 = pop_stack(Stack);
 
-                    //push_stack(Stack, x1);
+                        if(!SECOND_PRINT)
+                        {
+                            FILE* result = fopen("results[for user].txt", "wb");
+                            SECOND_PRINT = TRUE;
+                            fprintf(result, "[%lg]\n", x1);
+                            fclose(result);
+                        }
+
+                        else
+                        {
+                            FILE* result = fopen("results[for user].txt", "a");
+                            assert(result);
+                            fprintf(result, "[%lg]\n", x1);
+                            fclose(result);
+                        }
+
+                        push_stack(Stack, x1);
+                    }
                     break;
                 }
                 case CMD_DEL:
@@ -261,7 +199,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     if(Stack_call->cur_size < 1)
                     {
                         printf("no number in stack_call to return\n");
-                        EXIT_CONDITION = TRUE;
+                        byte_struct->error_state += ERROR_STK_CALL_SIZE;
                         break;
                     }
 
@@ -278,30 +216,23 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
  				case CMD_JB:
 				case CMD_JMP:
 				{
-					cmd_compair_exe(command, Stack, byte_struct, &i);
+					byte_struct->error_state += cmd_compair_exe(command, Stack, byte_struct, &i);
 					break;
 				}
 
 				case CMD_ABS:
-                    if(Stack->cur_size < 1)
-                    {
-                        printf("not enough numbers to abs\n");
-                        EXIT_CONDITION = TRUE;
-                        break;
-                    }
-
-                    push_stack(Stack, abs(pop_stack(Stack)));
+					stack_size_check(1, not enough numbers to abs\n)
+                    else
+                        push_stack(Stack, abs(pop_stack(Stack)));
                     break;
                 case CMD_DRAW:
-                    printf("DRAW\n");
-                    //txSleep (5000);
 					draw_screen(OP);
                     break;
                 case CMD_FILL:
 					fill_screen(OP);
                     break;
                 case CMD_CIRC:
-					draw_circ(OP, Stack);
+					draw_circ(OP, Stack, byte_struct);
                     break;
                 case CMD_KOPM:
                     draw_kopm();
@@ -313,19 +244,16 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     draw_mem();
                     break;
                 default:
-                    FILE* error = fopen("[!]ERRORS.txt", "ab");
-					assert(error);
-
-                    fprintf(error, "\tData of error : %s (dd/mm/yy)\n\n", define_date());
-                    fprintf(error, "Unknown command..\n");
-                    fprintf(error, "bytecode[%d] = %d", i, command);
-                    fclose(error);
+					byte_struct->error_state += ERROR_UNKNOWN_COM;
+					byte_struct->unknown_command = command;
 
 					break;
             }
         }
     }
 
+
+	determine_status(byte_struct, Stack);
     free(OP);
 }
 
@@ -335,6 +263,9 @@ auto bytecode_destruct(Bytecode* byte_struct) -> void
 
     free(byte_struct->data);
     byte_struct->data = nullptr;
+
+    //free(byte_struct->unknown_command);
+    //byte_struct->unknown_command = nullptr;
 
     byte_struct->bytecode_capacity = 0;
 }
@@ -429,9 +360,9 @@ auto print_for_user(stack_t* Stack) -> void
             }
         }
     }
-    else fprintf(result, "×èñåë â ñòåêå íåò.\n"
+    else
+		fprintf(result, "Stack size is below than 1\n"
                          "Currently size of Stack is %d", Stack->cur_size);
-
 
     fclose(result);
 }
@@ -475,7 +406,7 @@ auto fill_screen(char* OP) -> void
 
     for (int y = 0; y < SIZEY; y++)
         for (int x = 0; x < SIZEX; x++)
-    txSetPixel(x, y, RGB(OP[0], OP[1], OP[2]));
+    		txSetPixel(x, y, RGB(OP[0], OP[1], OP[2]));
 
 	return;
 }
@@ -485,37 +416,32 @@ auto draw_screen(char* OP) -> void
 	system("cls");
     txCreateWindow(SIZEX, SIZEY);
     txSetDefaults();
-    //txMessageBox();
+
     for (int y = 0; y < SIZEY; y++)
-    {
         for (int x = 0; x < SIZEX; x++)
-        {
             txSetPixel(x, y, RGB(OP[3 * (SIZEX * y + x)], OP[3 * (SIZEX * y + x) + 1], OP[3 * (SIZEX * y + x) + 2]));
-        }
-    }
 
 	return;
 }
 
-auto draw_circ(char* OP, stack_t* Stack) -> void
+auto draw_circ(char* OP, stack_t* Stack, Bytecode* byte_struct) -> void
 {
 	system("cls");
 
-    if(Stack->cur_size < 3)
-    {
-        printf("not enough numbers to circ. Size = %d\n", Stack->cur_size);
-        EXIT_CONDITION = TRUE;
-        return;
-    }
+    using namespace my_commands;
+	stack_size_check(3, not enough numbers to circ\n)
+	else
+	{
+		int Radius   = static_cast<int>(pop_stack(Stack));
+    	int y_center = static_cast<int>(pop_stack(Stack));
+    	int x_center = static_cast<int>(pop_stack(Stack));
 
-    int Radius   = static_cast<int>(pop_stack(Stack));
-    int y_center = static_cast<int>(pop_stack(Stack));
-    int x_center = static_cast<int>(pop_stack(Stack));
+		for (int y = 0; y < SIZEY; y++)
+        	for (int x = 0; x < SIZEX; x++)
+            	if (( pow((x - x_center), 2) + pow((y - y_center), 2) ) < pow(Radius, 2))
+                	txSetPixel(x, y, RGB(OP[3], OP[4], OP[5]));
+	}
 
-	for (int y = 0; y < SIZEY; y++)
-        for (int x = 0; x < SIZEX; x++)
-            if (( pow((x - x_center), 2) + pow((y - y_center), 2) ) < pow(Radius, 2))
-                txSetPixel(x, y, RGB(OP[3], OP[4], OP[5]));
 	return;
 }
 
@@ -606,7 +532,7 @@ auto draw_mem() -> void
     txCreateWindow(SIZEX, SIZEY);
     txSetDefaults();
 
-    HDC mem = txLoadImage("C:/Users/Danik/Documents/C_PROGRAMS/Projects/ASSEM_CPU/bin/Debug/Mem.bmp");
+    HDC mem = txLoadImage("bin/Debug/Mem.bmp");
     txBitBlt(txDC(), 0, 0, SIZEX, SIZEY, mem, 0, 0);
 
     srand(time(nullptr));
@@ -735,15 +661,12 @@ auto draw_mem() -> void
 
 auto get_byte(int digit, int number_of_bit) -> bool
 {
-    bool bit = (bool((1 << (number_of_bit - 1))  &  digit));
-    //printf("[%d]\n", bit);
-	return bit;
+    return (bool((1 << (number_of_bit - 1))  &  digit));
 }
 
-inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecode* byte_struct, char* OP)
+auto cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecode* byte_struct, char* OP) -> ERROR_STATE
 {
     using namespace my_commands;
-    //printf("%d\n", __LINE__);
 
 	if (!get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
 	{
@@ -763,7 +686,7 @@ inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecod
 				push_stack(Stack, rix_struct->rdx);
 		}
 	}
-
+				//* Проверки на значение в rix, чтобы не было OP[-1]
 	else if (get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
 	{
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
@@ -797,7 +720,7 @@ inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecod
             }
 		}
 	}
-
+		//* Проверки на значение в rix, чтобы не было OP[-1]
 	else if (get_byte(command, BIT_C_OP) && !get_byte(command, BIT_D_OP))
 	{
 		if (get_byte(command, BIT_NUMBER)) 												// NUMBER
@@ -831,22 +754,19 @@ inline cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecod
             }
 		}
 	}
-	else EXIT_CONDITION = true;
-    //printf("%d\n", __LINE__);
+	else
+		return ERROR_CMD_PUSH;
 
+	return 0;
 }
 
-inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode *byte_struct, char *OP)
+auto cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode *byte_struct, char *OP) -> ERROR_STATE
 {
     using namespace my_commands;
 
-	if(Stack->cur_size < 1)
-    {
-        printf("not enough numbers to pop\n");
-        EXIT_CONDITION = 1;
-    }
+	stack_size_check(1, not enough numbers to pop\n)
 
-    if (!get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
+    else if (!get_byte(command, BIT_D_OP) && !get_byte(command, BIT_C_OP))
 	{
 		if (get_byte(command, BIT_NUMBER))
 			pop_stack(Stack);
@@ -879,9 +799,9 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 
 			if (get_byte(rix_number, BIT_RAX))
 			{
-                if(rix_struct->rax < 0)
-                    EXIT_CONDITION = true;
-                else
+                //if(rix_struct->rax < 0)
+                //    EXIT_CONDITION = true;
+                //else
                 {
                     double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rax));
                     *temp_pointer      = static_cast<double> (pop_stack(Stack));
@@ -889,9 +809,9 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
             }
 			else if (get_byte(rix_number, BIT_RBX))
 			{
-                if(rix_struct->rbx < 0)
-                    EXIT_CONDITION = true;
-                else
+                //if(rix_struct->rbx < 0)
+                //    EXIT_CONDITION = true;
+                //else
                 {
                     double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rbx));
                     *temp_pointer      = static_cast<double> (pop_stack(Stack));
@@ -899,9 +819,9 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
             }
 			else if (get_byte(rix_number, BIT_RCX))
 			{
-                if(rix_struct->rcx < 0)
-                    EXIT_CONDITION = true;
-                else
+                //if(rix_struct->rcx < 0)
+                //    EXIT_CONDITION = true;
+                //else
                 {
                     double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rcx));
                     *temp_pointer      = static_cast<double> (pop_stack(Stack));
@@ -909,9 +829,9 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
             }
 			else if (get_byte(rix_number, BIT_RDX))
 			{
-                if(rix_struct->rdx < 0)
-                    EXIT_CONDITION = true;
-                else
+                //if(rix_struct->rdx < 0)
+                //    EXIT_CONDITION = true;
+                //else
                 {
                     double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rdx));
                     *temp_pointer      = static_cast<double> (pop_stack(Stack));
@@ -934,8 +854,8 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 
             if(rix_struct->rdx < 0)
             {
-                printf("BAAAD rdx in pop = %lg\n", rix_struct->rdx);
-                EXIT_CONDITION = true;
+                //printf("BAAAD rdx in pop = %lg\n", rix_struct->rdx);
+                //EXIT_CONDITION = true;
             }
 
 			else if (get_byte(rix_number, BIT_RAX))
@@ -961,82 +881,145 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
             }
 		}
 	}
-	else EXIT_CONDITION = true;
+	else
+		return ERROR_CMD_POP;
+
+	return 0;
 }
 
-inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i)
+auto cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i) -> ERROR_STATE
 {
-        using namespace my_commands;
-        //printf("in compair_exe i = %d\n", *i);
+    using namespace my_commands;
+    //printf("in compair_exe i = %d\n", *i);
 
-		if((Stack->cur_size < 2) && !get_byte(command, BIT_JUMP))
-        {
-            printf("not enough numbers to do contidional jump or common jump\n");
-            EXIT_CONDITION = true;
-        }
-        else if (get_byte(command, BIT_JUMP))
-        {
-            //push_stack(Stack, x2);
-            //push_stack(Stack, x1);
-            //printf("�� i = [%d] jmp\n", i);
-            //printf("jump to i =");
-            (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-            //printf("%d\n", *i);
-            //printf("command = %d\n\n", command);
-        }
-		else
-		{
-            double x1 = pop_stack(Stack);
-            double x2 = pop_stack(Stack);
-            //printf("x1 = [%lg]\nx2 = [%lg]\n", x1, x2);
-            //printf("command = [%d]\n", command);
+	if((Stack->cur_size < 2) && !get_byte(command, BIT_JUMP))
+    {
+        //printf("not enough numbers to do contidional jump or common jump\n");
+        //EXIT_CONDITION = true;
+    }
+    else if (get_byte(command, BIT_JUMP))
+    {
+        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+    }
+	else
+	{
+        double x1 = pop_stack(Stack);
+        double x2 = pop_stack(Stack);
 
-            if (get_byte(command, BIT_EQUAL))
+        if (get_byte(command, BIT_EQUAL))
+        {
+            //printf("BIT EQUAL\n");
+            if (get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) 		// <=
             {
-                //printf("BIT EQUAL\n");
-                if (get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) 		// <=
-                {
-                    //printf("JBE\n");
-                    if (x2 <= x1)
-                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                    else (*i)++;
-                }
-                else if (!get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // >=
-                {
-                    if (x2 >= x1)
-                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                    else (*i)++;
-                }
-                else if (!get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) // ==
-                {
-                    if (is_equal(x2,  x1))
-                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                    else (*i)++;
-                }
-                else if  (get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // !=
-                {
-                    if (!is_equal(x2, x1))
-                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                    else (*i)++;
+                //printf("JBE\n");
+                if (x2 <= x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+            }
+            else if (!get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // >=
+            {
+                if (x2 >= x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+            }
+            else if (!get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) // ==
+            {
+                if (is_equal(x2,  x1))
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+            }
+            else if  (get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // !=
+            {
+                if (!is_equal(x2, x1))
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
 			}
-            }
-            else if (get_byte(command, BIT_ABOVE))
-            {
-                if (x2 > x1)
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-            }
-            else if (get_byte(command, BIT_BELOW))
-            {
-                if (x2 < x1)
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-            }
-            else
-            {
-                printf("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOORRRR\n");
-                EXIT_CONDITION = true;
-            }
         }
+        else if (get_byte(command, BIT_ABOVE))
+        {
+            if (x2 > x1)
+                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            else (*i)++;
+        }
+        else if (get_byte(command, BIT_BELOW))
+        {
+            if (x2 < x1)
+                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            else (*i)++;
+        }
+        else
+			return ERROR_COMPAIR;
+    }
+	return 0;
+}
+
+auto determine_status(Bytecode* byte_struct, stack_t* Stack) -> void
+{
+	using namespace my_commands;
+
+	FILE* error = fopen("[!]DUMP_CPU.txt", "w");
+	assert(error);
+
+    fprintf(error, "\tData of DUMP in CPU : %s (dd/mm/yy)\n\n", define_date());
+
+	if(!byte_struct->error_state)
+		print_good(error);
+	else
+		for(int i = 0; i < NUMBER_OF_ERRORS; i++)
+			if(get_byte(byte_struct->error_state, i + 1))
+				print_error(error, i + 1);
+
+    if(Stack->cur_size == 0)
+        fprintf(error, "Stack is empty\n");
+	else
+	{
+        fprintf(error, "Numbers in Stack:\n");
+        for(int i = 0; i < Stack->cur_size; i++)
+            fprintf(error, "%d.[%lg]\n", i + 1, Stack->data[i]);
+    }
+    fclose(error);
+	return;
+}
+
+auto print_good(FILE* error) -> void
+{
+	assert(error);
+
+	fprintf(error, "CPU ended without any errors\n");
+
+	return;
+}
+
+auto print_error(FILE* error, int error_bit) -> void
+{
+    using namespace my_commands;
+	switch (error_bit)
+    {
+        case ID_ID:
+            fprintf(error, "Unknown CPU ID. Unfortunately, this processor can only process the code of a certain assembler\n");
+            break;
+        case ID_STACK_SIZE:
+            fprintf(error, "At some point in the program, you tried to take more from the stack than it can\n");
+            fprintf(error, "For example: Stack size is 1, but u tried to do \"add\" or \"mul\", etc. \n");
+            break;
+        case ID_UNKNOWN_COM:
+            fprintf(error, "The processor did not recognize one of the commands\n");
+            break;
+        case ID_CMD_PUSH:
+            fprintf(error, "Something went wrong in processing command \"push\"\n");
+            break;
+        case ID_CMD_POP:
+            fprintf(error, "Something went wrong in processing command \"pop\"\n");
+            break;
+        case ID_COMPAIR:
+            fprintf(error, "Something went wrong in any type of compair. For example jbe, jab, jump, etc.\n");
+            break;
+        case ID_STK_CALL_SIZE:
+            fprintf(error, "No number in stack_call to return\n");
+            break;
+        default:
+            fprintf(error, "Error in ERRORS. IT means that program has unknown error\n");
+            break;
+	}
 }
 

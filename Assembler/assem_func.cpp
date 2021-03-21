@@ -153,7 +153,7 @@ auto code_construct(Text* text_struct, Code* code_struct) -> void
             while (isspace(code_struct->data[i]))
                 i++;
         }
-   
+
     print_code_buffer(code_struct);
     return;
 }
@@ -181,52 +181,25 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
 {
     assert(code_struct);
     assert(byte_struct);
+    using namespace my_commands;
+
 
     Label* labels = (Label*) calloc(MAX_LABELS + 1, sizeof(Label));
     assert(labels);
 
-    for (int y = 0; y < MAX_LABELS; y++)
-    {
-        labels[y].name = (char*) calloc(MAX_LABEL_SIZE, sizeof(char));
-        assert(labels[y].name);
-    }
-
-    char* temp = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
-	assert(temp);
-
-	int cur_labels = 0;
-	code_struct->cur_size = 0;
-
-    for (int i = 0; i < code_struct->terms; i++)
-    {
-        int iter = 0;
-        get_lexeme(&iter, code_struct, temp);
-
-		if (temp[strlen(temp) - 1] == ':')
-        {
-            strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);
-
-            labels[cur_labels].length = strlen(temp);
-
-            labels[cur_labels++].adress = i;
-        }
-
-        code_struct->cur_size += iter + 1;
-    }
-
-    int amount_labels = cur_labels;
-    cur_labels = 0;
+	int amount_labels = get_labels(labels, code_struct);
 
     byte_struct->data = (double*) calloc(code_struct->terms, sizeof(double));
     assert(byte_struct->data);
 
-    double* numbers_flag = (double*) calloc(code_struct->terms, sizeof(double));
-    assert(numbers_flag);
+    double* specifiers = (double*) calloc(code_struct->terms, sizeof(double));
+    assert(specifiers);
 
     int flags_size     	  = 0;
     code_struct->cur_size = 0;
 
-    using namespace my_commands;
+    char* temp = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
+	assert(temp);
 
     for (int i = 0; i < code_struct->terms; i++)
     {
@@ -243,167 +216,61 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             byte_struct->data[i] = CMD_PUSH;
             IS_LAST_COMMAND_PUSH = 1;
         }
-        else if (!strcmp(temp, "add"))
-            byte_struct->data[i] = CMD_ADD;
-
-        else if (!strcmp(temp, "mul"))
-            byte_struct->data[i] = CMD_MUL;
-
-        else if (!strcmp(temp, "div"))
-            byte_struct->data[i] = CMD_DIV;
-
-        else if (!strcmp(temp, "sub"))
-            byte_struct->data[i] = CMD_SUB;
-
-        else if (!strcmp(temp, "sin"))
-            byte_struct->data[i] = CMD_SIN;
-
-        else if (!strcmp(temp, "cos"))
-            byte_struct->data[i] = CMD_COS;
-
-        else if (!strcmp(temp, "pow"))
-            byte_struct->data[i] = CMD_POW;
-
-        else if (!strcmp(temp, "sqr"))
-            byte_struct->data[i] = CMD_SQRT;
-
-        else if (!strcmp(temp, "in"))
-            byte_struct->data[i] = CMD_IN;
-
-        else if (!strcmp(temp, "out"))
-            byte_struct->data[i] = CMD_OUT;
-
-        else if (!strcmp(temp, "del"))
-            byte_struct->data[i] = CMD_DEL;
-
-        else if (!strcmp(temp, "abs"))
-            byte_struct->data[i] = CMD_ABS;
-
-        else if (!strcmp(temp, "circ"))
-            byte_struct->data[i] = CMD_CIRC;
-
-        else if (!strcmp(temp, "cat"))
-            byte_struct->data[i] = CMD_CAT;
-
-        else if (!strcmp(temp, "KOPM"))
-            byte_struct->data[i] = CMD_KOPM;
-
-        else if (!strcmp(temp, "ln"))
-            byte_struct->data[i] = CMD_LN;
-
-        else if (!strcmp(temp, "mem"))
-            byte_struct->data[i] = CMD_MEM;
-
-        else if (!strcmp(temp, "log10"))
-            byte_struct->data[i] = CMD_LOG10;
-
-        else if (!strcmp(temp, "log2"))
-            byte_struct->data[i] =  CMD_LOG2;
-
-        else if (!strcmp(temp, "rax"))
+		else if (IS_LAST_COMMAND_PUSH)
         {
-            byte_struct->data[i]       = CMD_RAX;
-            numbers_flag[flags_size++] = S_REGIST_SPEC;
-            IS_LAST_COMMAND_PUSH       = false;
+            byte_struct->data[i]     = (double) std::atof(temp);
+            specifiers[flags_size++] = S_NUMBER_SPEC;
+            IS_LAST_COMMAND_PUSH     = false;
         }
-
-        else if (!strcmp(temp, "rbx"))
-        {
-            byte_struct->data[i]       = CMD_RBX;
-            numbers_flag[flags_size++] = S_REGIST_SPEC;
-            IS_LAST_COMMAND_PUSH       = false;
-        }
-
-        else if (!strcmp(temp, "rcx"))
-        {
-            byte_struct->data[i]       = CMD_RCX;
-            numbers_flag[flags_size++] = S_REGIST_SPEC;
-            IS_LAST_COMMAND_PUSH       = false;
-        }
-
-        else if (!strcmp(temp, "rdx"))
-        {
-            byte_struct->data[i]       = CMD_RDX;
-            numbers_flag[flags_size++] = S_REGIST_SPEC;
-            IS_LAST_COMMAND_PUSH       = false;
-        }
-
-        else if (!strcmp(temp, "pop"))
+		else if (!strcmp(temp, "pop"))
         {
             byte_struct->data[i]     = CMD_POP;
-            numbers_flag[flags_size] = S_NUMBER_SPEC;
+            specifiers[flags_size]   = S_NUMBER_SPEC;
         }
 
-        else if (!strcmp(temp, "je"))
-        {
-            byte_struct->data[i] = CMD_JE;
-            IS_LAST_COMMAND_JMP  = true;
-        }
+        cmd_check(add  , CMD_ADD)
+		cmd_check(mul  , CMD_MUL)
+		cmd_check(div  , CMD_DIV)
+		cmd_check(sub  , CMD_SUB)
+		cmd_check(sin  , CMD_SIN)
+		cmd_check(cos  , CMD_COS)
+		cmd_check(pow  , CMD_POW)
+		cmd_check(sqrt , CMD_SQRT)
+		cmd_check(in   , CMD_IN)
+		cmd_check(out  , CMD_OUT)
+		cmd_check(del  , CMD_DEL)
+		cmd_check(abs  , CMD_ABS)
+		cmd_check(circ , CMD_CIRC)
+		cmd_check(cat  , CMD_CAT)
+		cmd_check(KOPM , CMD_KOPM)
+		cmd_check(ln   , CMD_LN)
+		cmd_check(mem  , CMD_MEM)
+		cmd_check(log10, CMD_LOG10)
+		cmd_check(log2 , CMD_LOG2)
+		cmd_check(draw , CMD_DRAW)
+		cmd_check(fill , CMD_FILL)
+		cmd_check(ret  , CMD_RET)
+		cmd_check(hlt  , CMD_HLT)
 
-        else if (!strcmp(temp, "jab"))
-        {
-            byte_struct->data[i] = CMD_JAB;
-            IS_LAST_COMMAND_JMP  = true;
-        }
+        rix_check(rax, CMD_RAX)
+		rix_check(rbx, CMD_RBX)
+		rix_check(rcx, CMD_RCX)
+		rix_check(rdx, CMD_RDX)
 
-        else if (!strcmp(temp, "jae"))
-        {
-            byte_struct->data[i] = CMD_JAE;
-            IS_LAST_COMMAND_JMP  = true;
-        }
+        transition_check(je  , CMD_JE)
+		transition_check(jab , CMD_JAB)
+		transition_check(jae , CMD_JAE)
+		transition_check(jbe , CMD_JBE)
+        transition_check(ja  , CMD_JA)
+		transition_check(jb  , CMD_JB)
+		transition_check(call, CMD_CALL)
+		transition_check(jmp , CMD_JMP)
 
-        else if (!strcmp(temp, "jbe"))
-        {
-            byte_struct->data[i] = CMD_JBE;
-            IS_LAST_COMMAND_JMP  = true;
-        }
+		bracket_check('[')
+		bracket_check('(')
 
-        else if (!strcmp(temp, "ja"))
-        {
-            byte_struct->data[i] = CMD_JA;
-            IS_LAST_COMMAND_JMP  = true;
-        }
-
-        else if (!strcmp(temp, "jb"))
-        {
-            byte_struct->data[i] = CMD_JB;
-            IS_LAST_COMMAND_JMP  = true;
-        }
-
-        else if (!strcmp(temp, "hlt"))
-            byte_struct->data[i] = CMD_HLT;
-
-        else if(temp[0] == '[')
-            bracket_exe('[', temp, byte_struct, flags_size, numbers_flag, i);
-
-        else if (temp[0] == '(')
-            bracket_exe('(', temp, byte_struct, flags_size, numbers_flag, i);
-
-        else if (IS_LAST_COMMAND_PUSH)
-        {
-            byte_struct->data[i]       = (double) std::atof(temp);
-            numbers_flag[flags_size++] = S_NUMBER_SPEC;
-            IS_LAST_COMMAND_PUSH       = false;
-        }
-
-        else if (temp[strlen(temp) - 1] == ':')
+		else if (temp[strlen(temp) - 1] == ':')
             byte_struct->data[i] = CMD_LABEL;
-
-        else if (!strcmp(temp, "ret"))
-            byte_struct->data[i] = CMD_RET;
-
-        else if (!strcmp(temp, "call"))
-        {
-            byte_struct->data[i] = CMD_CALL;
-            IS_LAST_COMMAND_JMP  = true;
-        }
-
-        else if (!strcmp(temp, "jmp"))
-        {
-            byte_struct->data[i] = CMD_JMP;
-            IS_LAST_COMMAND_JMP  = true;
-        }
-
         else if (IS_LAST_COMMAND_JMP)
         {
             temp++;
@@ -418,53 +285,42 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
             temp--;
             IS_LAST_COMMAND_JMP = false;
         }
-
-        else if (!strcmp(temp, "draw"))
-            byte_struct->data[i] = CMD_DRAW;
-
-        else if (!strcmp(temp, "fill"))
-            byte_struct->data[i] = CMD_FILL;
-
         else
-        {
-            FILE* error = fopen("[!]ERRORS.txt", "ab");
-			assert(error);
-
-            fprintf(error, "\n\tData of error : %s (dd/mm/yy)\n\n", define_date());
-            fprintf(error, "Assembler doesn't know this command..\n");
-            fprintf(error, "bytecode[%d] = [%s]\n", i, temp);
-
-            fclose(error);
-
-            NEW_COMMAND_ERROR = 1;
+		{
+			error_process(i, temp);
             free(temp);
-
+			temp = nullptr;
             break;
-        }
+		}
 
         byte_struct->bytecode_capacity++;
     }
 
     if(NEW_COMMAND_ERROR)
-        return;
+	{
+		free(specifiers);
+		free(labels);
+    	free(temp);
+		return;
+	}
+
 
     FILE* assembler_txt = fopen("[!]assembler_code.txt", "w");
     assert(assembler_txt);
 
-    flags_size = 0;
+	print_assem_id(assembler_txt)
 
+    flags_size = 0;
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
-    {
         if ((static_cast<int>(byte_struct->data[i]) == CMD_POP) || (static_cast<int>(byte_struct->data[i]) == CMD_PUSH))
         {
-            fprintf(assembler_txt, "%lg ", byte_struct->data[i++] + numbers_flag[flags_size++]);
+            fprintf(assembler_txt, "%lg ", byte_struct->data[i++] + specifiers[flags_size++]);
             fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
         }
         else
             fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
-    }
 
-    free(numbers_flag);
+    free(specifiers);
 
     for (int y = 0; y < amount_labels; y++)
         if (labels[y].name)
@@ -538,7 +394,7 @@ auto size_of_file(FILE* user_code) -> long
 
 inline get_lexeme(int *j, Code *code_struct, char *temp)
 {
-	for (*j = 0; (*j) < MAX_SIZE_COMMAND; (*j)++)
+	for ((*j) = 0; (*j) < MAX_SIZE_COMMAND; (*j)++)
     {
         if((code_struct->data[*j + code_struct->cur_size] != ' '))
             temp[*j] = code_struct->data[*j + code_struct->cur_size];
@@ -550,7 +406,7 @@ inline get_lexeme(int *j, Code *code_struct, char *temp)
     }
 }
 
-inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size, double *numbers_flag, int i)
+inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size, double *specifiers, int i)
 {
 	using namespace my_commands;
 
@@ -562,7 +418,7 @@ inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size
 	if(isdigit(*(temp + 1)))
     {
         byte_struct->data[i] 	      = std::atoi(temp + 1);
-        numbers_flag[(*flags_size)++] = SPEC_NUMBER;
+        specifiers[(*flags_size)++] = SPEC_NUMBER;
         IS_LAST_COMMAND_PUSH          = false;
     }
     else if(strlen(temp) == 5)
@@ -571,25 +427,25 @@ inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size
         if (!strncmp(new_temp, "rax", 3))
         {
             byte_struct->data[i]          = CMD_RAX;
-            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            specifiers[(*flags_size)++] = SPEC_REGIST;
             IS_LAST_COMMAND_PUSH          = false;
         }
         else if (!strncmp(new_temp, "rbx", 3))
         {
             byte_struct->data[i]          = CMD_RBX;
-            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            specifiers[(*flags_size)++] = SPEC_REGIST;
             IS_LAST_COMMAND_PUSH          = false;
         }
         else if (!strncmp(new_temp, "rcx", 3))
         {
             byte_struct->data[i]          = CMD_RCX;
-            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            specifiers[(*flags_size)++] = SPEC_REGIST;
             IS_LAST_COMMAND_PUSH          = false;
         }
         else if (!strncmp(new_temp, "rdx", 3))
         {
             byte_struct->data[i]          = CMD_RDX;
-            numbers_flag[(*flags_size)++] = SPEC_REGIST;
+            specifiers[(*flags_size)++] = SPEC_REGIST;
             IS_LAST_COMMAND_PUSH          = false;
         }
     }
@@ -617,4 +473,54 @@ inline define_specs(int* SPEC_NUMBER, int* SPEC_REGIST, char spec)
 		printf("Something went wrong in ()\n");
 		NEW_COMMAND_ERROR = true;
 	}
+}
+
+auto get_labels(Label* labels, Code *code_struct) -> number_of_labels
+{
+	for (int y = 0; y < MAX_LABELS; y++)
+    {
+        labels[y].name = (char*) calloc(MAX_LABEL_SIZE, sizeof(char));
+        assert(labels[y].name);
+    }
+
+    char* temp = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
+	assert(temp);
+
+	int cur_labels = 0;
+	code_struct->cur_size = 0;
+
+    for (int i = 0; i < code_struct->terms; i++)
+    {
+        int iter = 0;
+        get_lexeme(&iter, code_struct, temp);
+
+		if (temp[strlen(temp) - 1] == ':')
+        {
+            strncpy(labels[cur_labels].name, temp, strlen(temp) - 1);
+
+            labels[cur_labels].length = strlen(temp);
+
+            labels[cur_labels++].adress = i;
+        }
+
+        code_struct->cur_size += iter + 1;
+    }
+
+    code_struct->cur_size = 0;
+    free(temp);
+
+    return cur_labels; //int amount_labels = cur_labels;
+}
+
+inline error_process(int i, char* temp)
+{
+	FILE* error = fopen("[!]ERRORS.txt", "w");
+	assert(error);
+
+    fprintf(error, "\n\tData of error : %s (dd/mm/yy)\n\n", define_date());
+    fprintf(error, "Assembler doesn't know some command..\n");
+    fprintf(error, "bytecode[%d] = [%s]\n", i, temp);
+    fclose(error);
+
+    NEW_COMMAND_ERROR = 1;
 }

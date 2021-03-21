@@ -10,10 +10,14 @@ constexpr int SIZEX         = 300;
 constexpr int SIZEY         = 300;
 constexpr int OP_SIZE       = 3 * SIZEX * SIZEY;
 
+
+
 struct Bytecode
 {
-    double* data              = nullptr;
-    int     bytecode_capacity = 0;
+    double* data                = nullptr;
+    int     unknown_command     = -666;
+    int     bytecode_capacity   = 0;
+	int 	error_state 	    = 0;
 };
 
 struct Rix

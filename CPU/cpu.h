@@ -11,15 +11,23 @@
 
 #include "Commands.h"
 
+typedef int ERROR_STATE;
+
 auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void;
 
 auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void;
+
+auto determine_status(Bytecode* byte_struct, stack_t* Stack) -> void;
 
 auto bytecode_destruct(Bytecode* byte_struct) -> void;
 
 auto print_for_user(stack_t* Stack) -> void;
 
 auto ignore_spaces(char** buffer) -> void;
+
+auto print_good(FILE* error) -> void;
+
+auto print_error(FILE* error, int error_bit) -> void;
 
 auto get_number(char** buffer) -> double;
 
@@ -33,7 +41,7 @@ auto fill_screen(char* OP) -> void;
 
 auto draw_kopm() -> void;
 
-auto draw_circ(char* OP, stack_t* Stack) -> void;
+auto draw_circ(char* OP, stack_t* Stack, Bytecode* byte_struct) -> void;
 
 auto draw_screen(char* OP) -> void;
 
@@ -43,9 +51,10 @@ auto draw_cat() -> void;
 
 auto get_byte(int digit, int number_of_bit) -> bool;
 
-inline cmd_push_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char *OP);
+auto cmd_push_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char *OP) -> ERROR_STATE;
 
-inline cmd_pop_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char *OP);
+auto cmd_pop_exe(int command, int i, stack_t* Stack, Rix *rix_struct, Bytecode* byte_struct, char *OP) -> ERROR_STATE;
 
-inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i);
+auto cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *i) -> ERROR_STATE;
+
 #endif // CPU_H_INCLUDED
