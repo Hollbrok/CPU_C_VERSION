@@ -63,9 +63,6 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
     struct Rix rix_struct = {};
 
-    //int skip_first  = -1;
-    //int skip_second = -1;
-
     using namespace my_commands;
 
     char* OP = (char*) calloc(OP_SIZE, sizeof(char));
@@ -74,15 +71,18 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
     for (int i = 0; i < byte_struct->bytecode_capacity; i++)
     {
-        //printf("%d\n", __LINE__);
+
 
         if(EXIT_CONDITION == 1)
+        {
+            //printf("EXIT_CONDITION = 1\n");
+            //system("pause");
             break;
-
-        //if((skip_first == i) || (skip_second == i))
-        //    continue;
+        }
 
 		int command = static_cast<int>(byte_struct->data[i]);
+
+		//printf("i = [%d]\ncommand = %d\n", i, command);
         //printf("i = [%d]\n", i);
         //printf("Stack size if [%d]\n", Stack->cur_size);
 
@@ -165,6 +165,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     double x2 = pop_stack(Stack);
 
                     push_stack(Stack, x2 - x1);
+                    //printf("rdx  = rdx - %lg = %lg\n", x1, x2 - x1);
 
                     break;
                 }
@@ -292,6 +293,8 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     push_stack(Stack, abs(pop_stack(Stack)));
                     break;
                 case CMD_DRAW:
+                    printf("DRAW\n");
+                    //txSleep (5000);
 					draw_screen(OP);
                     break;
                 case CMD_FILL:
@@ -479,10 +482,10 @@ auto fill_screen(char* OP) -> void
 
 auto draw_screen(char* OP) -> void
 {
-	system("clear");
+	system("cls");
     txCreateWindow(SIZEX, SIZEY);
     txSetDefaults();
-
+    //txMessageBox();
     for (int y = 0; y < SIZEY; y++)
     {
         for (int x = 0; x < SIZEX; x++)
@@ -876,23 +879,43 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 
 			if (get_byte(rix_number, BIT_RAX))
 			{
-            	double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rax));
-            	*temp_pointer        = static_cast<double> (pop_stack(Stack));
+                if(rix_struct->rax < 0)
+                    EXIT_CONDITION = true;
+                else
+                {
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rax));
+                    *temp_pointer      = static_cast<double> (pop_stack(Stack));
+                }
             }
 			else if (get_byte(rix_number, BIT_RBX))
 			{
-            	double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rbx));
-            	*temp_pointer      = static_cast<double> (pop_stack(Stack));
+                if(rix_struct->rbx < 0)
+                    EXIT_CONDITION = true;
+                else
+                {
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rbx));
+                    *temp_pointer      = static_cast<double> (pop_stack(Stack));
+                }
             }
 			else if (get_byte(rix_number, BIT_RCX))
 			{
-            	double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rcx));
-            	*temp_pointer      = static_cast<double> (pop_stack(Stack));
+                if(rix_struct->rcx < 0)
+                    EXIT_CONDITION = true;
+                else
+                {
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rcx));
+                    *temp_pointer      = static_cast<double> (pop_stack(Stack));
+                }
             }
 			else if (get_byte(rix_number, BIT_RDX))
 			{
-            	double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rdx));
-            	*temp_pointer      = static_cast<double> (pop_stack(Stack));
+                if(rix_struct->rdx < 0)
+                    EXIT_CONDITION = true;
+                else
+                {
+                    double* temp_pointer = (double*) (OP + static_cast<int>(rix_struct->rdx));
+                    *temp_pointer      = static_cast<double> (pop_stack(Stack));
+                }
             }
 		}
 	}
@@ -909,7 +932,13 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
 		{
 			int rix_number = static_cast<int>(byte_struct->data[i + 1]);
 
-			if (get_byte(rix_number, BIT_RAX))
+            if(rix_struct->rdx < 0)
+            {
+                printf("BAAAD rdx in pop = %lg\n", rix_struct->rdx);
+                EXIT_CONDITION = true;
+            }
+
+			else if (get_byte(rix_number, BIT_RAX))
 			{
             	char* temp_pointer = static_cast<char*> (OP + static_cast<int>(rix_struct->rax));
             	*temp_pointer      = static_cast<char> (pop_stack(Stack));
@@ -926,6 +955,7 @@ inline cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode
             }
 			else if (get_byte(rix_number, BIT_RDX))
 			{
+                //printf("POP rdx = %lg\n", rix_struct->rdx);
             	char* temp_pointer = static_cast<char*> (OP + static_cast<int>(rix_struct->rdx));
             	*temp_pointer      = static_cast<char> (pop_stack(Stack));
             }
@@ -939,59 +969,74 @@ inline cmd_compair_exe(int command, stack_t* Stack, Bytecode* byte_struct, int *
         using namespace my_commands;
         //printf("in compair_exe i = %d\n", *i);
 
-		if(Stack->cur_size < 2)
+		if((Stack->cur_size < 2) && !get_byte(command, BIT_JUMP))
         {
             printf("not enough numbers to do contidional jump or common jump\n");
             EXIT_CONDITION = true;
         }
-
-		double x1 = pop_stack(Stack);
-        double x2 = pop_stack(Stack);
-
-		if (get_byte(command, BIT_EQUAL))
-		{
-			if (get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) 		// <=
-			{
-				if (x2 <= x1)
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-			}
-			else if (!get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // >=
-			{
-				if (x2 >= x1)
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-			}
-			else if (!get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) // ==
-			{
-				if (is_equal(x2,  x1))
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-			}
-			else if  (get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // !=
-			{
-				if (!is_equal(x2, x1))
-                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-                else (*i)++;
-			}
-		}
-		else if (get_byte(command, BIT_ABOVE))
-		{
-			if (x2 > x1)
-                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-            else (*i)++;
-		}
-		else if (get_byte(command, BIT_BELOW))
-		{
-			if (x2 < x1)
-                (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
-            else (*i)++;
-		}
+        else if (get_byte(command, BIT_JUMP))
+        {
+            //push_stack(Stack, x2);
+            //push_stack(Stack, x1);
+            //printf("На i = [%d] jmp\n", i);
+            //printf("jump to i =");
+            (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            //printf("%d\n", *i);
+            //printf("command = %d\n\n", command);
+        }
 		else
 		{
-            push_stack(Stack, x2);
-            push_stack(Stack, x1);
-			(*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+            double x1 = pop_stack(Stack);
+            double x2 = pop_stack(Stack);
+            //printf("x1 = [%lg]\nx2 = [%lg]\n", x1, x2);
+            //printf("command = [%d]\n", command);
+
+            if (get_byte(command, BIT_EQUAL))
+            {
+                //printf("BIT EQUAL\n");
+                if (get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) 		// <=
+                {
+                    //printf("JBE\n");
+                    if (x2 <= x1)
+                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                    else (*i)++;
+                }
+                else if (!get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // >=
+                {
+                    if (x2 >= x1)
+                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                    else (*i)++;
+                }
+                else if (!get_byte(command, BIT_BELOW) && !get_byte(command, BIT_ABOVE)) // ==
+                {
+                    if (is_equal(x2,  x1))
+                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                    else (*i)++;
+                }
+                else if  (get_byte(command, BIT_BELOW) && get_byte(command, BIT_ABOVE)) // !=
+                {
+                    if (!is_equal(x2, x1))
+                        (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                    else (*i)++;
+			}
+            }
+            else if (get_byte(command, BIT_ABOVE))
+            {
+                if (x2 > x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+            }
+            else if (get_byte(command, BIT_BELOW))
+            {
+                if (x2 < x1)
+                    (*i) = static_cast<int>(byte_struct->data[(*i) + 1]);
+                else (*i)++;
+            }
+            else
+            {
+                printf("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOORRRR\n");
+                EXIT_CONDITION = true;
+            }
         }
 }
 

@@ -1,0 +1,11 @@
+*.[cbp.save]
+*.[h.save]
+*.[cbp]
+*.[cpp.save]
+*.bmarks
+*.depend
+*.html
+*.layout
+*.[layout.save]
+*.log
+*.dmp
