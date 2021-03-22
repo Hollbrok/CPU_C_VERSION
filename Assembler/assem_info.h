@@ -30,9 +30,9 @@ struct Code
 struct Bytecode
 {
     double* data              = nullptr;
-    int     bytecode_capacity = 0;
-	int 	error_state		  = 0;
 	char*   unknown_command   = nullptr;
+	int 	error_state		  = 0;
+    int     bytecode_capacity = 0;
 };
 
 struct Label
