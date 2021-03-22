@@ -69,8 +69,17 @@ inline get_lexeme(int *j, Code *code_struct, char *temp);
 
 inline bracket_exe(char spec, char* temp, Bytecode *byte_struct, int *flags_size, double *specifiers, int i);
 
-inline define_specs(int* SPEC_NUMBER, int* SPEC_REGIST, char spec);
+auto define_specs(int* SPEC_NUMBER, int* SPEC_REGIST, char spec) -> int;
 
-inline error_process(int i, char* temp);
+auto error_process(int i, char* temp) -> int;
+
+auto print_error(FILE *error, int error_bit, Bytecode *byte_struct) -> void;
+
+auto print_good(FILE* error) -> void;
+
+auto determine_status(Bytecode* byte_struct) -> void;
+
+auto get_byte(int digit, int number_of_bit) -> bool;
+
 
 #endif // ASSEM_H_INCLUDED

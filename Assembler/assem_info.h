@@ -31,6 +31,8 @@ struct Bytecode
 {
     double* data              = nullptr;
     int     bytecode_capacity = 0;
+	int 	error_state		  = 0;
+	char*   unknown_command   = nullptr;
 };
 
 struct Label

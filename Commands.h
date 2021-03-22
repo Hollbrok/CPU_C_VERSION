@@ -42,7 +42,10 @@ namespace my_commands
 		ERROR_CMD_POP		= 16,
 		ERROR_COMPAIR		= 32,
 		ERROR_STK_CALL_SIZE = 64,
-		NUMBER_OF_ERRORS	= 7,
+		ERROR_FIND_LABEL	= 128,
+		ERROR_PROC_BRACKET	= 256,
+		ERROR_UNK_BRACKET	= 512,
+		NUMBER_OF_ERRORS	= 10,
 	};
 
 	enum Errors_bytes
@@ -54,6 +57,9 @@ namespace my_commands
 		ID_CMD_POP			= 5,
 		ID_COMPAIR			= 6,
 		ID_STK_CALL_SIZE    = 7,
+		ID_FIND_LABEL		= 8,
+		ID_PROC_BRACKET 	= 9,
+		ID_UNK_BRACKET		= 10,
 	};
 
 	enum Bit_positions
