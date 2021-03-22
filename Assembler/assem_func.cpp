@@ -275,13 +275,19 @@ auto get_bytecode(Code* code_struct, Bytecode* byte_struct) -> void
         {
             temp++;
 
+			bool FIND_LABEL = false;
             for (int index = 0; index < amount_labels; index++)
                 if (!strcmp(temp, labels[index].name))
                 {
                     byte_struct->data[i] = labels[index].adress;
+					FIND_LABEL = true;
                     break;
                 }
-
+			if(!FIND_LABEL)
+			{
+				NEW_COMMAND_ERROR = true;
+				break;
+			}
             temp--;
             IS_LAST_COMMAND_JMP = false;
         }
