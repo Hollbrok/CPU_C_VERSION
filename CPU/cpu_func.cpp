@@ -28,10 +28,13 @@ auto get_bytecode(FILE* text, Bytecode* byte_struct) -> void
 
     //byte_struct->unknown_command = (char*) calloc(MAX_SIZE_COMMAND, sizeof(char));
     //assert(byte_struct->unknown_command);
-
+    char* temp_pointer = buffer_char;
     int ass_cur_size = 0;
-    while (*buffer_char)
-        byte_struct->data[ass_cur_size++] = get_number(&buffer_char);
+    while (*temp_pointer)
+        byte_struct->data[ass_cur_size++] = get_number(&temp_pointer);
+
+    free(buffer_char);
+    buffer_char = nullptr;
     byte_struct->bytecode_capacity = ass_cur_size;
     return;
 }
@@ -44,6 +47,7 @@ auto get_number(char** buffer) -> double
     while (isdigit(**buffer) || (**buffer == '.') || (**buffer == '-'))
         (*buffer)++;
 
+    ignore_spaces(buffer);
     return number;
 }
 
@@ -101,7 +105,10 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                 case CMD_MUL:
 					stack_size_check(2, not enough numbers to mul\n)
                     else
+                    {
+                        printf("in mul\n");
                         push_stack(Stack, pop_stack(Stack) * pop_stack(Stack));
+                    }
                     break;
                 case CMD_DIV:
                 {
@@ -110,6 +117,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
                     {
                         double x1 = pop_stack(Stack);
                         double x2 = pop_stack(Stack);
+                        printf("x1 = [%lg], x2 = [%lg]\n", x1, x2);
                         push_stack(Stack, x2 / x1);
                     }
                     break;
@@ -255,6 +263,7 @@ auto CPU(Bytecode* byte_struct, stack_t* Stack, stack_t* Stack_call) -> void
 
 	determine_status(byte_struct, Stack);
     free(OP);
+    OP = nullptr;
 }
 
 auto bytecode_destruct(Bytecode* byte_struct) -> void
@@ -677,7 +686,10 @@ auto cmd_push_exe(int command, int i, stack_t* Stack, Rix* rix_struct, Bytecode*
 			int rix_number = static_cast<int>(byte_struct->data[i + 1]);
 
 			if (get_byte(rix_number, BIT_RAX))
+			{
+                //printf("ѕушу в стек rax = [%lg]\n", rix_struct->rax);
 				push_stack(Stack, rix_struct->rax);
+			}
 			else if (get_byte(rix_number, BIT_RBX))
 				push_stack(Stack, rix_struct->rbx);
 			else if (get_byte(rix_number, BIT_RCX))
@@ -775,7 +787,11 @@ auto cmd_pop_exe(int command, int i, stack_t *Stack, Rix *rix_struct, Bytecode *
 			int rix_number = static_cast<int>(byte_struct->data[i + 1]);
 
 			if (get_byte(rix_number, BIT_RAX))
+			{
+                //printf("rax before = [%lg]\n", rix_struct->rax);
 				rix_struct->rax = pop_stack(Stack);
+				//printf("rax after = [%lg]\n", rix_struct->rax);
+			}
 			else if (get_byte(rix_number, BIT_RBX))
 				rix_struct->rbx = pop_stack(Stack);
 			else if (get_byte(rix_number, BIT_RCX))

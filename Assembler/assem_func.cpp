@@ -67,6 +67,7 @@ auto text_construct(Text *text_struct, FILE *user_code) -> void
 	text_struct->length_file = file_length;
 
 	free(lines);
+	lines = nullptr;
 
 	FILE *info = fopen("[!]info.txt", "w");
 	assert(info);
@@ -199,9 +200,12 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 
 	for (int i = 0; i < code_struct->terms; i++)
 	{
+        //printf("i = %d\n", i);
 		if (byte_struct->error_state)
+		{
+            printf("error state\n");
 			break;
-
+        }
 		int j = 0;
 		get_lexeme(&j, code_struct, temp);
 
@@ -212,16 +216,10 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 			byte_struct->data[i] = CMD_PUSH;
 			IS_LAST_COMMAND_PUSH = 1;
 		}
-		else if (IS_LAST_COMMAND_PUSH)
-		{
-			byte_struct->data[i] = (double)std::atof(temp);
-			specifiers[flags_size++] = S_NUMBER_SPEC;
-			IS_LAST_COMMAND_PUSH = false;
-		}
 		else if (!strcmp(temp, "pop"))
 		{
 			byte_struct->data[i] = CMD_POP;
-			specifiers[flags_size] = S_NUMBER_SPEC;
+			//specifiers[flags_size] = S_NUMBER_SPEC;
 		}
 
 		cmd_check(add, CMD_ADD)
@@ -252,6 +250,12 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 		rix_check(rbx, CMD_RBX)
 		rix_check(rcx, CMD_RCX)
 		rix_check(rdx, CMD_RDX)
+		else if (IS_LAST_COMMAND_PUSH)
+		{
+			byte_struct->data[i] = (double)std::atof(temp);
+			specifiers[flags_size++] = S_NUMBER_SPEC;
+			IS_LAST_COMMAND_PUSH = false;
+		}
 
 		transition_check(je, CMD_JE)
 		transition_check(jab, CMD_JAB)
@@ -305,8 +309,14 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 	if (byte_struct->error_state)
 	{
 		free(specifiers);
+        specifiers = nullptr;
+
 		free(labels);
-		free(temp);
+        labels = nullptr;
+
+        free(temp);
+        temp = nullptr;
+
 		determine_status(byte_struct);
 		return;
 	}
@@ -315,10 +325,11 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 
 	FILE *assembler_txt = fopen("[!]assembler_code.txt", "w");
 	assert(assembler_txt);
-
+    //printf("here\n");
 	print_assem_id(assembler_txt)
 
-		flags_size = 0;
+    flags_size = 0;
+   // printf("capacity is %d\n", byte_struct->bytecode_capacity);
 	for (int i = 0; i < byte_struct->bytecode_capacity; i++)
 		if ((static_cast<int>(byte_struct->data[i]) == CMD_POP) || (static_cast<int>(byte_struct->data[i]) == CMD_PUSH))
 		{
@@ -329,13 +340,18 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 			fprintf(assembler_txt, "%lg ", byte_struct->data[i]);
 
 	free(specifiers);
+    specifiers = nullptr;
 
 	for (int y = 0; y < amount_labels; y++)
 		if (labels[y].name)
 			free(labels[y].name);
 
 	free(labels);
+	labels = nullptr;
+
 	free(temp);
+	temp = nullptr;
+
 	fclose(assembler_txt);
 
 	return;
@@ -382,7 +398,7 @@ auto set_time(struct tm *time) -> char *
 	return tmp;
 }
 
-auto define_date(void) -> char *
+auto define_date(void) -> char*
 {
 	const time_t timer = time(nullptr);
 	struct tm *local_time = localtime(&timer);
