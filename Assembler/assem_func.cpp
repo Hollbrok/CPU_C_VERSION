@@ -200,7 +200,6 @@ auto get_bytecode(Code *code_struct, Bytecode *byte_struct) -> void
 
 	for (int i = 0; i < code_struct->terms; i++)
 	{
-        //printf("i = %d\n", i);
 		if (byte_struct->error_state)
 		{
             printf("error state\n");

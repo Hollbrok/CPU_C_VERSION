@@ -541,7 +541,8 @@ auto draw_mem() -> void
     txCreateWindow(SIZEX, SIZEY);
     txSetDefaults();
 
-    HDC mem = txLoadImage("bin/Debug/Mem.bmp");
+    HDC mem = txLoadImage("Mem.bmp");
+    assert(mem);
     txBitBlt(txDC(), 0, 0, SIZEX, SIZEY, mem, 0, 0);
 
     srand(time(nullptr));

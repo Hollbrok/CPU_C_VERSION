@@ -11,9 +11,9 @@
 #include <limits.h>
 #include <typeinfo>
 #include <ctype.h>
+#include <conio.h>
 #include "stack_config.h"
 
-#define DOUBLE_T
 
 #ifdef DOUBLE_T
     typedef double type_data;
@@ -85,19 +85,19 @@
     const int high_sec  = 1;
 #endif
 
-#define ASSERT_OK                                       \
-    if (stack_verify(Stack))                            \
-    {                                                   \
-        stack_dump(Stack);                              \
-        return;                                         \
+#define ASSERT_OK                                    \
+    if (stack_verify(Stack))                         \
+    {                                                \
+        stack_dump(Stack);                           \
+        return;                                      \
     }
 
-#define START_ACTIONS(a)                                \
+#define START_ACTIONS(a)                             \
     stack_t a = {};
 
-#define Construct(a,b)                                  \
-        name = #a;                                      \
-        name++;                                         \
+#define Construct(a,b)                               \
+        name = #a;                                   \
+        name++;                                      \
         stack_construct(a, b, name);
 
 #define ASSERT_POP_OK                                   \
@@ -119,7 +119,7 @@
 
 struct stack_t
 {
-    int canary_left_stack = 0;
+    int canary_left_stack;
 
     type_data* data       = nullptr;
     char* name            = nullptr;
@@ -240,4 +240,3 @@ char* error_print();
 char* define_lvl();
 
 #endif
-

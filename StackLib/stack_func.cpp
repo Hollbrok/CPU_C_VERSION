@@ -1,15 +1,15 @@
+#define DOUBLE_T
 #define HIGH_SECURE
 #include "stack.h"
 
-
-
-int ERROR_STATE         = 0;
-int DOUBLE_CONSTRUCT    = 0;
-char addres[]           = "bin/Debug/[!]log_stack.txt";
+int ERROR_STATE                  = 0;
+int DOUBLE_CONSTRUCT             = 0;
+char* addres                     = "log_stack.txt";
 
 
 void stack_construct(stack_t* Stack, int max_c, char* name)
 {
+    assert(Stack && "You passed nullptr to stack_consturct");
 
     if(max_c < 0 || max_c >= 100000)
     {
@@ -17,7 +17,7 @@ void stack_construct(stack_t* Stack, int max_c, char* name)
         char mass[67] = "******************************************************************";
 
 
-        FILE* res = fopen("[!]log_stack.txt", "ab");
+        FILE* res = fopen("log_stack.txt", "ab");
 
         fprintf(res, "%*s\n", 66, mass);
         fprintf(res, "ERROR IN MAX_C NUMBER\n");
@@ -25,7 +25,7 @@ void stack_construct(stack_t* Stack, int max_c, char* name)
 
         fclose(res);
 
-        return;
+          return;
     }
 
     if(Stack == nullptr || DOUBLE_CONSTRUCT)
@@ -85,8 +85,9 @@ void stack_construct(stack_t* Stack, int max_c, char* name)
 
         Stack->data++;
     }
-
+    //printf("Иду в assert_ok\n");
     ASSERT_OK
+    //printf("После assert_ok\n");
 }
 
 void stack_destruct(stack_t* Stack)
@@ -107,16 +108,36 @@ void stack_destruct(stack_t* Stack)
 
 void push_stack(stack_t* Stack, type_data push_num)
 {
-    //assert(push_num);
+    assert((push_num != NAN) && "You passed incorrect number to push_stack");
+    assert(Stack && "You passed nullptr to push_stack");
     ASSERT_OK
-
-    #ifdef DEBUG
-        printf("\npush_num in push_stack = %lf\n\n", push_num);
-    #endif
 
     FILE* res = fopen("log_stack.txt", "ab");
 
-    if(Stack->cur_size == Stack->capacity)
+    if(FORMAT != "s" && FORMAT != "c")
+    {
+        //CHECK_CAP
+    }
+
+    if((FORMAT == "s") || (FORMAT == "c"))
+    {
+        if(Stack->cur_size == Stack->capacity)
+        {
+            add_memory(Stack);
+            fclose(res);
+            Stack->data[Stack->cur_size++] = push_num;
+            hash_stack(Stack);
+        }
+
+        else
+        {
+            fclose(res);
+            Stack->data[Stack->cur_size++] = push_num;
+            hash_stack(Stack);
+        }
+    }
+
+    else if(Stack->cur_size == Stack->capacity)
     {
         add_memory(Stack);
         fclose(res);
@@ -126,7 +147,6 @@ void push_stack(stack_t* Stack, type_data push_num)
 
     else
     {
-
         fclose(res);
         Stack->data[Stack->cur_size++] = push_num;
         hash_stack(Stack);
@@ -141,7 +161,7 @@ type_data pop_stack(stack_t* Stack)
 
     ASSERT_POP_OK
 
-    if(Stack->cur_size <= Stack->capacity / REAL_MULTIPLIER + 1)
+    if(Stack->cur_size <= (Stack->capacity / REAL_MULTIPLIER + 1))
     {
         add_memory(Stack);
         Stack->cur_size--;
@@ -170,7 +190,8 @@ type_data pop_stack(stack_t* Stack)
 
 void stack_dump(stack_t* Stack)
 {
-    if(ERROR_STATE == 14)
+    //printf("ERROR_STATE = %d\n", ERROR_STATE);
+    if(ERROR_STATE == NULL_STACK_PTR)
     {
         return;
     }
@@ -179,20 +200,12 @@ void stack_dump(stack_t* Stack)
 
     char mass[67] = "******************************************************************";
 
-    FILE* res = fopen("[!]log_stack.txt", "ab");
+    FILE* res = fopen("log_stack.txt", "ab");
+    assert(res && "can't open file log_stack.txt");
     fprintf(res, "\n%*s\n", 66, mass);
-
+    //printf("here\n");
     if(ERROR_STATE)
-    {
-        fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, Stack->hash_stack, sec_lvl);
-        char* addres_n = "notepad ";
-        char* addres_f = (char*) calloc(100, sizeof(char));
-        addres_f = strcat(addres_f, addres_n);
-        addres_f = strcat(addres_f, addres);
-        system(addres_f);
-        free(addres_f);
-    }
-
+        fprintf(res, "Stack (ERROR #%d : %s) [%p]. \nSecurity lvl is %s\n", ERROR_STATE, error_print(), Stack, sec_lvl);
     else
     {
         fprintf(res, "Stack(OK) [%p]. \"%s\"\n", Stack, Stack->name);
@@ -244,11 +257,15 @@ void stack_dump(stack_t* Stack)
 
     fprintf(res, "%*s\n\n", 66, mass);
     fclose(res);
+    //printf("return\n");
+    return;
 }
 
 int stack_verify(stack_t* Stack)
 {
-    if(ERROR_STATE == 14)
+    assert(Stack && "You passed nullptr to stack_verify");
+    int hash_st = Stack->hash_stack;
+    if(ERROR_STATE == MAX_CAPACITY_ERROR)
     {
         return MAX_CAPACITY_ERROR;
     }
@@ -259,7 +276,7 @@ int stack_verify(stack_t* Stack)
         return NULL_STACK_PTR;
     }
 
-    else if((Stack->hash_stack != hash_stack(Stack)) && ((!low_sec) && (!med_sec)))
+    else if((hash_st != hash_stack(Stack)) && ((!low_sec) && (!med_sec)))
     {
         ERROR_STATE = HACK_STACK;
         return HACK_STACK;
@@ -286,7 +303,7 @@ int stack_verify(stack_t* Stack)
 
     else if((isdigit(Stack->capacity)) && (!low_sec))
         {
-            if(!std::isnan(Stack->capacity))
+            if(!isnan(Stack->capacity))
             {
                 ERROR_STATE = CLASSIFY_CAPACITY;
                 return CLASSIFY_CAPACITY;
@@ -301,7 +318,7 @@ int stack_verify(stack_t* Stack)
 
     else if((isdigit(Stack->cur_size)) && (!low_sec))
         {
-            if(std::isnan(Stack->cur_size) && Stack->cur_size > 0)
+            if(isnan(Stack->cur_size) && Stack->cur_size > 0)
             {
                 ERROR_STATE = CLASSIFY_CUR;
                 return CLASSIFY_CUR;
@@ -334,12 +351,13 @@ int stack_verify(stack_t* Stack)
     else
     {
         //printf("1\n");
-        return 0;
+        return false;
     }
 }
 
 char* error_print()
 {
+    //printf("in error_printf\n");
     switch(ERROR_STATE)
     {
         case 1:
@@ -378,7 +396,6 @@ char* error_print()
 
 void add_memory(stack_t* Stack)
 {
-    assert(Stack);
     ASSERT_OK
 
     if(Stack->capacity == 0)
@@ -411,14 +428,7 @@ void add_memory(stack_t* Stack)
 
     }
 
-    else if(Stack->cur_size <= REAL_ADDER)
-    {
-        return;
-    }
-
-
-
-    else if(Stack->cur_size <= Stack->capacity / REAL_REDUCER + 1) //как только уменьшиться кол-во элементов в 4 раза(не включительно)
+    else if(Stack->cur_size <= (Stack->capacity / REAL_REDUCER + 1)) //как только уменьшиться кол-во элементов в 4 раза(не включительно)
     {
         Stack->capacity /= 2;
         Stack->data = (type_data*) realloc(Stack->data - 1, (Stack->capacity + 2) * sizeof(type_data));
@@ -427,6 +437,11 @@ void add_memory(stack_t* Stack)
         Stack->data[Stack->capacity] = (type_data) CANARY_RIGHT_DATA;
         hash_stack(Stack);
 
+    }
+
+    else if(Stack->cur_size <= REAL_ADDER)
+    {
+        return;
     }
 
     ASSERT_OK
@@ -440,6 +455,14 @@ int hash_stack(stack_t* Stack)
         return 0;
     }
 
+    /*int cur_size = 0;
+    for(int i = 0; i < Stack->capacity; i++)
+        if(Stack->data[i] != POISON)
+        {
+            printf("Stack->data[%d] = %lg\n", i, Stack->data[i]);
+            cur_size++;
+        }
+    printf("cur_size = %d\n", cur_size);*/
     if(Stack->cur_size == 0)
     {
         Stack->hash_stack = 0;
@@ -447,30 +470,22 @@ int hash_stack(stack_t* Stack)
     }
 
     int Hash = 1;
-    int N    = Stack->cur_size;
+    int N    = Stack->capacity;
     double A = (sqrt(5) - 1) / 2;
 
 
     double trash = 0;
 
-    for(int i = 0; i < N; i++)
+    for(int i = 0; i < Stack->cur_size; i++)
     {
-        if(i > 0)
-        {
-            Hash += (int) (N * ((double)(A * ((int) (Stack->data[i]) | (int) (Stack->data[i - 1]))) - (int) (A * ((int) (Stack->data[i]) | (int) (Stack->data[i - 1]))))) + (int) (Stack->data[i]) ^ (int) (Stack->data[i - 1]) - (int) (Stack->data[i]) & (int) (Stack->data[i - 1]);
-            Hash += Stack->capacity;
-            Hash += (int) *(Stack->data) >> i;
-            Hash += (int) *(Stack->name) >> i % 2;
-        }
-
-        else
-        {
-            Hash += (int) ( N *  modf(A * (int) Stack->data[i], &trash) );
-            Hash += Stack->capacity;
-            Hash += (int) *(Stack->data) >> 2;
-            Hash += (int) *(Stack->name) >> Stack->cur_size % 3;
-        }
+        Hash += (int) (N * ((double)(A * ((int) (Stack->data[i]) | (int) (Stack->data[i - 1]))) - (int) (A * ((int) (Stack->data[i]) | (int) (Stack->data[i - 1]))))) + (int) (Stack->data[i]) ^ (int) (Stack->data[i - 1]) - (int) (Stack->data[i]) & (int) (Stack->data[i - 1]);
+        Hash += Stack->capacity;
+        //Hash += ((int)(Stack->data));
+        Hash += *(Stack->name + strlen(Stack->name) % 2);//>> i % 2;
     }
+
+    Hash += abs((Stack->canary_left_stack >> 2));
+    Hash += abs((Stack->capacity * Stack->canary_right_stack) >> 2);
 
     Stack->hash_stack = Hash;
     return Hash;
@@ -484,6 +499,6 @@ char* define_lvl()
         return "MEDIUM";
     else if(high_sec)
         return "HIGH";
-    return "ERROR, CHACK YOUR CODE";
+    return "ERROR, CHECK YOUR CODE";
 
 }

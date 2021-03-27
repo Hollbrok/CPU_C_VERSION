@@ -83,9 +83,9 @@ namespace my_commands
 
     enum Commands
     {
-        CMD_HLT         = 0,	// 0000 0000
-        CMD_PUSH        = 8,	// 0000 1000
-		CMD_POP         = 128,	// 1000 0000
+        CMD_HLT         = 0,	// 0 0000 0000
+        CMD_PUSH        = 8,	// 0 0000 1000
+		CMD_POP         = 128,	// 0 1000 0000
 
         CMD_ADD         = 256,	// 1 0000 0000
         CMD_MUL         = 257,
@@ -102,7 +102,7 @@ namespace my_commands
 
         CMD_LN          = 275,
         CMD_LOG10       = 276,
-        CMD_LABEL   	= 277,	// not yet used command
+        CMD_LABEL   	= 277,	// 1 0001 0101
         CMD_LOG2        = 278,	// 1 0001 0110
 
 		CMD_RAX         = 289,	// 1 0010 0001

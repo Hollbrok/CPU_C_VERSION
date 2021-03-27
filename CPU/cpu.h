@@ -7,6 +7,7 @@
 
 /*#define DEBUG*/       // if you need to find a bug or fix something
 #define DOUBLE_T        // that's the type of data
+#define HIGH_SECURE
 #include <stack.h>
 
 #include "Commands.h"
