@@ -1,4 +1,0 @@
-push 30
-sin
-out
-hlt

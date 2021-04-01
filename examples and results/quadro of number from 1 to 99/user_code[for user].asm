@@ -1,6 +1,6 @@
 push 1
 pop rbx
-LAB6:
+L2:
 push rbx
 push 2
 pow
@@ -11,5 +11,5 @@ add
 pop rbx
 push rbx
 push 100
-jb :LAB6
+jb :L2
 hlt

@@ -1,13 +1,13 @@
 push 0
 pop rbx
-LAB6:
+L3:
 push 1
 push rbx
 add
 pop rbx
 push rbx
 push 12
-jb :LAB6
+jb :L3
 push rbx
 out
 hlt
