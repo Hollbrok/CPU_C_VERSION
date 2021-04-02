@@ -5,9 +5,9 @@
 #include <time.h>
 #include "assem_info.h"
 
-#define DOUBLE_T  // that's the type of data
+//#define DOUBLE_T  // that's the type of data
 /*#define DEBUG*/ // if you need to find a bug or fix something
-#include <stack.h>
+//#include "stack.h"
 
 #include "Commands.h"
 
@@ -79,5 +79,7 @@ auto print_good(FILE *error) -> void;
 auto determine_status(Bytecode *byte_struct) -> void;
 
 auto get_byte(int digit, int number_of_bit) -> bool;
+
+auto is_jmp(double x) -> bool;
 
 #endif // ASSEM_H_INCLUDED

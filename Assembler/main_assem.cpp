@@ -1,24 +1,35 @@
 #include "assem.h"
 
-int main()	//int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     printf("Assembling in progress..\n");
 
-    FILE* user_code = fopen("user_code[for user].txt", "rb");	// fopen(argv[1], "rb");
-    assert(user_code);
+    FILE* user_code = nullptr;
 
-    Text text_struct = {};                          // text struct
-    text_construct(&text_struct, user_code);        // text construct
+    if(argc == 1)
+    {
+        user_code = fopen("user_code[for_user].asm", "rb");	// fopen(argv[1], "rb");
+        assert(user_code && "can't open user_code");
+    }
+    else if(argc == 2)
+    {
+        user_code = fopen(argv[argc - 1], "rb");	// fopen(argv[1], "rb");
+        assert(user_code && "can't open argv[argc - 1]");
+    }
+    else
+    {
+        printf("Too much arguments.\nExit..");
+        for(int i = 0; i < argc; i++)
+            printf("[%d].%s\n", i + 1, argv[i]);
+        fclose(user_code);
+        return 2;
+    }
 
-    Code code_struct = {};                          // code struct (delete comments and etc.)
-    code_construct(&text_struct, &code_struct);     // code construct
+    Text text_c(user_code);
 
-    Bytecode byte_struct = {};                      // bytecode struct
-    get_bytecode(&code_struct, &byte_struct);       // bytecode construct
+    Code code_c(&text_c);
 
-    text_destruct(&text_struct);                    // deconstruct of text structure
-    code_destruct(&code_struct);                    // deconstruct of code structure
-    bytecode_destruct(&byte_struct);                // deconstruct of bytecode structure
+    Bytecode byte_c(&code_c);
 
     printf("DONE!!\n");
     fclose(user_code);
