@@ -168,7 +168,8 @@
 
 		ret
     ```
-<details>
+- [X] [Результат]<details><summary></summary>
+![Круг](https://github.com/Hollbrok/CPU_C_VERSION/blob/main/examples%20and%20results/Draw/CIRC.png)
 
 
 ### Основы нашего __ассемблерного языка__
