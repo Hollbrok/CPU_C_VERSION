@@ -20,8 +20,23 @@ Stack::Stack(const char *name, size_t capacity) :
     assert(res && "Can't open log_stack.txt");
     fclose(res);
 
-    data_ = (data_type*) calloc(capacity + 2, sizeof(data_type));
-	assert(data_ && "Can't calloc memory for data_\n");
+	try
+	{
+		data_ = new data_type [capacity_ + 2];
+	}
+	catch(const char &e)
+	{
+		printf("Allocation failed\n");
+		return;
+	}
+	catch(...)
+	{
+        printf("Caught unknown exception.");
+	}
+
+
+    //data_ = (data_type*) calloc(capacity + 2, sizeof(data_type));
+	//assert(data_ && "Can't calloc memory for data_\n");
 
     data_[0] = static_cast<data_type> ( CANARY_LEFT_DATA );
     data_[capacity + 1] = static_cast<data_type> ( CANARY_RIGHT_DATA );
@@ -43,7 +58,7 @@ Stack::~Stack()
     	data_[i] = POISON;
 
     data_type* pointer =(data_type*) ((char*)data_ - sizeof(data_type));
-    free(pointer);
+    delete[] pointer;
 
     data_ = nullptr;
 
@@ -88,28 +103,67 @@ void Stack::add_memory()
 	if(capacity_ == 0)
 	{
 		capacity_ = REAL_START_SIZE;
-		data_     = (data_type*) realloc(data_ - 1, (capacity_ + 2) * sizeof(data_type));
-		assert(data_ && "Can't realloc memory for data_");
 
-		for(int i = 0; i < capacity_ + 1; i++)
-            data_[i] = POISON;
+		data_type* temp_data = data_ - 1;
 
-		data_++;
-        data_[capacity_] = CANARY_RIGHT_DATA;
+		try
+		{
+			data_ = new data_type[capacity_ + 2];
+		}
+		catch(const char &e)
+		{
+			printf("Allocation failed\n");
+			return;
+		}
+		catch(...)
+        {
+            printf("Caught unknown exception.");
+        }
+
+		data_[0] = static_cast<data_type> ( CANARY_LEFT_DATA );
+    	data_[capacity_ + 1] = static_cast<data_type> ( CANARY_RIGHT_DATA );
+
+    	for(int i = 1; i < capacity_ + 1; i++)
+        	data_[i] = POISON;
+
+    	data_++;
+
+		delete[] temp_data;
 		hash_ = calc_hash();
+
 	}
 	else if (cur_size_ == capacity_)
 	{
 		capacity_ *= 2;
 
-        data_ = (data_type*) realloc(data_ - 1, (capacity_ + 2) * sizeof(data_type));
+		data_type* temp_data = data_ - 1;
 
-        for(int i = capacity_ / 2 + 1; i < capacity_ + 1; i++)
-            data_[i] = POISON;
+		try
+		{
+			data_ = new data_type [capacity_ + 2];
+		}
+		catch(const char &e)
+		{
+			printf("Allocation failed\n");
+			return;
+		}
+		catch(...)
+        {
+            printf("Caught unknown exception.");
+        }
 
-        data_++;
-        data_[capacity_] = CANARY_RIGHT_DATA;
+		data_[0] = static_cast<data_type> ( CANARY_LEFT_DATA );
+    	data_[capacity_ + 1] = static_cast<data_type> ( CANARY_RIGHT_DATA );
+
+		for(int i = 1; i < cur_size_ + 1; i++)
+			data_[i] = temp_data[i];
+		for(int i = cur_size_ + 1; i < capacity_ + 1; i++)
+			data_[i] = POISON;
+
+		data_++;
+
         hash_ = calc_hash();
+		delete[] temp_data;
 	}
 	else
 	{
@@ -145,7 +199,7 @@ data_type Stack::pop()
         hash_ = calc_hash();
         return temp;
     }
-
+    printf("Return POISON\n");
     return  POISON;
 }
 
@@ -157,12 +211,32 @@ void Stack::reduce_memory()
 	if(cur_size_ <= (capacity_ / REAL_REDUCER + 1))
 	{
         capacity_ /= 2;
-        data_ = (data_type*) realloc(data_ - 1, (capacity_ + 2) * sizeof(data_type));
+		data_type* temp_data = data_ - 1;
+
+		try
+		{
+			data_ = new data_type [capacity_ + 2];
+		}
+		catch(const char &e)
+		{
+			printf("Allocation failed\n");
+			return;
+		}
+		catch(...)
+        {
+            printf("Caught unknown exception.");
+        }
+
+		data_[0] = CANARY_LEFT_DATA;
+		data_[capacity_ + 1] = CANARY_RIGHT_DATA;
+
+		for(int i = 0; i < capacity_ + 1; i++)
+			data_[i] = temp_data[i];
 
         data_++;
-        data_[capacity_] = CANARY_RIGHT_DATA;
-        hash_ = calc_hash();
 
+        hash_ = calc_hash();
+		delete[] temp_data;
     }
 	else
 	{
