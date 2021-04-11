@@ -11,12 +11,18 @@
 
      * 5.1) Режим __Угадайка__ -- это классический режим игры в акинатора, при котором вы загадываете предмет, а __акинатор__ пытается угадать при помощи различных вопросов, с вариантами ответа __да__/__нет__.
         * 5.1.1) А вам нужно просто честно отвечать на его __вопросы__: 
+        
             <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_1.png" width = 400>
          * 5.1.2) Когда у __акинатора__ закончатся вопросы он выдаст свой вариант ответа. Если он угадал, то все круто, в противном случае он __попросит__ вас ввести __ваш предмет__ и некоторое его __свойство__. ВСЕ! После этого в его базе появится ваше слово и следующий раз он угадает его:
+         
             <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Ask_user.png" width = 400>   
+            
             <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Ask_user_question.png" width = 400>
+            
         * 5.1.3) В конце игры __котик__ поблагодарит тебя за игру )
+        
          <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_1_end.png" width = 400>
+         
     * 5.2) __ Дерево __ -- режим просмотра всей доступной акинатору __базы__:
         <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_2.png" width = 800>    
 
