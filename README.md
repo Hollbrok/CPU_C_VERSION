@@ -8,6 +8,7 @@
     <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Menu_of_akinator.png" width = 400>
 * 5) Нажав на соответственную кнопку __играть__ перед вами будут доступные режимы для игры:
     <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regimes.png" width = 400>
+
      * 5.1) Режим __Угадайка__ -- это классический режим игры в акинатора, при котором вы загадываете предмет, а __акинатор__ пытается угадать при помощи различных вопросов, с вариантами ответа __да__/__нет__.
         * 5.1.1) А вам нужно просто честно отвечать на его __вопросы__: 
             <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_1.png" width = 400>
