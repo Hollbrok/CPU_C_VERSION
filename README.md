@@ -20,8 +20,7 @@
             <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Ask_user_question.png" width = 400>
             
         * 5.1.3) В конце игры __котик__ поблагодарит тебя за игру )
-         <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_1_end.png" width = 400>
-         
-    * 5.2) __ Дерево __ -- режим просмотра всей доступной акинатору __базы__:
+        <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_1_end.png" width = 400>
+    * 5.2) __Дерево__ -- режим просмотра всей доступной акинатору __базы__:
         <img src="https://github.com/Hollbrok/Akinator/blob/master/example%20of%20dump/For%20README/Regime_2.png" width = 800>    
 
